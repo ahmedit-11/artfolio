@@ -1,0 +1,182 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 270 50% 99%;
+    --foreground: 270 10% 10%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 270 10% 10%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 270 10% 10%;
+
+    --primary: 270 70% 45%;
+    --primary-foreground: 270 10% 98%;
+
+    --secondary: 270 30% 96%;
+    --secondary-foreground: 270 10% 10%;
+
+    --muted: 270 20% 96%;
+    --muted-foreground: 270 10% 40%;
+
+    --accent: 270 50% 96%;
+    --accent-foreground: 270 10% 10%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 270 20% 92%;
+    --input: 270 20% 92%;
+    --ring: 270 70% 45%;
+
+    --radius: 0.75rem;
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    --background: 270 20% 10%;
+    --foreground: 270 10% 98%;
+
+    --card: 270 20% 12%;
+    --card-foreground: 270 10% 98%;
+
+    --popover: 270 20% 12%;
+    --popover-foreground: 270 10% 98%;
+
+    --primary: 270 70% 60%;
+    --primary-foreground: 270 10% 98%;
+
+    --secondary: 270 20% 16%;
+    --secondary-foreground: 270 10% 98%;
+
+    --muted: 270 20% 16%;
+    --muted-foreground: 270 10% 60%;
+
+    --accent: 270 20% 16%;
+    --accent-foreground: 270 10% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 270 10% 98%;
+
+    --border: 270 20% 18%;
+    --input: 270 20% 18%;
+    --ring: 270 70% 60%;
+
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans;
+    background-image:
+      radial-gradient(at 0% 0%, rgba(var(--primary) / 0.1) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, rgba(var(--primary) / 0.1) 0px, transparent 50%);
+  }
+
+  .glass-card {
+    @apply bg-white/80 dark:bg-white/10 backdrop-blur-md border border-white/30 dark:border-white/10 shadow-lg;
+  }
+
+  .purple-gradient {
+    @apply bg-gradient-to-br from-purple-600 to-indigo-900;
+  }
+
+  .hover-card {
+    @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:shadow-purple-200/40 dark:hover:shadow-purple-900/20;
+  }
+
+  .gradient-text {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-indigo-700 dark:from-purple-400 dark:to-indigo-500;
+  }
+
+  .gradient-border {
+    @apply border border-transparent bg-gradient-to-r from-purple-600 to-indigo-700 bg-clip-padding;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Remove focus outline after mouse clicks but keep for keyboard navigation */
+  .js-focus-visible :focus:not(.focus-visible) {
+    outline: none;
+  }
+
+  /* Remove persistent focus rings on buttons and links after click */
+  button:focus:not(:focus-visible),
+  a:focus:not(:focus-visible),
+  [role="button"]:focus:not(:focus-visible) {
+    outline: none;
+    box-shadow: none;
+  }
+
+  /* Animation utilities */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes scaleIn {
+    from {
+      transform: scale(0.95);
+      opacity: 0;
+    }
+
+    to {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  .animate-fade-in {
+    animation: fadeIn 0.6s ease-out forwards;
+  }
+
+  .animate-scale-in {
+    animation: scaleIn 0.5s ease-out forwards;
+  }
+
+  .animation-delay-150 {
+    animation-delay: 150ms;
+  }
+
+  .animation-delay-300 {
+    animation-delay: 300ms;
+  }
+
+  .animation-delay-450 {
+    animation-delay: 450ms;
+  }
+}
