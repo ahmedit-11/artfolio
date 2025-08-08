@@ -92,12 +92,15 @@
   body {
     @apply bg-background text-foreground font-sans;
     background-image:
-      radial-gradient(at 0% 0%, rgba(var(--primary) / 0.1) 0px, transparent 50%),
-      radial-gradient(at 100% 100%, rgba(var(--primary) / 0.1) 0px, transparent 50%);
+      radial-gradient(at 0% 0%, rgba(147, 51, 234, 0.08) 0px, transparent 40%),
+      radial-gradient(at 100% 0%, rgba(99, 102, 241, 0.06) 0px, transparent 40%),
+      radial-gradient(at 100% 100%, rgba(236, 72, 153, 0.05) 0px, transparent 40%),
+      radial-gradient(at 0% 100%, rgba(147, 51, 234, 0.04) 0px, transparent 40%);
+    background-attachment: fixed;
   }
 
   .glass-card {
-    @apply bg-white/80 dark:bg-white/10 backdrop-blur-md border border-white/30 dark:border-white/10 shadow-lg;
+    @apply bg-white/60 dark:bg-white/10 backdrop-blur-lg border border-white/40 dark:border-white/10 shadow-lg backdrop-saturate-150;
   }
 
   .purple-gradient {
@@ -133,6 +136,54 @@
   [role="button"]:focus:not(:focus-visible) {
     outline: none;
     box-shadow: none;
+  }
+
+  /* Custom Toast Styling */
+  .Toastify__toast {
+    background-color: hsl(var(--card));
+    color: hsl(var(--foreground));
+    border: 1px solid hsl(var(--border));
+    border-radius: var(--radius);
+    font-family: inherit;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .Toastify__toast--success {
+    background-color: hsl(var(--card));
+    color: hsl(var(--foreground));
+    border-left: 4px solid hsl(var(--primary));
+  }
+
+  .Toastify__toast--error {
+    background-color: hsl(var(--card));
+    color: hsl(var(--foreground));
+    border-left: 4px solid hsl(var(--destructive));
+  }
+
+  .Toastify__toast--info {
+    background-color: hsl(var(--card));
+    color: hsl(var(--foreground));
+    border-left: 4px solid hsl(var(--secondary));
+  }
+
+  .Toastify__toast--warning {
+    background-color: hsl(var(--card));
+    color: hsl(var(--foreground));
+    border-left: 4px solid hsl(35, 80%, 50%);
+  }
+
+  .Toastify__toast-body {
+    font-size: 0.875rem;
+    padding: 0.5rem;
+  }
+
+  .Toastify__close-button {
+    color: hsl(var(--foreground));
+    opacity: 0.7;
+  }
+
+  .Toastify__close-button:hover {
+    opacity: 1;
   }
 
   /* Animation utilities */
@@ -178,5 +229,62 @@
 
   .animation-delay-450 {
     animation-delay: 450ms;
+  }
+
+  /* Float up animation */
+  @keyframes float-up {
+    0% {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-float-up {
+    animation: float-up 1s ease-out forwards;
+  }
+
+  /* Glow animation */
+  @keyframes glow {
+    0%, 100% {
+      text-shadow: 0 0 5px rgba(147, 51, 234, 0.3);
+    }
+    50% {
+      text-shadow: 0 0 20px rgba(147, 51, 234, 0.6), 0 0 30px rgba(147, 51, 234, 0.4);
+    }
+  }
+
+  .animate-glow {
+    animation: glow 3s ease-in-out infinite;
+  }
+
+  /* Gradient shift animation */
+  @keyframes gradient-shift {
+    0% {
+      background-position: 0% 50%;
+    }
+    25% {
+      background-position: 100% 50%;
+    }
+    50% {
+      background-position: 100% 100%;
+    }
+    75% {
+      background-position: 0% 100%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+
+  .animate-gradient-shift {
+    animation: gradient-shift 4s ease-in-out infinite;
+  }
+
+  .bg-300 {
+    background-size: 300% 300%;
   }
 }

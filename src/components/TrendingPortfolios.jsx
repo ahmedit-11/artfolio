@@ -49,7 +49,7 @@ const portfolios = [
 
 const TrendingPortfolios = () => {
   return (
-    <section className="py-16 bg-secondary/50">
+    <section className="py-16 bg-gradient-to-br from-slate-200/50  to-purple-200/50 dark:bg-gradient-to-br dark:from-purple-900/15 dark:via-indigo-900/20 dark:to-background">
       <div className="container px-4 mx-auto">
         <div className="flex justify-between items-center mb-8">
           <h2 className="text-2xl md:text-3xl font-bold font-quicksand">

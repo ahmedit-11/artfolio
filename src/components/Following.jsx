@@ -60,7 +60,7 @@ const Following = ({
   ]
 }) => {
   return (
-    <section className={`py-16  bg-secondary\/50 from-white to-purple-50 dark:from-background dark:to-purple-900/10 ${className || ''}`}>
+    <section className={`py-16 bg-gradient-to-br from-slate-200/50  to-purple-200/50 dark:bg-gradient-to-br dark:from-purple-900/15 dark:via-indigo-900/20 dark:to-background ${className || ''}`}>
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center mb-8">
           <h2 className="text-2xl md:text-3xl font-bold font-quicksand text-foreground">

@@ -6,17 +6,28 @@ import { Link } from "react-router-dom";
 
 const Hero = () => {
   return (
-    <div className="relative overflow-hidden bg-gradient-to-b from-purple-50 to-white dark:from-purple-900/20 dark:to-background">
-      <div className="absolute inset-0 bg-purple-gradient opacity-5 dark:opacity-20"></div>
+    <div className="relative overflow-hidden bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-background">
+      {/* Animated background elements */}
+      <div className="absolute inset-0 bg-gradient-to-br from-purple-400/10 via-indigo-400/10 to-pink-400/10 dark:from-purple-900/20 dark:via-indigo-900/20 dark:to-pink-900/20"></div>
+      <div className="absolute top-0 left-0 w-full h-full">
+        <div className="absolute top-20 left-10 w-72 h-72 bg-purple-800/40 dark:bg-pink-500/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute top-40 right-20 w-96 h-96 bg-indigo-800/35 dark:bg-indigo-500/20 rounded-full blur-3xl animate-pulse animation-delay-300"></div>
+        <div className="absolute bottom-20 left-1/3 w-80 h-80 bg-pink-900/30 dark:bg-pink-300/20 rounded-full blur-3xl animate-pulse animation-delay-150"></div>
+      </div>
+
       <div className="container relative px-4 py-20 mx-auto text-center sm:py-24 md:py-28">
         <div className="animate-fade-in">
-          <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl mb-6 font-quicksand hover:scale-[1.01] transition-transform duration-300">
-            <span className="block">Showcase Your Creative Work</span>
-            <span className="block bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-indigo-800">
-              Connect with Other Creatives
-            </span>
+          <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl mb-6 font-quicksand">
+            <div className="animate-float-up animation-delay-200">
+              <span className="block animate-glow">Showcase Your Creative Work</span>
+            </div>
+            <div className="animate-float-up animation-delay-500">
+              <span className="block bg-clip-text text-transparent bg-gradient-to-r from-purple-500 via-purple-200 via-indigo-500 to-purple-500 animate-gradient-shift bg-300">
+                Connect with Other Creatives
+              </span>
+            </div>
           </h1>
-          <p className="max-w-2xl mx-auto mb-8 text-lg text-muted-foreground text-white hover:scale-[1.01] transition-transform duration-300">
+          <p className="max-w-2xl mx-auto mb-8 text-lg text-muted-foreground dark:text-white hover:scale-[1.01] transition-transform duration-300">
             A social portfolio platform for designers, artists, writers, developers and all creative professionals to 
             showcase their best work and discover amazing talent.
           </p>
@@ -80,8 +91,8 @@ const Hero = () => {
             </div>
           </div>
           
-          <div className="absolute -z-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[200%] h-[200%] opacity-20 dark:opacity-10">
-            <div className="absolute top-0 left-0 right-0 bottom-0 bg-[radial-gradient(circle,rgba(147,51,234,0.3)_0%,rgba(255,255,255,0)_70%)]"></div>
+          <div className="absolute -z-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[200%] h-[200%] opacity-30 dark:opacity-10">
+            <div className="absolute top-0 left-0 right-0 bottom-0 bg-[radial-gradient(ellipse_at_center,rgba(147,51,234,0.15)_0%,rgba(99,102,241,0.1)_35%,rgba(236,72,153,0.05)_70%,rgba(255,255,255,0)_100%)]"></div>
           </div>
         </div>
       </div>

@@ -67,7 +67,7 @@ const ForYou = ({ className }) => {
   }, []);
 
   return (
-    <section className={`py-16  dark:bg-background from-white to-purple-50 dark:from-background dark:to-purple-900/10 ${className || ''}`}>
+    <section className={`py-16 bg-gradient-to-br from-gray-50/80 to-purple-50/60 dark:bg-gradient-to-br dark:from-background dark:to-purple-900/15 ${className || ''}`}>
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center mb-8">
           <h2 className="text-2xl md:text-3xl font-bold font-quicksand text-foreground">

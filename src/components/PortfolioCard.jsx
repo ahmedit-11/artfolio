@@ -36,7 +36,7 @@ const PortfolioCard = ({
   return (
     <div
       className={cn(
-        "group relative overflow-hidden rounded-xl bg-card hover-card transition-all duration-300",
+        "group relative overflow-hidden rounded-xl bg-white/95 dark:bg-card border border-gray-300/50 dark:border-gray-800/100 hover-card transition-all duration-300 shadow-sm hover:shadow-md",
         className
       )}
       onClick={handleCardClick}

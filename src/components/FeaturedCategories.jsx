@@ -30,7 +30,7 @@ const categories = [
 
 const FeaturedCategories = () => {
   return (
-    <section className="py-16 bg-white dark:bg-background">
+    <section className="py-16 bg-gradient-to-br from-gray-50/80 to-purple-50/60 dark:bg-gradient-to-br dark:from-background dark:to-purple-900/15">
       <div className="container px-4 mx-auto">
         <div className="flex justify-between items-center mb-8">
           <h2 className="text-2xl md:text-3xl font-bold font-quicksand text-foreground">

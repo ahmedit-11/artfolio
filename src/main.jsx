@@ -8,6 +8,8 @@ import { createRoot } from 'react-dom/client';
 import App from './App.jsx';
 // Import global styles
 import './index.css';
+// Import react-toastify CSS
+import 'react-toastify/dist/ReactToastify.css';
 
 // Create the root element and render the App inside React.StrictMode for highlighting potential problems
 createRoot(document.getElementById("root")).render(
