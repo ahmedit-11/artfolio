@@ -1,4 +1,5 @@
 import React from "react";
+import { useScrollToTop } from "../utils/scrollToTop";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Card } from "@/components/ui/card";
@@ -27,6 +28,7 @@ const categories = [
 ];
 
 const ExplorePage = () => {
+  useScrollToTop();
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <Header />

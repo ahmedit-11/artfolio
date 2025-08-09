@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { useNavigate } from "react-router-dom";
 import { Twitter, Github, Linkedin, Instagram, Facebook, Globe, Link as LinkIcon } from "lucide-react";
-
+import { useScrollToTop } from "../utils/scrollToTop";
 const initialProfile = {
   bio: "Digital artist and UI designer passionate about creating immersive experiences.",
   avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=creative_artist",
@@ -40,6 +40,7 @@ function saveProfile(profile) {
 }
 
 const ProfileSettings = () => {
+  useScrollToTop();
   const navigate = useNavigate();
   const storedProfile = loadProfile();
   const [fullName, setFullName] = useState(storedProfile?.fullName || "Sarah Anderson");

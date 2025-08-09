@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useScrollToTop } from "../utils/scrollToTop";
 import { Link, useNavigate } from "react-router-dom";
 import Cookies from "js-cookie"
 
@@ -18,6 +19,7 @@ import axios from "axios";
 // import { title } from "process";
 
 const SignUp = () => {
+  useScrollToTop();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

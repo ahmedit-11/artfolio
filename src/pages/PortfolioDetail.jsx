@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useScrollToTop } from "../utils/scrollToTop";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card";
@@ -231,9 +232,7 @@ const PortfolioDetail = () => {
   const [isClosing, setIsClosing] = useState(false);
 
   // Jump to top instantly on mount
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
+  useScrollToTop();
 
   // navigate after fade-out
   useEffect(() => {

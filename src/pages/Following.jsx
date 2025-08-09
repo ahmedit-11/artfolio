@@ -1,4 +1,5 @@
 import React from "react";
+import { useScrollToTop } from "../utils/scrollToTop";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PortfolioCard from "@/components/PortfolioCard";
@@ -48,6 +49,7 @@ const portfolios = [
 ];
 
 const FollowingPage = () => {
+  useScrollToTop();
   const { query } = useSearch();
   const filtered = localSearch(portfolios, query);
   return (

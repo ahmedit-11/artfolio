@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useScrollToTop } from "../utils/scrollToTop";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -33,9 +34,7 @@ const commonTags = [
 
 const CreatePortfolio = () => {
   // Always scroll to top on mount
-  React.useEffect(() => {
-    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
-  }, []);
+  useScrollToTop();
   const navigate = useNavigate();
 
   // Core form state

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useScrollToTop } from "../utils/scrollToTop";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -51,6 +52,7 @@ const useStoredToggle = (key, defaultValue = false) => {
 };
 
 const Settings = () => {
+  useScrollToTop();
   const navigate = useNavigate();
 
   // Toggles with persistence

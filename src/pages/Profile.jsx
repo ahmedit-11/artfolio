@@ -1,4 +1,5 @@
 import React from "react";
+import { useScrollToTop } from "../utils/scrollToTop";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -61,6 +62,7 @@ function loadProfile() {
 }
 
 const Profile = () => {
+  useScrollToTop();
   const storedProfile = loadProfile();
   const userData = {
     username: "creative_artist",

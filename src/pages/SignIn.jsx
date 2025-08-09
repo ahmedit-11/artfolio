@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useScrollToTop } from "../utils/scrollToTop";
 import { Link, useNavigate } from "react-router-dom";
 import Cookies from "js-cookie"
 import { Button } from "@/components/ui/button";
@@ -14,6 +15,7 @@ import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/comp
 import axios from "axios";
 
 const SignIn = () => {
+  useScrollToTop();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);

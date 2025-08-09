@@ -2,7 +2,7 @@ import React from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PortfolioCard from "@/components/PortfolioCard";
-
+import { useScrollToTop } from "../utils/scrollToTop";
 const forYouItems = [
   {
     id: 1,
@@ -47,7 +47,7 @@ const forYouItems = [
 ];
 
 const ForYouPage = () => {
-
+  useScrollToTop();
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <Header />

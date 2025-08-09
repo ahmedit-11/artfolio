@@ -1,6 +1,7 @@
 // Search.jsx
 // Dedicated search page with history, popular searches, and filters.
 import React, { useState, useEffect } from "react";
+import { useScrollToTop } from "../utils/scrollToTop";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import SearchBar from "@/components/SearchBar";
@@ -16,6 +17,7 @@ const popularTerms = ["UI/UX", "3D", "Illustration", "Photography"];
 import portfolios from "@/data/portfolios";
 
 const SearchPage = () => {
+  useScrollToTop();
   const { query, setQuery } = useSearch();
   const [scope, setScope] = useState("all"); // all | following
   const [history, setHistory] = useState(() => JSON.parse(localStorage.getItem("searchHistory") || "[]"));

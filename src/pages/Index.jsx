@@ -1,4 +1,5 @@
 import React from "react";
+import { useScrollToTop } from "../utils/scrollToTop";
 import Hero from "@/components/Hero";
 import FeaturedCategories from "@/components/FeaturedCategories";
 import TrendingPortfolios from "@/components/TrendingPortfolios";
@@ -8,6 +9,7 @@ import CallToAction from "@/components/CallToAction";
 // import AuthForm from "@/pages/authForm/authForm"
 
 const Index = () => {
+  useScrollToTop();
   return (
     <>
       <Hero />

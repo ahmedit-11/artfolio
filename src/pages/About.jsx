@@ -1,8 +1,11 @@
 import React from "react";
+import { useScrollToTop } from "../utils/scrollToTop";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
-const About = () => (
+const About = () => {
+  useScrollToTop();
+  return (
   <div className="flex flex-col min-h-screen">
     <Header />
     <main className="flex-grow animate-fade-in">
@@ -19,14 +22,13 @@ const About = () => (
           <ul className="list-disc pl-6 text-muted-foreground font-quicksand">
             <li>Connect with fellow creatives from around the world</li>
             <li>Showcase your work in a beautiful, modern portfolio</li>
-            <li>Discover new trends, techniques, and inspiration</li>
-            <li>Grow your audience and career</li>
           </ul>
         </div>
       </div>
     </main>
     <Footer />
   </div>
-);
+  );
+};
 
 export default About; 

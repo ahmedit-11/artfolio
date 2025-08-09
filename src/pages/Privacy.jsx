@@ -1,8 +1,11 @@
 import React from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { useScrollToTop } from "../utils/scrollToTop";
 
-const Privacy = () => (
+const Privacy = () => {
+  useScrollToTop();
+  return (
   <div className="flex flex-col min-h-screen">
     <Header />
     <main className="flex-grow container mx-auto px-4 py-12 max-w-2xl animate-fade-in">
@@ -32,6 +35,6 @@ const Privacy = () => (
     </main>
     <Footer />
   </div>
-);
+);}
 
 export default Privacy; 

@@ -1,9 +1,11 @@
 import React, { useEffect } from "react";
+import { useScrollToTop } from "../utils/scrollToTop";
 import { useLocation, useNavigate } from "react-router-dom";
 import ThemeToggle from "@/components/ThemeToggle";
 import { Button } from "@/components/ui/button";
 
 const NotFound = () => {
+  useScrollToTop();
   const location = useLocation();
   const navigate = useNavigate();
 
