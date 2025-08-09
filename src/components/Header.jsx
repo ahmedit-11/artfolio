@@ -2,16 +2,14 @@
 // Defines the header/navigation bar for the application, including navigation links, user actions, and theme toggle.
 import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-
+import Cookies from "js-cookie"
 import { Button } from "@/components/ui/button";
 import { Heart, Search, User, Home, Image, Menu, X, Mail, LogIn, Compass, Users, TrendingUp, Settings, ArrowLeft } from "lucide-react";
-import NotificationDropdown from "./NotificationDropdown";
 import { cn } from "@/lib/utils";
 import ThemeToggle from "./ThemeToggle";
 import AvatarMenu from "./AvatarMenu";
 
 // This would come from your auth context
-const isAuthenticated = true; // Toggle this to test different states
 
 // Header component manages navigation and user actions
 const Header = () => {
@@ -36,10 +34,10 @@ const Header = () => {
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
-
+  const token = Cookies.get('token')
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className={cn("container flex h-16 items-center justify-between", isMenuOpen && "pointer-events-none md:pointer-events-auto")}>
+      <div className="container flex h-16 items-center justify-between">
         {/* Logo and Brand */}
         <div className="flex items-center space-x-4">
           {location.pathname !== "/" && (
@@ -53,7 +51,7 @@ const Header = () => {
               <ArrowLeft className="size-5" />
             </Button>
           )}
-          <Link to="/" className="flex items-center space-x-2 rounded">
+          <Link to="/" className="flex items-center space-x-2 focus:outline-none focus:ring-2 focus:ring-purple-500 rounded">
             <div className="size-8 rounded-full bg-purple-gradient flex items-center justify-center">
               <span className="text-white font-bold text-sm">⭐</span>
             </div>
@@ -116,27 +114,28 @@ const Header = () => {
             className="text-muted-foreground hover:text-foreground hover:bg-purple-100 dark:hover:bg-purple-900/20"
             onClick={() => navigate("/search")}
           >
-            <Search className="size-5 dark:text-white" />
+            <Search className="size-5 text-white" />
           </Button>
-          <NotificationDropdown />
           <ThemeToggle />
-          {isAuthenticated ? (
+          {token ? (
             <AvatarMenu />
           ) : (
             <Link to="/signin">
-              <Button variant="ghost" className="bg-purple-gradient hover:opacity-90 font-quicksand text-white">
-                <LogIn className="size-4 mr-2" />
-                Sign In
-              </Button>
+              {
+
+                <Button variant="ghost" className="bg-purple-gradient hover:opacity-90 font-quicksand text-white">
+                  <LogIn className="size-4 mr-2" />
+                  Sign In
+                </Button>
+              }
             </Link>
           )}
         </div>
 
         {/* Mobile Menu Button and User Actions */}
         <div className="flex items-center space-x-3 md:hidden ">
-          <NotificationDropdown />
           <ThemeToggle />
-          {isAuthenticated ? (
+          {token ? (
             <AvatarMenu />
           ) : (
             <Link to="/signin">
@@ -152,14 +151,6 @@ const Header = () => {
         </div>
       </div>
 
-      {/* Backdrop overlay */}
-      {isMenuOpen && (
-        <div
-          className="fixed inset-0 z-30 md:hidden"
-          onClick={toggleMenu}
-        />
-      )}
-
       {/* Mobile Navigation Menu */}
       <div
         className={cn(
@@ -167,7 +158,7 @@ const Header = () => {
           isMenuOpen ? "translate-x-0" : "translate-x-full"
         )}
       >
-        <nav className="container py-6 space-y-4 bg-border " >
+        <nav className="container py-6 space-y-4 bg-border ">
           <Link to="/" className={cn(
             "flex items-center space-x-2 p-3 rounded-lg text-muted-foreground hover:text-foreground hover:bg-purple-100 dark:hover:bg-purple-900/20 transition-colors",
             location.pathname === "/" && "text-primary bg-purple-100 dark:bg-purple-900/20"

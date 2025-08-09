@@ -8,9 +8,11 @@ import { createRoot } from 'react-dom/client';
 import App from './App.jsx';
 // Import global styles
 import './index.css';
+import axios from 'axios';
 // Import react-toastify CSS
 import 'react-toastify/dist/ReactToastify.css';
 
+axios.defaults.baseURL = "http://192.168.1.110:8000/api"
 // Create the root element and render the App inside React.StrictMode for highlighting potential problems
 createRoot(document.getElementById("root")).render(
   <React.StrictMode>

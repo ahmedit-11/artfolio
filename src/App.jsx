@@ -1,6 +1,6 @@
 // App.jsx
 // Main application component that sets up routing and theme preference for the app.
-import React, { useEffect } from "react";
+import React, { useEffect,Suspense } from "react";
 import { SearchProvider } from "@/contexts/SearchContext";
 
 // Import routing components from react-router-dom
@@ -28,6 +28,25 @@ import PortfolioDetail from "./pages/PortfolioDetail";
 import CreatePortfolio from "./pages/CreatePortfolio";
 import AdminPanel from "./components/admin/AdminPanel";
 import { ToastContainer } from "react-toastify";
+// const SignUp = lazy(() => import("./pages/SignUp"));
+// const SignIn = lazy(() => import("./pages/SignIn"));
+// const Settings = lazy(() => import("./pages/Settings"));
+// const Profile = lazy(() => import("./pages/Profile"));
+// const ProfileSettings = lazy(() => import("./pages/ProfileSettings"));
+// const Terms = lazy(() => import("./pages/Terms"));
+// const Privacy = lazy(() => import("./pages/Privacy"));
+// const FollowingPage = lazy(() => import("./pages/Following"));
+// const TrendingPage = lazy(() => import("./pages/Trending"));
+// const ExplorePage = lazy(() => import("./pages/Explore"));
+// const ForYouPage = lazy(() => import("./pages/ForYou"));
+// const Contact = lazy(() => import("./pages/Contact"));
+// const About = lazy(() => import("./pages/About"));
+// const Features = lazy(() => import("./pages/Features"));
+// const Cookies = lazy(() => import("./pages/Cookies"));
+// const PortfolioDetail = lazy(() => import("./pages/PortfolioDetail"));
+// const CreatePortfolio = lazy(() => import("./pages/CreatePortfolio"));
+// const AdminPanel = lazy(() => import("./components/admin/AdminPanel"));
+// const SearchPage = lazy(() => import("./pages/Search"));
 // import Explore from "./pages/Explore";
 
 const App = () => {
@@ -51,6 +70,11 @@ const App = () => {
   return (
     <SearchProvider>
       <BrowserRouter>
+      <Suspense fallback={
+          <div className="flex items-center justify-center min-h-screen">
+            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-purple-600"></div>
+          </div>
+        }>
         <Routes>
           <Route element={<Layout />}>
             <Route index element={<Index />} />
@@ -78,9 +102,10 @@ const App = () => {
   
           <Route path="*" element={<NotFound />} />
         </Routes>
+      </Suspense>
       </BrowserRouter>
   
-      {/* ✅ ToastContainer مستقل */}
+      {/* ToastContainer  */}
       <ToastContainer position="top-right" autoClose={3000} limit={3} />
     </SearchProvider>
   );

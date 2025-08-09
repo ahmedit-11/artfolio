@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import Cookies from "js-cookie"
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,6 +11,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useToast } from "@/components/ui/use-toast";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
+import axios from "axios";
 
 const SignIn = () => {
   const [email, setEmail] = useState("");
@@ -22,31 +24,41 @@ const SignIn = () => {
 
   const handleSignIn = async (e) => {
     e.preventDefault();
-    if (!acceptTerms) {
+    setIsLoading(true);
+    try {
+      await axios.get('http://192.168.1.110:8000/sanctum/csrf-cookie');
+      axios.defaults.withCredentials = true;
+      const response = await axios.post("/login", {
+        email,
+        password,
+      });
+      console.log(response.data?.data?.access_token)
+      Cookies.set("token", response.data?.data?.access_token)
+      navigate("/"); // Redirect to home page
+    } catch (error) {
+      let message = "An error occurred. Please try again.";
+      if (error.response && error.response.data && error.response.data.message) {
+        message = error.response.data.message;
+        alert(message)
+      }
       toast({
-        title: "Please accept the Terms and Privacy Policy",
-        description: "You must agree to the Terms of Service and Privacy Policy to continue.",
+        title: "Sign in failed",
+        description: message,
         variant: "destructive",
       });
-      return;
-    }
-    setIsLoading(true);
-    
-    // Simulate API call
-    setTimeout(() => {
+    } finally {
       setIsLoading(false);
-      toast({
-        title: "Sign in successful",
-        description: "Welcome back to Purplefolio!",
-      });
-      navigate("/"); // Redirect to home page
-    }, 1500);
+    }
   };
-  
+
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
-
+  useEffect(() => {
+    if (Cookies.get("token")) { 
+      navigate('/')
+    }
+  }, [])
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
@@ -60,7 +72,7 @@ const SignIn = () => {
               Sign in to continue your creative journey
             </p>
           </div>
-          
+
           <Card className="border-border shadow-lg animate-fade-in animation-delay-150">
             <CardHeader className="space-y-1">
               <CardTitle className="text-2xl font-quicksand">Sign In</CardTitle>
@@ -88,7 +100,7 @@ const SignIn = () => {
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
                     <Label htmlFor="password" className="font-quicksand">Password</Label>
-                    <Link 
+                    <Link
                       to="/forgot-password"
                       className="text-sm text-primary hover:underline font-quicksand transition-all"
                     >
@@ -119,14 +131,9 @@ const SignIn = () => {
                     </div>
                   </TooltipProvider>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox id="acceptTerms" checked={acceptTerms} onCheckedChange={setAcceptTerms} />
-                  <label htmlFor="acceptTerms" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 font-quicksand">
-                    I agree to the <Link to="/terms" className="text-primary hover:underline">Terms of Service</Link> and <Link to="/privacy" className="text-primary hover:underline">Privacy Policy</Link>
-                  </label>
-                </div>
-                <Button 
-                  type="submit" 
+                
+                <Button
+                  type="submit"
                   className="w-full bg-purple-gradient hover:opacity-90 transition-all font-quicksand group"
                   disabled={isLoading}
                 >
@@ -143,7 +150,7 @@ const SignIn = () => {
                   )}
                 </Button>
               </form>
-              
+
               <div className="relative my-6">
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t border-border"></div>
@@ -152,20 +159,14 @@ const SignIn = () => {
                   <span className="bg-card px-2 text-muted-foreground font-quicksand">Or continue with</span>
                 </div>
               </div>
-              <Button variant="outline" className="w-full font-quicksand hover:bg-muted transition-all mb-2">
-                <svg className="mr-2 h-4 w-4" width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg"><g><path d="M17.64 9.2045c0-.638-.0573-1.2527-.1636-1.8409H9v3.4818h4.8445c-.2082 1.1218-.8345 2.0736-1.7763 2.7136v2.2545h2.8736C16.9782 14.0845 17.64 11.8582 17.64 9.2045z" fill="#4285F4"/><path d="M9 18c2.43 0 4.4673-.8062 5.9564-2.1864l-2.8736-2.2545c-.7973.5345-1.8145.8491-3.0827.8491-2.3691 0-4.3773-1.6018-5.0964-3.7573H.9391v2.3164C2.4227 16.2936 5.4818 18 9 18z" fill="#34A853"/><path d="M3.9036 10.6509c-.1818-.5345-.2864-1.1045-.2864-1.6509s.1045-1.1164.2864-1.6509V5.0336H.9391C.3409 6.2536 0 7.5791 0 9c0 1.4209.3409 2.7464.9391 3.9664l2.9645-2.3155z" fill="#FBBC05"/><path d="M9 3.5791c1.3227 0 2.5045.4545 3.4364 1.3455l2.5773-2.5773C13.4645.8062 11.4273 0 9 0 5.4818 0 2.4227 1.7064.9391 4.0336l2.9645 2.3164C4.6227 5.1809 6.6309 3.5791 9 3.5791z" fill="#EA4335"/></g></svg>
-                 Google
-              </Button>
-              <Button variant="outline" className="w-full font-quicksand hover:bg-muted transition-all">
-                <Github className="mr-2 h-4 w-4" />
-                Github
-              </Button>
+              
+              
             </CardContent>
             <CardFooter className="flex flex-col space-y-4">
               <div className="text-center text-sm text-muted-foreground font-quicksand">
                 Don't have an account?{" "}
-                <Link 
-                  to="/signup" 
+                <Link
+                  to="/signup"
                   className="text-primary hover:underline font-semibold transition-all hover:text-purple-600"
                 >
                   Sign Up

@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import Cookies from "js-cookie"
+import StarRating from "@/components/StarRating";
+
 import {
   Heart,
   MessageCircle,
@@ -23,7 +26,6 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import CommentsModal from "@/components/CommentsModal";
-
 // Mock data for different portfolio types
 const mockPortfolios = {
   images: {
@@ -261,13 +263,13 @@ const PortfolioDetail = () => {
   }, [portfolio.stats.likes]);
 
   const handlePrevImage = () => {
-    setCurrentImageIndex((prev) => 
+    setCurrentImageIndex((prev) =>
       prev === 0 ? portfolio.content.items.length - 1 : prev - 1
     );
   };
 
   const handleNextImage = () => {
-    setCurrentImageIndex((prev) => 
+    setCurrentImageIndex((prev) =>
       prev === portfolio.content.items.length - 1 ? 0 : prev + 1
     );
   };
@@ -297,11 +299,11 @@ const PortfolioDetail = () => {
 
   const navigateFullscreenImage = (direction) => {
     if (direction === 'prev') {
-      setFullscreenImageIndex(prev => 
+      setFullscreenImageIndex(prev =>
         prev === 0 ? portfolio.content.items.length - 1 : prev - 1
       );
     } else {
-      setFullscreenImageIndex(prev => 
+      setFullscreenImageIndex(prev =>
         prev === portfolio.content.items.length - 1 ? 0 : prev + 1
       );
     }
@@ -330,7 +332,7 @@ const PortfolioDetail = () => {
         return (
           <div className="space-y-8">
             {/* Cover Image */}
-            <div 
+            <div
               className="relative aspect-[16/9] rounded-xl overflow-hidden bg-secondary/20 cursor-pointer group"
               onClick={() => openFullscreenGallery(0)}
             >
@@ -429,14 +431,19 @@ const PortfolioDetail = () => {
         return null;
     }
   };
-
+  const handelTranslate = () => {
+    if (!Cookies.get("token")) {
+      navigate('/signIn')
+    }
+  }
+  const token = Cookies.get("token")
   return (
     <div className={cn("min-h-screen bg-background", isClosing ? "animate-fade-out" : "animate-fade-in")}>
       {/* Header */}
       <div className="sticky top-0 z-50 bg-background/80 backdrop-blur-lg border-b">
         <div className="container max-w-6xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <Button
+             <Button
               variant="ghost"
               onClick={() => setIsClosing(true)}
               className="hover:bg-purple-100 dark:hover:bg-purple-900/20"
@@ -444,37 +451,7 @@ const PortfolioDetail = () => {
               <ArrowLeft className="size-4 mr-2" />
               Back
             </Button>
-            <div className="flex items-center gap-4">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={handleLike}
-                className={cn(
-                  "hover:bg-purple-100 dark:hover:bg-purple-900/20",
-                  isLiked && "text-purple-600"
-                )}
-              >
-                <Heart className={cn("size-5", isLiked && "fill-current")} />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setIsBookmarked(!isBookmarked)}
-                className={cn(
-                  "hover:bg-purple-100 dark:hover:bg-purple-900/20",
-                  isBookmarked && "text-purple-600"
-                )}
-              >
-                <Bookmark className="size-5" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="hover:bg-purple-100 dark:hover:bg-purple-900/20"
-              >
-                <Share2 className="size-5" />
-              </Button>
-            </div>
+          
           </div>
         </div>
       </div>
@@ -517,43 +494,47 @@ const PortfolioDetail = () => {
           {/* Right Column - Sidebar */}
           <div className="space-y-6">
             {/* Stats */}
-            <Card className="p-6">
-              <h3 className="font-semibold mb-4">Stats</h3>
-              <div className="grid grid-cols-2 gap-4">
-                <Button
-                  variant="ghost"
-                  onClick={handleLike}
-                  className={cn(
-                    "text-center p-3 bg-purple-50 dark:bg-purple-900/10 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-900/20 h-auto flex flex-col transition-all duration-200",
-                    isLiked && "text-purple-600"
-                  )}
-                >
-                  <Heart className={cn("size-5 mx-auto mb-2 transition-all duration-200", isLiked && "fill-current")} />
-                  <div className="font-semibold">{likes}</div>
-                  <div className="text-sm text-muted-foreground">Likes</div>
-                </Button>
-                <Button
-                  variant="ghost"
-                  onClick={() => setShowComments(true)}
-                  className="text-center p-3 bg-purple-50 dark:bg-purple-900/10 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-900/20 h-auto flex flex-col transition-all duration-200"
-                >
-                  <MessageCircle className="size-5 mx-auto mb-2 text-purple-600" />
-                  <div className="font-semibold">
-                    {portfolio.stats.comments}
+            <Card className="p-6 flex flex-col gap-2 justify-between">
+              <div onClick={handelTranslate}>
+                <h3 className="font-semibold mb-4">Stats</h3>
+                <div className="grid grid-cols-2 gap-4">
+
+                  <Button
+                    variant="ghost"
+                    onClick={handleLike}
+                    className={cn(
+                      "text-center p-3 bg-purple-50 dark:bg-purple-900/10 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-900/20 h-auto flex flex-col transition-all duration-200",
+                      isLiked && "text-purple-600"
+                    )}
+                  >
+                    <Heart className={cn("size-5 mx-auto mb-2 transition-all duration-200", isLiked && "fill-current")} />
+                    <div className="font-semibold">{likes}</div>
+                    <div className="text-sm text-muted-foreground">Likes</div>
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    onClick={() => setShowComments(true)}
+                    className="text-center p-3 bg-purple-50 dark:bg-purple-900/10 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-900/20 h-auto flex flex-col transition-all duration-200"
+                  >
+                    <MessageCircle className="size-5 mx-auto mb-2 text-purple-600" />
+                    <div className="font-semibold">
+                      {portfolio.stats.comments}
+                    </div>
+                    <div className="text-sm text-muted-foreground">Comments</div>
+                  </Button>
+                  <div className="text-center p-3 bg-purple-50 dark:bg-purple-900/10 rounded-lg">
+                    <Share2 className="size-5 mx-auto mb-2 text-purple-600" />
+                    <div className="font-semibold">{portfolio.stats.shares}</div>
+                    <div className="text-sm text-muted-foreground">Shares</div>
                   </div>
-                  <div className="text-sm text-muted-foreground">Comments</div>
-                </Button>
-                <div className="text-center p-3 bg-purple-50 dark:bg-purple-900/10 rounded-lg">
-                  <Share2 className="size-5 mx-auto mb-2 text-purple-600" />
-                  <div className="font-semibold">{portfolio.stats.shares}</div>
-                  <div className="text-sm text-muted-foreground">Shares</div>
-                </div>
-                <div className="text-center p-3 bg-purple-50 dark:bg-purple-900/10 rounded-lg">
-                  <Eye className="size-5 mx-auto mb-2 text-purple-600" />
-                  <div className="font-semibold">{portfolio.stats.views}</div>
-                  <div className="text-sm text-muted-foreground">Views</div>
+                  <div className="text-center p-3 bg-purple-50 dark:bg-purple-900/10 rounded-lg">
+                    <Eye className="size-5 mx-auto mb-2 text-purple-600" />
+                    <div className="font-semibold">{portfolio.stats.views}</div>
+                    <div className="text-sm text-muted-foreground">Views</div>
+                  </div>
                 </div>
               </div>
+              <StarRating/>
             </Card>
 
             {/* Tags */}
@@ -588,6 +569,7 @@ const PortfolioDetail = () => {
                   </span>
                 </div>
               </div>
+              <StarRating />
             </Card>
           </div>
         </div>

@@ -4,7 +4,8 @@ import React from "react";
 import { Heart, MessageCircle, Share2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
-
+import Cookies from "js-cookie";
+import StarRating from "./StarRating";
 // PortfolioCard component renders a card for a single portfolio item with interactive features
 const PortfolioCard = ({
   id,
@@ -32,7 +33,7 @@ const PortfolioCard = ({
       navigate(`/portfolio/${id}`);
     }
   };
-
+  const token = Cookies.get('token')
   return (
     <div
       className={cn(
@@ -91,26 +92,18 @@ const PortfolioCard = ({
         </div>
 
         {/* Stats */}
-        <div className="flex items-center justify-between text-sm text-muted-foreground">
-          <div className="flex items-center gap-4">
+        <div className="flex justify-between items-center gap-4 text-sm text-muted-foreground">
             <div className="flex items-center gap-1">
               <Heart className="size-4" />
               <span>{likes}</span>
             </div>
-            <div className="flex items-center gap-1">
+            <div className="flex   items-center gap-2">
               <MessageCircle className="size-4" />
               <span>{comments}</span>
             </div>
-          </div>
-          <button
-            className="hover:text-purple-600 dark:hover:text-purple-400 transition-colors"
-            onClick={(e) => {
-              e.stopPropagation();
-              onShareClick?.();
-            }}
-          >
-            <Share2 className="size-4" />
-          </button>
+              <StarRating/>
+         
+        
         </div>
       </div>
     </div>
