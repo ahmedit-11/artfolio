@@ -10,10 +10,11 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Mail, ArrowRight, Github, Eye, EyeOff } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { useToast } from "@/components/ui/use-toast";
+// import { useToast } from "@/components/ui/use-toast";
+import { toast } from "react-toastify";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
+import PageTitle from "@/components/PageTitle";
 import axios from "axios";
-
 const SignIn = () => {
   useScrollToTop();
   const [email, setEmail] = useState("");
@@ -22,7 +23,6 @@ const SignIn = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [acceptTerms, setAcceptTerms] = useState(false);
   const navigate = useNavigate();
-  const { toast } = useToast();
 
   const handleSignIn = async (e) => {
     e.preventDefault();
@@ -41,7 +41,7 @@ const SignIn = () => {
       let message = "An error occurred. Please try again.";
       if (error.response && error.response.data && error.response.data.message) {
         message = error.response.data.message;
-        alert(message)
+        toast.error(message)
       }
       toast({
         title: "Sign in failed",
@@ -62,17 +62,14 @@ const SignIn = () => {
     }
   }, [])
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex bg-background flex-col min-h-screen">
       <Header />
-      <main className="flex-grow flex items-center justify-center p-4 md:p-8">
+      <main className="flex-grow flex items-center justify-center  p-4 md:p-8">
         <div className="w-full max-w-md">
           <div className="text-center mb-8 animate-fade-in">
-            <h1 className="text-3xl font-bold font-quicksand bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-indigo-800">
+            <PageTitle subtitle="Sign in to continue your creative journey">
               Welcome Back
-            </h1>
-            <p className="text-muted-foreground mt-2 font-quicksand">
-              Sign in to continue your creative journey
-            </p>
+            </PageTitle>
           </div>
 
           <Card className="border-border shadow-lg animate-fade-in animation-delay-150">

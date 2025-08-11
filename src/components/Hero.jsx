@@ -9,30 +9,43 @@ const Hero = () => {
     <div className="relative overflow-hidden bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-background">
       {/* Animated background elements */}
       <div className="absolute inset-0 bg-gradient-to-br from-purple-400/10 via-indigo-400/10 to-pink-400/10 dark:from-purple-900/20 dark:via-indigo-900/20 dark:to-pink-900/20"></div>
-      <div className="absolute top-0 left-0 w-full h-full">
-        <div className="absolute top-20 left-10 w-72 h-72 bg-purple-800/40 dark:bg-pink-500/20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute top-40 right-20 w-96 h-96 bg-indigo-800/35 dark:bg-indigo-500/20 rounded-full blur-3xl animate-pulse animation-delay-300"></div>
-        <div className="absolute bottom-20 left-1/3 w-80 h-80 bg-pink-900/30 dark:bg-pink-300/20 rounded-full blur-3xl animate-pulse animation-delay-150"></div>
+      <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
+        <div className="absolute top-20 left-10 w-72 h-72 bg-purple-800/40 dark:bg-pink-500/20 rounded-full blur-3xl motion-safe:animate-pulse"></div>
+        <div className="absolute top-40 right-20 w-96 h-96 bg-indigo-800/35 dark:bg-indigo-500/20 rounded-full blur-3xl motion-safe:animate-pulse animation-delay-300"></div>
+        <div className="absolute bottom-20 left-1/3 w-80 h-80 bg-pink-900/30 dark:bg-pink-300/20 rounded-full blur-3xl motion-safe:animate-pulse animation-delay-150"></div>
       </div>
 
       <div className="container relative px-4 py-20 mx-auto text-center sm:py-24 md:py-28">
         <div className="animate-fade-in">
-          <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl mb-6 font-quicksand">
-            <div className="animate-float-up animation-delay-200">
-              <span className="block animate-glow">Showcase Your Creative Work</span>
+          <h1 className="relative text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl mb-6 font-quicksand">
+            {/* Subtle blurred glow behind heading */}
+            <div
+              aria-hidden
+              className="pointer-events-none absolute left-1/2 top-1/2 -z-10 h-40 w-[80%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-gradient-to-r from-purple-500/25 via-indigo-500/20 to-pink-500/25 blur-3xl"
+            />
+            <div className="motion-safe:animate-float-up animation-delay-200">
+              <span
+                className="block bg-clip-text text-transparent bg-gradient-to-r from-purple-600 via-pink-400 to-indigo-500 dark:from-purple-300 dark:via-pink-300 dark:to-indigo-300 bg-[length:300%_100%] motion-safe:animate-gradient-shift drop-shadow-[0_0_18px_rgba(168,85,247,0.35)]"
+              >
+                Showcase Your Creative Work
+              </span>
             </div>
-            <div className="animate-float-up animation-delay-500">
-              <span className="block bg-clip-text text-transparent bg-gradient-to-r from-purple-500 via-purple-200 via-indigo-500 to-purple-500 animate-gradient-shift bg-300">
+            <div className="motion-safe:animate-float-up animation-delay-500">
+              <span
+                className="block bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-indigo-400 to-pink-400 bg-[length:300%_100%] motion-safe:animate-gradient-shift drop-shadow-[0_0_10px_rgba(99,102,241,0.25)]"
+              >
                 Connect with Other Creatives
               </span>
             </div>
           </h1>
+          {/* Gradient underline accent */}
+          <div className="mx-auto mb-8 h-1 w-24 rounded-full bg-gradient-to-r from-purple-500 via-indigo-500 to-pink-500 shadow-[0_0_18px_rgba(168,85,247,0.25)]"></div>
           <p className="max-w-2xl mx-auto mb-8 text-lg text-muted-foreground dark:text-white hover:scale-[1.01] transition-transform duration-300">
             A social portfolio platform for designers, artists, writers, developers and all creative professionals to 
             showcase their best work and discover amazing talent.
           </p>
           </div>
-          {/* <div className="flex flex-col sm:flex-row justify-center gap-4">
+          <div className="relative z-20 flex flex-col sm:flex-row justify-center gap-4">
             <Link to="/create">
               <Button 
                 size="lg" 
@@ -46,13 +59,14 @@ const Hero = () => {
               <Button 
                 size="lg" 
                 variant="outline" 
-                className="group font-quicksand hover:scale-105 transition-all duration-300 hover:border-purple-400"
+                className="group relative overflow-hidden isolate z-10 font-quicksand border hover:scale-105 transition-all duration-300 hover:border-purple-400 hover:bg-purple-50/60 dark:hover:bg-purple-900/20 hover:text-purple-700 dark:hover:text-purple-300"
               >
-                Explore Portfolios
-                <ArrowRight className="ml-2 size-4 transition-transform duration-300 group-hover:translate-x-2" />
+                <span className="relative z-10">Explore Portfolios</span>
+                <ArrowRight className="ml-2 size-4 transition-transform duration-300 group-hover:translate-x-2 relative z-10" />
+                <span className="pointer-events-none absolute inset-0 bg-gradient-to-r from-purple-500/10 to-indigo-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
               </Button>
             </Link>
-          </div> */}
+          </div>
         
         <div className="mt-16 relative z-10">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

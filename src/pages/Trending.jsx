@@ -3,6 +3,7 @@ import { useScrollToTop } from "../utils/scrollToTop";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PortfolioCard from "@/components/PortfolioCard";
+import PageTitle from "@/components/PageTitle";
 
 const portfolios = [
   {
@@ -50,21 +51,14 @@ const portfolios = [
 const TrendingPage = () => {
   useScrollToTop();
   return (
-    <div className="flex flex-col min-h-screen bg-background">
+    <div className="flex flex-col min-h-screen bg-background bg-background">
       <Header />
       <main className="flex-grow animate-fade-in">
-        <section className="py-12 bg-gradient-to-b from-background to-secondary/30">
+        <section className="py-12 ">
           <div className="container px-4 mx-auto">
-            <div className="max-w-2xl">
-              <h1 className="text-3xl font-bold font-quicksand mb-3">
-                <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-indigo-700">
-                  Trending Now
-                </span>
-              </h1>
-              <p className="text-muted-foreground font-quicksand">
-                Explore the most popular and trending portfolios that are making waves in the creative community.
-              </p>
-            </div>
+            <PageTitle subtitle="Explore the most popular and trending portfolios that are making waves in the creative community.">
+              Trending Now
+            </PageTitle>
             <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {portfolios.map((portfolio) => (
                 <PortfolioCard

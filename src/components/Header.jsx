@@ -55,7 +55,7 @@ const Header = () => {
             <div className="size-8 rounded-full bg-purple-gradient flex items-center justify-center">
               <span className="text-white font-bold text-sm">⭐</span>
             </div>
-            <span className="font-bold text-xl gradient-text">Artfolio</span>
+            <span className="font-bold text-xl bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-indigo-700">Artfolio</span>
           </Link>
         </div>
 
@@ -114,7 +114,7 @@ const Header = () => {
             className="text-muted-foreground hover:text-foreground hover:bg-purple-100 dark:hover:bg-purple-900/20"
             onClick={() => navigate("/search")}
           >
-            <Search className="size-5 text-white" />
+            <Search className="size-5 dark:text-white " />
           </Button>
           <ThemeToggle />
           {token ? (

@@ -1,32 +1,44 @@
 import React, { useState, useEffect } from "react";
-import { useScrollToTop } from "../utils/scrollToTop";
-import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button"
+import { Heart, MessageCircle, Share2, ArrowLeft, ExternalLink } from "lucide-react";
+import { useParams, useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import Cookies from "js-cookie"
-import StarRating from "@/components/StarRating";
 
+
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import CommentsModal from "@/components/CommentsModal";
+import PageTitle from "@/components/PageTitle";
+import { useScrollToTop } from "@/utils/scrollToTop";
+import StarRating from "@/components/StarRating";
+import Tag from "../components/ui/tag";
+import Cookies from "js-cookie";
 import {
-  Heart,
-  MessageCircle,
-  Share2,
-  Bookmark,
-  Calendar,
-  User,
-  Tag,
+  Download,
   Eye,
-  ArrowLeft,
+  Calendar,
+  Clock,
+  User,
+  Camera,
+  Palette,
+  Monitor,
+  Smartphone,
+  Star,
+  ChevronLeft,
+  ChevronRight,
   Play,
   Pause,
   Volume2,
   VolumeX,
-  ChevronLeft,
-  ChevronRight,
-  X,
+  Maximize,
+  MoreHorizontal,
+
+  Flag,
 } from "lucide-react";
+
 import { cn } from "@/lib/utils";
-import CommentsModal from "@/components/CommentsModal";
+// import CommentsModal from "@/components/CommentsModal";
+// import PageTitle from "../components/PageTitle";
 // Mock data for different portfolio types
 const mockPortfolios = {
   images: {
@@ -329,7 +341,7 @@ const PortfolioDetail = () => {
     switch (portfolio.content.type) {
       case "images":
         return (
-          <div className="space-y-8">
+          <div className="space-y-8 ">
             {/* Cover Image */}
             <div
               className="relative aspect-[16/9] rounded-xl overflow-hidden bg-secondary/20 cursor-pointer group"
@@ -462,15 +474,15 @@ const PortfolioDetail = () => {
           <div className="lg:col-span-2 space-y-8">
             {/* Title and Creator */}
             <div>
-              <h1 className="text-3xl md:text-4xl font-bold mb-4 gradient-text">
-                {portfolio.title}
-              </h1>
+              <PageTitle>
+              {portfolio.title}
+              </PageTitle>
+             
               <div className="flex items-center gap-4">
-                <img
-                  src={portfolio.creator.avatar}
-                  alt={portfolio.creator.name}
-                  className="size-12 rounded-full"
-                />
+                <Avatar className="size-12">
+                  <AvatarImage src={portfolio.creator.avatar} alt={portfolio.creator.name} />
+                  <AvatarFallback>{portfolio.creator.name.charAt(0)}</AvatarFallback>
+                </Avatar>
                 <div>
                   <h3 className="font-semibold">{portfolio.creator.name}</h3>
                   <p className="text-sm text-muted-foreground">
@@ -506,7 +518,7 @@ const PortfolioDetail = () => {
                       isLiked && "text-purple-600"
                     )}
                   >
-                    <Heart className={cn("size-5 mx-auto mb-2 transition-all duration-200", isLiked && "fill-current")} />
+                    <Heart className={cn("size-5 mx-auto mb-2 transition-all text-purple-600 duration-200", isLiked && "fill-current")} />
                     <div className="font-semibold">{likes}</div>
                     <div className="text-sm text-muted-foreground">Likes</div>
                   </Button>
@@ -541,12 +553,9 @@ const PortfolioDetail = () => {
               <h3 className="font-semibold mb-4">Tags</h3>
               <div className="flex flex-wrap gap-2">
                 {portfolio.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="px-3 py-1 bg-purple-100 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 rounded-full text-sm"
-                  >
+                  <Tag key={tag}>
                     {tag}
-                  </span>
+                  </Tag>
                 ))}
               </div>
             </Card>

@@ -13,9 +13,11 @@ import {
   Palette,
   Volume2,
   Languages,
+  LogOut
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import ThemeToggle from "@/components/ThemeToggle";
+import PageTitle from "@/components/PageTitle";
 
 const SettingsSection = ({ icon: Icon, title, description, children }) => (
   <Card className="p-6 mb-6">
@@ -65,8 +67,10 @@ const Settings = () => {
 
   return (
 
-    <div className="container max-w-4xl mx-auto px-4 py-8 animate-fade-in">
-      <h1 className="text-3xl font-bold mb-8">Settings</h1>
+    <div className="container max-w-4xl mx-auto px-4 py-8 bg-background animate-fade-in">
+      <PageTitle subtitle="Manage your account preferences and customize your experience" className="mb-8">
+        Settings
+      </PageTitle>
 
       <SettingsSection
         icon={User}
@@ -121,6 +125,12 @@ const Settings = () => {
           <div className="flex items-center justify-between">
             <span>Change Password</span>
             <Button variant="outline" size="sm">Update</Button>
+          </div>
+          <Separator />
+          <div className="flex items-center justify-between">
+         LogOut
+            <Button variant="destructive" size="sm">
+            <LogOut className="size-4 mr-2" />LogOut</Button>
           </div>
           <Separator />
           <div className="flex items-center justify-between">

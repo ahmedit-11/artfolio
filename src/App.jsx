@@ -28,6 +28,7 @@ import PortfolioDetail from "./pages/PortfolioDetail";
 import CreatePortfolio from "./pages/CreatePortfolio";
 import AdminPanel from "./components/admin/AdminPanel";
 import { ToastContainer } from "react-toastify";
+import axios from "axios";
 // const SignUp = lazy(() => import("./pages/SignUp"));
 // const SignIn = lazy(() => import("./pages/SignIn"));
 // const Settings = lazy(() => import("./pages/Settings"));
@@ -49,6 +50,12 @@ import { ToastContainer } from "react-toastify";
 // const SearchPage = lazy(() => import("./pages/Search"));
 // import Explore from "./pages/Explore";
 
+async function   f(){
+await axios.get('http://192.168.1.110:8000/sanctum/csrf-cookie');
+axios.defaults.withCredentials = true;
+const response = await axios.get("/users")
+console.log(response.data.data)}
+f()
 const App = () => {
   // useEffect to set the theme (dark/light) based on user preference or system settings
   useEffect(() => {

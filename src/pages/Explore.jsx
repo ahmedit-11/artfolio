@@ -3,6 +3,7 @@ import { useScrollToTop } from "../utils/scrollToTop";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Card } from "@/components/ui/card";
+import PageTitle from "@/components/PageTitle";
 
 const categories = [
   {
@@ -35,16 +36,9 @@ const ExplorePage = () => {
       <main className="flex-grow animate-fade-in">
         <section className="py-12 bg-gradient-to-b from-background to-secondary/30">
           <div className="container px-4 mx-auto">
-            <div className="max-w-2xl">
-              <h1 className="text-3xl font-bold font-quicksand mb-3">
-                <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-indigo-700">
-                  Explore Categories
-                </span>
-              </h1>
-              <p className="text-muted-foreground font-quicksand">
-                Discover creative categories and find inspiration from a variety of portfolios.
-              </p>
-            </div>
+            <PageTitle subtitle="Discover creative categories and find inspiration from a variety of portfolios.">
+              Explore Categories
+            </PageTitle>
             <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {categories.map((category) => (
                 <Card

@@ -1,8 +1,9 @@
 // PortfolioDetail.jsx
 // Displays a detailed view of a portfolio item with a large image, title, creator information, likes, comments, and tags.
 import React, { useState, useEffect } from "react";
-import { Heart, MessageCircle, Tag } from "lucide-react";
+import { Heart, MessageCircle, Tag as TagIcon ,ArrowLeft} from "lucide-react";
 import { cn } from "@/lib/utils";
+import Tag from "./ui/tag";
 import CommentSection from "./CommentSection";
 
 // PortfolioDetail component renders a detailed view of a single portfolio item with interactive features
@@ -93,14 +94,12 @@ const PortfolioDetail = ({
         {tags && tags.length > 0 && (
           <div className="flex flex-wrap gap-2">
             {tags.map((tag, index) => (
-              <button
-                key={index}
-                className="text-sm bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 px-3 py-1 rounded-full hover:bg-purple-200 dark:hover:bg-purple-900/50 transition-colors"
-                onClick={() => onTagClick(tag)}
-              >
-                <Tag className="size-4 inline mr-1" />
-                {tag}
-              </button>
+              <div key={index} className="flex items-center">
+                <TagIcon className="size-4 mr-1 text-purple-600 dark:text-purple-400" />
+                <Tag onClick={onTagClick}>
+                  {tag}
+                </Tag>
+              </div>
             ))}
           </div>
         )}

@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Plus, X, UploadCloud } from "lucide-react";
 import { cn } from "@/lib/utils";
+import PageTitle from "@/components/PageTitle";
+import Tag from "@/components/ui/tag";
 
 /*
   ============================
@@ -117,13 +119,11 @@ const CreatePortfolio = () => {
   };
 
   return (
-    <section className="py-12 bg-gradient-to-b from-background to-secondary/30 animate-fade-in">
+    <section className="py-12 bg-background  animate-fade-in">
       <div className="container max-w-4xl mx-auto px-4">
-        <h1 className="text-3xl font-bold font-quicksand mb-8">
-          <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-indigo-700">
-            Create Portfolio
-          </span>
-        </h1>
+        <PageTitle subtitle="Showcase your creative work and build your professional portfolio" className="mb-8">
+          Create Portfolio
+        </PageTitle>
 
       <form onSubmit={handleSubmit} className="space-y-8">
         {/* Title */}
@@ -204,16 +204,13 @@ const CreatePortfolio = () => {
           {selectedTags.length > 0 && (
             <div className="flex flex-wrap gap-2 mt-4">
               {selectedTags.map((tag) => (
-                <span
+                <Tag
                   key={tag}
-                  className="px-3 py-1 bg-purple-100 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 rounded-full text-sm flex items-center gap-1"
+                  removable
+                  onRemove={() => toggleTag(tag)}
                 >
                   {tag}
-                  <X
-                    className="size-3 cursor-pointer"
-                    onClick={() => toggleTag(tag)}
-                  />
-                </span>
+                </Tag>
               ))}
             </div>
           )}

@@ -1,6 +1,8 @@
 // CommentSlider.jsx
 // Displays a sliding panel for viewing a comment and its replies, with an input for adding new replies.
-import React from "react";
+import React from 'react';
+import { X } from 'lucide-react';
+import { Avatar, AvatarImage, AvatarFallback } from './ui/avatar';
 
 // CommentSlider component renders a sliding panel for a comment and its replies
 const CommentSlider = ({ comment, onClose }) => {
@@ -23,17 +25,14 @@ const CommentSlider = ({ comment, onClose }) => {
           onClick={onClose}
           aria-label="Close comments"
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-          </svg>
+          <X className="w-5 h-5" />
         </button>
         {/* Main comment */}
         <div className="p-6 border-b border-zinc-200 dark:border-zinc-700 flex items-start space-x-4">
-          <img
-            src={comment.user.avatar}
-            alt={comment.user.name}
-            className="w-12 h-12 rounded-full object-cover"
-          />
+          <Avatar className="w-12 h-12">
+            <AvatarImage src={comment.user.avatar} alt={comment.user.name} />
+            <AvatarFallback>{comment.user.name.charAt(0)}</AvatarFallback>
+          </Avatar>
           <div className="flex-1">
             <div className="flex items-center space-x-2">
               <span className="font-semibold">{comment.user.name}</span>
@@ -51,11 +50,10 @@ const CommentSlider = ({ comment, onClose }) => {
           {comment.replies && comment.replies.length > 0 ? (
             comment.replies.map((reply) => (
               <div key={reply.id} className="flex items-start space-x-3">
-                <img
-                  src={reply.user.avatar}
-                  alt={reply.user.name}
-                  className="w-9 h-9 rounded-full object-cover"
-                />
+                <Avatar className="w-8 h-8">
+                  <AvatarImage src={reply.user.avatar} alt={reply.user.name} />
+                  <AvatarFallback>{reply.user.name.charAt(0)}</AvatarFallback>
+                </Avatar>
                 <div>
                   <div className="flex items-center space-x-2">
                     <span className="font-medium">{reply.user.name}</span>
@@ -75,11 +73,10 @@ const CommentSlider = ({ comment, onClose }) => {
         </div>
         {/* New reply input */}
         <div className="p-4 border-t border-zinc-200 dark:border-zinc-700 flex items-center space-x-2">
-          <img
-            src="https://randomuser.me/api/portraits/men/4.jpg"
-            alt="Your avatar"
-            className="w-8 h-8 rounded-full object-cover"
-          />
+          <Avatar className="w-8 h-8">
+            <AvatarImage src="https://randomuser.me/api/portraits/men/4.jpg" alt="Your avatar" />
+            <AvatarFallback>U</AvatarFallback>
+          </Avatar>
           <input
             type="text"
             placeholder="Write a reply..."

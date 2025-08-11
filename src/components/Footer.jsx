@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import PageTitle from "./PageTitle";
 
 const Footer = () => {
   return (
@@ -11,7 +12,7 @@ const Footer = () => {
               <div className="size-8 rounded-full bg-purple-gradient flex items-center justify-center">
                 <span className="text-white font-bold text-sm">⭐</span>
               </div>
-              <span className="font-bold text-xl gradient-text">Artfolio</span>
+              <span className="font-bold text-xl bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-indigo-700">Artfolio</span>
             </Link>
             <p className="text-sm text-muted-foreground max-w-xs">
               A social portfolio platform for creatives to showcase their work and connect with a global community.
@@ -19,10 +20,12 @@ const Footer = () => {
           </div>
 
           <div>
-            <h3 className="font-medium mb-4 gradient-text">Platform</h3>
+            
+            <h3 className="font-medium mb-4 bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-indigo-700">Platform</h3>
             <ul className="space-y-2 text-sm">
               <li>
                 <Link to="/features" className="text-muted-foreground hover:text-foreground focus:text-foreground rounded transition-colors">
+ 
                   Features
                 </Link>
               </li>
@@ -33,7 +36,7 @@ const Footer = () => {
           </div>
 
           <div>
-            <h3 className="font-medium mb-4 gradient-text">Resources</h3>
+            <h3 className="font-medium mb-4 bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-indigo-700">Resources</h3>
             <ul className="space-y-2 text-sm">
         
               <li>
@@ -50,7 +53,7 @@ const Footer = () => {
           </div>
 
           <div>
-            <h3 className="font-medium mb-4 gradient-text">Legal</h3>
+            <h3 className="font-medium mb-4 bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-indigo-700">Legal</h3>
             <ul className="space-y-2 text-sm">
               <li>
                 <Link to="/privacy" className="text-muted-foreground hover:text-foreground focus:text-foreground rounded transition-colors">

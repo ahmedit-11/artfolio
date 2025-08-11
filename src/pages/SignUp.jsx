@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useScrollToTop } from "../utils/scrollToTop";
 import { Link, useNavigate } from "react-router-dom";
 import Cookies from "js-cookie"
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,7 +11,7 @@ import { Mail, User, ArrowRight, Github, Eye, EyeOff, CloudCog } from "lucide-re
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { ToastContainer, toast } from 'react-toastify';
-
+import PageTitle from "@/components/PageTitle";
 
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
 import axios from "axios";
@@ -125,18 +124,15 @@ const SignUp = () => {
     }
   }, [])
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col bg-background min-h-screen">
       <ToastContainer />
       <Header />
-      <main className="flex-grow flex items-center justify-center p-4 md:p-8">
+      <main className="flex-grow flex items-center  justify-center p-4 md:p-8">
         <div className="w-full max-w-md">
           <div className="text-center mb-8 animate-fade-in">
-            <h1 className="text-3xl font-bold font-quicksand bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-indigo-800">
+            <PageTitle subtitle="Create an account to showcase your creative work">
               Join Artfolio
-            </h1>
-            <p className="text-muted-foreground mt-2 font-quicksand">
-              Create an account to showcase your creative work
-            </p>
+            </PageTitle>
           </div>
 
           <Card className="border-border shadow-lg animate-fade-in animation-delay-150">

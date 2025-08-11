@@ -17,7 +17,7 @@ const NotFound = () => {
   }, [location.pathname]);
 
   return (
-    <main className="flex-grow animate-fade-in">
+    <main className="flex-grow bg-background animate-fade-in">
       <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-purple-100/60 to-indigo-100 dark:from-purple-900/60 dark:to-background transition-colors duration-500">
         <div className="absolute top-4 right-4">
          

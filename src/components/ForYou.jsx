@@ -14,6 +14,7 @@ const forYouItems = [
     likes: 127,
     comments: 24,
     tags: ["Digital Art", "Illustration"],
+    rating: 4.5,
   },
   {
     id: 2,
@@ -24,6 +25,7 @@ const forYouItems = [
     likes: 85,
     comments: 16,
     tags: ["Web Design", "UI/UX"],
+    rating: 4.5,
   },
   {
     id: 3,
@@ -34,6 +36,7 @@ const forYouItems = [
     likes: 184,
     comments: 32,
     tags: ["Photography", "Urban"],
+    rating: 2.5,
   },
   {
     id: 4,
@@ -44,6 +47,7 @@ const forYouItems = [
     likes: 93,
     comments: 18,
     tags: ["3D Design", "Character"],
+    rating: 5,
   }
 ];
 
@@ -93,6 +97,7 @@ const ForYou = ({ className }) => {
                 likes={item.likes}
                 comments={item.comments}
                 tags={item.tags}
+                rating={item.rating}
                 className="transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:shadow-purple-200/40 dark:hover:shadow-purple-900/20"
               />
             ))}

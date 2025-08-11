@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Upload, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import Tag from "./ui/tag";
 
 // PortfolioForm component renders a form for creating or editing a portfolio item
 const PortfolioForm = ({
@@ -156,19 +157,13 @@ const PortfolioForm = ({
         </div>
         <div className="flex flex-wrap gap-2 mt-2">
           {formData.tags.map((tag) => (
-            <div
+            <Tag
               key={tag}
-              className="flex items-center gap-1 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 px-3 py-1 rounded-full"
+              removable
+              onRemove={handleRemoveTag}
             >
-              <span>{tag}</span>
-              <button
-                type="button"
-                onClick={() => handleRemoveTag(tag)}
-                className="hover:text-purple-900 dark:hover:text-purple-100"
-              >
-                <X className="size-4" />
-              </button>
-            </div>
+              {tag}
+            </Tag>
           ))}
         </div>
       </div>

@@ -1,12 +1,14 @@
-import React, { useState } from "react";
-import { Card } from "@/components/ui/card";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Separator } from "@/components/ui/separator";
-import { useNavigate } from "react-router-dom";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { useScrollToTop } from "@/utils/scrollToTop";
 import { Twitter, Github, Linkedin, Instagram, Facebook, Globe, Link as LinkIcon } from "lucide-react";
-import { useScrollToTop } from "../utils/scrollToTop";
+import { Separator } from "@/components/ui/separator";
 const initialProfile = {
   bio: "Digital artist and UI designer passionate about creating immersive experiences.",
   avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=creative_artist",
@@ -122,7 +124,7 @@ const ProfileSettings = () => {
   };
 
   return (
-    <div className="container max-w-2xl mx-auto px-4 py-8 animate-fade-in">
+    <div className="container max-w-2xl mx-auto px-4 py-8 bg-background animate-fade-in">
       <Button variant="ghost" onClick={() => navigate("/settings")} className="mb-4">&larr; Back to Settings</Button>
       <Card className="p-6">
         <h2 className="text-2xl font-bold mb-4">Edit Profile</h2>
@@ -134,7 +136,10 @@ const ProfileSettings = () => {
           <div>
             <label className="block font-medium mb-1">Profile Image</label>
             <div className="flex items-center space-x-4">
-              <img src={avatar} alt="avatar" className="size-16 rounded-full border" />
+              <Avatar className="size-16 border">
+                <AvatarImage src={avatar} alt="avatar" />
+                <AvatarFallback>{fullName.charAt(0)}</AvatarFallback>
+              </Avatar>
               <Input type="file" accept="image/*" onChange={handleAvatarChange} />
             </div>
           </div>
