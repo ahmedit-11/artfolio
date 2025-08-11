@@ -14,7 +14,7 @@ import Footer from "@/components/Footer";
 import { toast } from "react-toastify";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
 import PageTitle from "@/components/PageTitle";
-import axios from "axios";
+import { authAPI } from "../lib/api";
 const SignIn = () => {
   useScrollToTop();
   const [email, setEmail] = useState("");
@@ -28,15 +28,16 @@ const SignIn = () => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      await axios.get('http://192.168.1.110:8000/sanctum/csrf-cookie');
-      axios.defaults.withCredentials = true;
-      const response = await axios.post("/login", {
+      const response = await authAPI.login({
         email,
         password,
       });
-      console.log(response.data?.data?.access_token)
-      Cookies.set("token", response.data?.data?.access_token)
-      navigate("/"); // Redirect to home page
+      if (response && response.success) {
+        toast.success("Login successful!");
+        navigate("/");
+      } else {
+        toast.error("Login failed. Please try again.");
+      }
     } catch (error) {
       let message = "An error occurred. Please try again.";
       if (error.response && error.response.data && error.response.data.message) {

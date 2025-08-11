@@ -67,12 +67,9 @@ const AvatarMenu = () => {
           <span>Settings</span>
         </DropdownMenuItem>
         
-        <DropdownMenuSeparator />
+   
         
-        <DropdownMenuItem className="cursor-pointer text-red-500 dark:text-red-400">
-          <LogOut className="size-4 mr-2" />
-          <span>Log Out</span>
-        </DropdownMenuItem>
+      
       </DropdownMenuContent>
     </DropdownMenu>
   );

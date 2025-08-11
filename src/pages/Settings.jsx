@@ -18,6 +18,8 @@ import {
 import { useNavigate } from "react-router-dom";
 import ThemeToggle from "@/components/ThemeToggle";
 import PageTitle from "@/components/PageTitle";
+import { authAPI } from "../lib/api";
+import { toast } from "react-toastify";
 
 const SettingsSection = ({ icon: Icon, title, description, children }) => (
   <Card className="p-6 mb-6">
@@ -56,6 +58,7 @@ const useStoredToggle = (key, defaultValue = false) => {
 const Settings = () => {
   useScrollToTop();
   const navigate = useNavigate();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   // Toggles with persistence
   const [emailNotifs, setEmailNotifs] = useStoredToggle("settings_email_notifs", true);
@@ -64,6 +67,26 @@ const Settings = () => {
   const [highContrast, setHighContrast] = useStoredToggle("settings_high_contrast", false);
   const [soundEffects, setSoundEffects] = useStoredToggle("settings_sound_effects", true);
   const [notifSounds, setNotifSounds] = useStoredToggle("settings_notif_sounds", true);
+
+  // Logout handler
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    try {
+      console.log("Starting logout process...");
+      await authAPI.logout();
+      toast.success("Logged out successfully!");
+    } catch (error) {
+      console.error("Logout error details:", error);
+      console.error("Error response:", error.response?.data);
+      console.error("Error status:", error.response?.status);
+      // Even if backend logout fails, token is cleared locally, so we can still proceed
+      toast.success("Logged out successfully!");
+    } finally {
+      setIsLoggingOut(false);
+      // Always navigate to signin after logout attempt (token is cleared either way)
+      navigate("/signin");
+    }
+  };
 
   return (
 
@@ -127,7 +150,7 @@ const Settings = () => {
             <Button variant="outline" size="sm">Update</Button>
           </div>
           <Separator />
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between" onClick={handleLogout}>
          LogOut
             <Button variant="destructive" size="sm">
             <LogOut className="size-4 mr-2" />LogOut</Button>
@@ -249,6 +272,26 @@ const Settings = () => {
           <div className="flex items-center justify-between">
             <span>Cookie Policy</span>
             <Button variant="link" size="sm" onClick={() => navigate('/cookies')}>View</Button>
+          </div>
+        </div>
+      </SettingsSection>
+
+      <SettingsSection
+        icon={LogOut}
+        title="Sign Out"
+        description="Sign out of your account on this device"
+      >
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <span>Sign out of your account</span>
+            <Button 
+              variant="destructive" 
+              size="sm" 
+              onClick={handleLogout}
+              disabled={isLoggingOut}
+            >
+              {isLoggingOut ? "Signing out..." : "Sign Out"}
+            </Button>
           </div>
         </div>
       </SettingsSection>

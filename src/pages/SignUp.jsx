@@ -14,7 +14,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import PageTitle from "@/components/PageTitle";
 
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
-import axios from "axios";
+import { authAPI } from "../lib/api";
 // import { title } from "process";
 
 const SignUp = () => {
@@ -51,25 +51,12 @@ const SignUp = () => {
 
     setIsLoading(true);
     try {
-      await axios.get('http://192.168.1.110:8000/sanctum/csrf-cookie');
-      axios.defaults.withCredentials = true;
-
-      const response = await axios.post(
-        "http://192.168.1.110:8000/api/register",
-        {
-          name,
-          email,
-          password,
-          password_confirmation: confirmPassword
-        },
-        {
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-          },
-          withCredentials: true
-        }
-      );
+      const response = await authAPI.register({
+        name,
+        email,
+        password,
+        password_confirmation: confirmPassword
+      });
       setIsLoading(false);
       // toast({
       //   title: "Account created!",
