@@ -8,11 +8,13 @@ import { Card } from "@/components/ui/card";
 
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import CommentsModal from "@/components/CommentsModal";
+import ReportModal from "@/components/ReportModal";
 import PageTitle from "@/components/PageTitle";
 import { useScrollToTop } from "@/utils/scrollToTop";
 import StarRating from "@/components/StarRating";
 import Tag from "../components/ui/tag";
 import Cookies from "js-cookie";
+import { reportAPI } from "@/lib/api";
 import {
   Download,
   Eye,
@@ -58,6 +60,7 @@ const mockPortfolios = {
       likes: 248,
       comments: 36,
       shares: 89,
+      rating: "5.0",
     },
     content: {
       type: "images",
@@ -142,6 +145,7 @@ const mockPortfolios = {
       likes: 342,
       comments: 45,
       shares: 123,
+      rating: "3.0",
     },
     content: {
       type: "video",
@@ -177,6 +181,7 @@ const mockPortfolios = {
       likes: 289,
       comments: 32,
       shares: 76,
+      rating: "4.0",
     },
     content: {
       type: "audio",
@@ -212,6 +217,7 @@ const mockPortfolios = {
       likes: 412,
       comments: 67,
       shares: 145,
+      rating: "4.5",
     },
     content: {
       type: "text",
@@ -264,6 +270,7 @@ const PortfolioDetail = () => {
   const [likes, setLikes] = useState(0);
   const [showFullscreenGallery, setShowFullscreenGallery] = useState(false);
   const [fullscreenImageIndex, setFullscreenImageIndex] = useState(0);
+  const [showReportModal, setShowReportModal] = useState(false);
 
   // For demo purposes, we'll use the images portfolio
   const portfolio = mockPortfolios.images;
@@ -297,6 +304,21 @@ const PortfolioDetail = () => {
   const handleShare = () => {
     navigator.clipboard.writeText(window.location.href);
     // You could add a toast notification here
+  };
+
+  const handleReport = async (reportData) => {
+    try {
+      await reportAPI.reportPortfolio(portfolio.id, {
+        reason: reportData.reason,
+        reason_type: reportData.reasonType
+      });
+      // You could add a success toast notification here
+      console.log('Portfolio reported successfully');
+    } catch (error) {
+      console.error('Failed to report portfolio:', error);
+      // You could add an error toast notification here
+      throw error;
+    }
   };
 
   const openFullscreenGallery = (imageIndex) => {
@@ -462,7 +484,18 @@ const PortfolioDetail = () => {
               <ArrowLeft className="size-4 mr-2" />
               Back
             </Button>
-          
+            
+            {/* Report Button */}
+            {token && (
+              <Button
+                variant="ghost"
+                onClick={() => setShowReportModal(true)}
+                className="text-muted-foreground hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/10"
+              >
+                <Flag className="size-4 mr-2" />
+                Report
+              </Button>
+            )}
           </div>
         </div>
       </div>
@@ -505,10 +538,11 @@ const PortfolioDetail = () => {
           {/* Right Column - Sidebar */}
           <div className="space-y-6">
             {/* Stats */}
-            <Card className="p-6 flex flex-col gap-2 justify-between">
-              <div onClick={handelTranslate}>
+            <Card className="p-6 ">
+              <div className="" onClick={handelTranslate}>
                 <h3 className="font-semibold mb-4">Stats</h3>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="flex flex-col gap-4  items-center justify-between">
+                <div className="grid grid-cols-2 justify-center gap-4">
 
                   <Button
                     variant="ghost"
@@ -533,19 +567,20 @@ const PortfolioDetail = () => {
                     </div>
                     <div className="text-sm text-muted-foreground">Comments</div>
                   </Button>
-                  <div className="text-center p-3 bg-purple-50 dark:bg-purple-900/10 rounded-lg">
+                  {/* <div className="text-center p-3 bg-purple-50 dark:bg-purple-900/10 rounded-lg">
                     <Share2 className="size-5 mx-auto mb-2 text-purple-600" />
                     <div className="font-semibold">{portfolio.stats.shares}</div>
                     <div className="text-sm text-muted-foreground">Shares</div>
-                  </div>
-                  <div className="text-center p-3 bg-purple-50 dark:bg-purple-900/10 rounded-lg">
-                    <Eye className="size-5 mx-auto mb-2 text-purple-600" />
-                    <div className="font-semibold">{portfolio.stats.views}</div>
-                    <div className="text-sm text-muted-foreground">Views</div>
+                  </div> */}
+                  <div className="text-center items-center col-span-2 align-center  p-3 bg-purple-50 dark:bg-purple-900/10 rounded-lg">
+                    <Star className="size-5 mx-auto mb-2  text-purple-600" />
+                    <div className="font-semibold">{portfolio.stats.rating}</div>
+                    <div className="text-sm text-muted-foreground">Rating</div>
                   </div>
                 </div>
+              <StarRating />
               </div>
-              <StarRating/>
+              </div>
             </Card>
 
             {/* Tags */}
@@ -577,7 +612,7 @@ const PortfolioDetail = () => {
                   </span>
                 </div>
               </div>
-              <StarRating />
+             
             </Card>
           </div>
         </div>
@@ -589,6 +624,15 @@ const PortfolioDetail = () => {
         onClose={() => setShowComments(false)}
         portfolioId={portfolio.id}
         portfolioTitle={portfolio.title}
+      />
+
+      {/* Report Modal */}
+      <ReportModal
+        isOpen={showReportModal}
+        onClose={() => setShowReportModal(false)}
+        portfolioId={portfolio.id}
+        portfolioTitle={portfolio.title}
+        onSubmit={handleReport}
       />
 
       {/* Fullscreen Image Gallery */}

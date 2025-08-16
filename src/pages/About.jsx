@@ -14,10 +14,10 @@ const About = () => {
       <main className="flex-grow animate-fade-in">
         <div className="container mx-auto px-4 py-16 max-w-6xl">
           <PageTitle
-            subtitle="Artfolio is a social portfolio platform for creatives to showcase their work, connect with a global community, and find inspiration. Our mission is to empower artists, designers, and creators to share their stories and grow their careers."
+            subtitle="Artova is a social portfolio platform for creatives to showcase their work, connect with a global community, and find inspiration. Our mission is to empower artists, designers, and creators to share their stories and grow their careers."
             className="mb-10"
           >
-            About Artfolio
+            About Artova
           </PageTitle>
 
           {/* Mission Section */}
@@ -28,7 +28,7 @@ const About = () => {
                 <div>
                   <h3 className="text-2xl font-bold font-quicksand mb-3">Create. Share. Grow.</h3>
                   <p className="text-muted-foreground leading-relaxed mb-4">
-                    We believe creativity thrives in supportive communities. Artfolio makes it simple to publish polished portfolios, get discovered, and build meaningful connections.
+                    We believe creativity thrives in supportive communities. Artova makes it simple to publish polished portfolios, get discovered, and build meaningful connections.
                   </p>
                   <ul className="space-y-2 text-sm text-muted-foreground list-disc pl-5">
                     <li>Personalized portfolios with consistent, accessible design.</li>
@@ -101,7 +101,7 @@ const About = () => {
           {/* CTA Section */}
           <section aria-labelledby="join" className="mb-4">
             <div className="bg-card border border-border rounded-2xl p-8 text-center">
-              <h2 id="join" className="text-2xl font-bold font-quicksand mb-2">Join the Artfolio community</h2>
+              <h2 id="join" className="text-2xl font-bold font-quicksand mb-2">Join the Artova community</h2>
               <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
                 Start your portfolio, explore inspiring creators, and share your journey.
               </p>

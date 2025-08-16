@@ -26,29 +26,37 @@ const SignIn = () => {
 
   const handleSignIn = async (e) => {
     e.preventDefault();
+    
+    // Prevent any default form behavior
+    if (e && e.preventDefault) {
+      e.preventDefault();
+    }
+    
     setIsLoading(true);
+    
     try {
       const response = await authAPI.login({
         email,
         password,
       });
+      
       if (response && response.success) {
-        toast.success("Login successful!");
+        toast.success("Login Successfully!");
         navigate("/");
       } else {
         toast.error("Login failed. Please try again.");
       }
     } catch (error) {
+      console.error("Login error:", error);
       let message = "An error occurred. Please try again.";
+      
       if (error.response && error.response.data && error.response.data.message) {
         message = error.response.data.message;
-        toast.error(message)
+      } else if (error.message) {
+        message = error.message;
       }
-      toast({
-        title: "Sign in failed",
-        description: message,
-        variant: "destructive",
-      });
+      
+      toast.error(message);
     } finally {
       setIsLoading(false);
     }
@@ -151,14 +159,7 @@ const SignIn = () => {
                 </Button>
               </form>
 
-              <div className="relative my-6">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-border"></div>
-                </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-card px-2 text-muted-foreground font-quicksand">Or continue with</span>
-                </div>
-              </div>
+             
               
               
             </CardContent>

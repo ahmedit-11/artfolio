@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Mail, User, ArrowRight, Github, Eye, EyeOff, CloudCog } from "lucide-react";
+import { Mail, User, ArrowRight, Github, Eye, EyeOff, CloudCog, Check, X } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { ToastContainer, toast } from 'react-toastify';
@@ -27,27 +27,51 @@ const SignUp = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [acceptTerms, setAcceptTerms] = useState(false);
+  const [passwordRequirements, setPasswordRequirements] = useState({
+    length: false,
+    uppercase: false,
+    lowercase: false,
+    number: false,
+    special: false
+  });
   const navigate = useNavigate();
-  // const { toast } = useToast();
+  // Validate password requirements
+  const validatePassword = (password) => {
+    const requirements = {
+      length: password.length >= 8,
+      uppercase: /[A-Z]/.test(password),
+      lowercase: /[a-z]/.test(password),
+      number: /\d/.test(password),
+      special: /[!@#$%^&*(),.?":{}|<>]/.test(password)
+    };
+    setPasswordRequirements(requirements);
+    return Object.values(requirements).every(Boolean);
+  };
+
+  const handlePasswordChange = (e) => {
+    const newPassword = e.target.value;
+    setPassword(newPassword);
+    validatePassword(newPassword);
+  };
+
+  const isPasswordValid = Object.values(passwordRequirements).every(Boolean);
+
   const handleSignUp = async (e) => {
     e.preventDefault();
-    // if (!acceptTerms) {
-    //   toast({
-    //     title: "Please accept the Terms and Privacy Policy",
-    //     description: "You must agree to the Terms of Service and Privacy Policy to continue.",
-    //     variant: "destructive",
-    //   });
-    //   return;
-    // }
+    if (!acceptTerms) {
+      toast.error("Please accept the Terms and Privacy Policy to continue.");
+      return;
+    }
 
-    // if (password !== confirmPassword) {
-    //   toast({
-    //     title: "Password mismatch",
-    //     description: "Please make sure your passwords match.",
-    //     variant: "destructive",
-    //   });
-    //   return;
-    // }
+    if (password !== confirmPassword) {
+      toast.error("Passwords do not match. Please make sure your passwords match.");
+      return;
+    }
+
+    if (!isPasswordValid) {
+      toast.error("Password does not meet the required criteria. Please check the requirements below.");
+      return;
+    }
 
     setIsLoading(true);
     try {
@@ -90,11 +114,7 @@ const SignUp = () => {
           message = Object.values(errors).flat().join(" ");
         }
       }
-      // toast({
-      //   title: "Signup failed",
-      //   description: message,
-      //   variant: "destructive",
-      // });
+     
     }
   };
 
@@ -118,7 +138,7 @@ const SignUp = () => {
         <div className="w-full max-w-md">
           <div className="text-center mb-8 animate-fade-in">
             <PageTitle subtitle="Create an account to showcase your creative work">
-              Join Artfolio
+              Join Artova
             </PageTitle>
           </div>
 
@@ -179,12 +199,68 @@ const SignUp = () => {
                     <Input
                       id="password"
                       type={showPassword ? "text" : "password"}
-                      placeholder="password"
+                      placeholder="********"
                       className="pl-10 font-quicksand"
                       value={password}
-                      onChange={(e) => setPassword(e.target.value)}
+                      onChange={handlePasswordChange}
                       required
                     />
+                  </div>
+                  {/* Password Requirements */}
+                  <div className="bg-muted/50 p-3 rounded-lg space-y-2">
+                    <h4 className="font-medium text-sm mb-2 font-quicksand">Password Requirements:</h4>
+                    <div className="grid grid-cols-1 gap-1 text-xs">
+                      <div className={`flex items-center space-x-2 font-quicksand ${
+                        passwordRequirements.length ? 'text-green-600 dark:text-green-400' : 'text-muted-foreground'
+                      }`}>
+                        {passwordRequirements.length ? (
+                          <Check className="w-3 h-3" />
+                        ) : (
+                          <X className="w-3 h-3" />
+                        )}
+                        <span>At least 8 characters</span>
+                      </div>
+                      <div className={`flex items-center space-x-2 font-quicksand ${
+                        passwordRequirements.uppercase ? 'text-green-600 dark:text-green-400' : 'text-muted-foreground'
+                      }`}>
+                        {passwordRequirements.uppercase ? (
+                          <Check className="w-3 h-3" />
+                        ) : (
+                          <X className="w-3 h-3" />
+                        )}
+                        <span>One uppercase letter (A-Z)</span>
+                      </div>
+                      <div className={`flex items-center space-x-2 font-quicksand ${
+                        passwordRequirements.lowercase ? 'text-green-600 dark:text-green-400' : 'text-muted-foreground'
+                      }`}>
+                        {passwordRequirements.lowercase ? (
+                          <Check className="w-3 h-3" />
+                        ) : (
+                          <X className="w-3 h-3" />
+                        )}
+                        <span>One lowercase letter (a-z)</span>
+                      </div>
+                      <div className={`flex items-center space-x-2 font-quicksand ${
+                        passwordRequirements.number ? 'text-green-600 dark:text-green-400' : 'text-muted-foreground'
+                      }`}>
+                        {passwordRequirements.number ? (
+                          <Check className="w-3 h-3" />
+                        ) : (
+                          <X className="w-3 h-3" />
+                        )}
+                        <span>One number (0-9)</span>
+                      </div>
+                      <div className={`flex items-center space-x-2 font-quicksand ${
+                        passwordRequirements.special ? 'text-green-600 dark:text-green-400' : 'text-muted-foreground'
+                      }`}>
+                        {passwordRequirements.special ? (
+                          <Check className="w-3 h-3" />
+                        ) : (
+                          <X className="w-3 h-3" />
+                        )}
+                        <span>One special character (!@#$%^&*)</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
                 <div className="space-y-2">
@@ -205,7 +281,7 @@ const SignUp = () => {
                     <Input
                       id="confirmPassword"
                       type={showConfirmPassword ? "text" : "password"}
-                      placeholder="confirm password"
+                      placeholder="********"
                       className="pl-10 font-quicksand"
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
@@ -222,7 +298,7 @@ const SignUp = () => {
                 <Button
                   type="submit"
                   className="w-full bg-purple-gradient hover:opacity-90 transition-all font-quicksand group"
-                  disabled={isLoading}
+                  disabled={isLoading || !isPasswordValid || password !== confirmPassword || !acceptTerms}
                 >
                   {isLoading ? (
                     <span className="flex items-center">
@@ -238,22 +314,7 @@ const SignUp = () => {
                 </Button>
               </form>
 
-              <div className="relative my-6">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-border"></div>
-                </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-card px-2 text-muted-foreground font-quicksand">Or continue with</span>
-                </div>
-              </div>
-              <Button variant="outline" className="w-full font-quicksand hover:bg-muted transition-all mb-2">
-                <svg className="mr-2 h-4 w-4" width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg"><g><path d="M17.64 9.2045c0-.638-.0573-1.2527-.1636-1.8409H9v3.4818h4.8445c-.2082 1.1218-.8345 2.0736-1.7763 2.7136v2.2545h2.8736C16.9782 14.0845 17.64 11.8582 17.64 9.2045z" fill="#4285F4" /><path d="M9 18c2.43 0 4.4673-.8062 5.9564-2.1864l-2.8736-2.2545c-.7973.5345-1.8145.8491-3.0827.8491-2.3691 0-4.3773-1.6018-5.0964-3.7573H.9391v2.3164C2.4227 16.2936 5.4818 18 9 18z" fill="#34A853" /><path d="M3.9036 10.6509c-.1818-.5345-.2864-1.1045-.2864-1.6509s.1045-1.1164.2864-1.6509V5.0336H.9391C.3409 6.2536 0 7.5791 0 9c0 1.4209.3409 2.7464.9391 3.9664l2.9645-2.3155z" fill="#FBBC05" /><path d="M9 3.5791c1.3227 0 2.5045.4545 3.4364 1.3455l2.5773-2.5773C13.4645.8062 11.4273 0 9 0 5.4818 0 2.4227 1.7064.9391 4.0336l2.9645 2.3164C4.6227 5.1809 6.6309 3.5791 9 3.5791z" fill="#EA4335" /></g></svg>
-                Google
-              </Button>
-              <Button variant="outline" className="w-full font-quicksand hover:bg-muted transition-all">
-                <Github className="mr-2 h-4 w-4" />
-                Github
-              </Button>
+           
             </CardContent>
             <CardFooter className="flex flex-col space-y-4">
               <div className="text-center text-sm text-muted-foreground font-quicksand">

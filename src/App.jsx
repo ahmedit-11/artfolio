@@ -11,6 +11,9 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
+import ChangePassword from "./pages/ChangePassword";
 import Settings from "./pages/Settings";
 import Profile from "./pages/Profile";
 import ProfileSettings from "./pages/ProfileSettings";
@@ -23,7 +26,7 @@ import ForYouPage from "./pages/ForYou";
 import Contact from "./pages/Contact";
 import About from "./pages/About";
 import Features from "./pages/Features";
-import Cookies from "js-cookie";
+import CookiesPage from "./pages/Cookies";
 import PortfolioDetail from "./pages/PortfolioDetail";
 import CreatePortfolio from "./pages/CreatePortfolio";
 import AdminPanel from "./components/admin/AdminPanel";
@@ -83,12 +86,15 @@ const App = () => {
             <Route path="/profile" element={<Profile />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="/settings/profile" element={<ProfileSettings />} />
+            <Route path="/settings/change-password" element={<ChangePassword />} />
             <Route path="/portfolio/:id" element={<PortfolioDetail />} />
             <Route path="/create" element={<CreatePortfolio />} />
           </Route>
   
           <Route path="/signin" element={<SignIn />} />
           <Route path="/signup" element={<SignUp />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/following" element={<FollowingPage />} />
@@ -100,7 +106,7 @@ const App = () => {
           <Route path="/admin" element={<AdminPanel />} />
           <Route path="/search" element={<SearchPage />} />
           <Route path="/features" element={<Features />} />
-          <Route path="/cookies" element={<Cookies />} />
+          <Route path="/cookies" element={<CookiesPage />} />
   
           <Route path="*" element={<NotFound />} />
         </Routes>

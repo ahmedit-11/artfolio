@@ -125,6 +125,11 @@
     text-wrap: balance;
   }
 
+  /* Explicit Poppins utility to ensure logo font applies even if Tailwind config isn't picked up */
+  .font-poppins {
+    font-family: 'Poppins', sans-serif;
+  }
+
   /* Remove focus outline after mouse clicks but keep for keyboard navigation */
   .js-focus-visible :focus:not(.focus-visible) {
     outline: none;

@@ -166,11 +166,11 @@ const CallToAction = () => {
                 <Button 
                   size="lg" 
                   variant="outline"
-                  className="group relative px-8 py-4 border-2 border-white/30 text-white hover:border-white/60 hover:bg-white/10 font-semibold rounded-full transition-all duration-300 hover:scale-105 backdrop-blur-sm"
+                  className="group relative px-8 py-4 border-2 border-gray-200 hover:border-purple-400 hover:bg-purple-50/60 dark:hover:bg-purple-900/20 hover:text-purple-700 dark:hover:text-purple-300 font-semibold rounded-full transition-all duration-300 hover:scale-105 backdrop-blur-sm"
                 >
                   <span className="flex items-center gap-2">
                     <Play className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
-                    Explore Gallery
+                    Explore Portfolio
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-2 transition-transform duration-300" />
                   </span>
                 </Button>
@@ -178,9 +178,9 @@ const CallToAction = () => {
             </div>
 
             {/* Subtle call-out */}
-            <div className="mt-8 flex items-center justify-center gap-2 text-white/60 text-sm">
+            <div className="mt-8 flex items-center justify-center gap-2 dark:text-white/60 text-sm">
               <Zap className="w-4 h-4 text-yellow-400" />
-              <span>Free to start • No credit card required</span>
+              <span className="">Free to start • No credit card required</span>
             </div>
           </div>
         </div>

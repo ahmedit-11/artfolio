@@ -1,6 +1,6 @@
 // Header.jsx
 // Defines the header/navigation bar for the application, including navigation links, user actions, and theme toggle.
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import Cookies from "js-cookie"
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,7 @@ import AvatarMenu from "./AvatarMenu";
 
 // Header component manages navigation and user actions
 const Header = () => {
+  const logoFont = 'Pacifico, cursive';
   // State for mobile menu open/close
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
@@ -34,10 +35,21 @@ const Header = () => {
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
+
+  // Mount/unmount mobile menu for smooth exit without leaving overlay in DOM
+  const [renderMobileMenu, setRenderMobileMenu] = useState(false);
+  useEffect(() => {
+    if (isMenuOpen) {
+      setRenderMobileMenu(true);
+      return;
+    }
+    const t = setTimeout(() => setRenderMobileMenu(false), 300); // match duration-300
+    return () => clearTimeout(t);
+  }, [isMenuOpen]);
   const token = Cookies.get('token')
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center justify-between">
+      <div className="w-full px-0 flex h-16 md:h-20 items-center justify-between">
         {/* Logo and Brand */}
         <div className="flex items-center space-x-4">
           {location.pathname !== "/" && (
@@ -51,11 +63,11 @@ const Header = () => {
               <ArrowLeft className="size-5" />
             </Button>
           )}
-          <Link to="/" className="flex items-center space-x-2 focus:outline-none focus:ring-2 focus:ring-purple-500 rounded">
-            <div className="size-8 rounded-full bg-purple-gradient flex items-center justify-center">
-              <span className="text-white font-bold text-sm">⭐</span>
+          <Link to="/" className="flex items-center space-x-2 focus:outline-none focus:ring-2 focus:ring-purple-500 rounded-lg transition-all duration-200 hover:scale-105" aria-label="Go to homepage">
+            <div className="size-14 md:size-16 rounded-full flex items-center justify-center">
+             <img src="assets/logo.png" alt="Artova" className="w-14 h-14 md:w-16 md:h-16 object-contain" />
             </div>
-            <span className="font-bold text-xl bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-indigo-700">Artfolio</span>
+            <span className="font-poppins font-bold text-2xl md:text-3xl bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-indigo-700" style={{ fontFamily: logoFont }}>ArTova</span>
           </Link>
         </div>
 
@@ -116,14 +128,14 @@ const Header = () => {
           >
             <Search className="size-5 dark:text-white " />
           </Button>
-          <ThemeToggle />
+         
           {token ? (
             <AvatarMenu />
           ) : (
             <Link to="/signin">
               {
 
-                <Button variant="ghost" className="bg-purple-gradient hover:opacity-90 font-quicksand text-white">
+                <Button variant="ghost" className="bg-purple-gradient hover:opacity-90 font-quicksand mr-5 text-white">
                   <LogIn className="size-4 mr-2" />
                   Sign In
                 </Button>
@@ -134,7 +146,7 @@ const Header = () => {
 
         {/* Mobile Menu Button and User Actions */}
         <div className="flex items-center space-x-3 md:hidden ">
-          <ThemeToggle />
+          
           {token ? (
             <AvatarMenu />
           ) : (
@@ -152,13 +164,24 @@ const Header = () => {
       </div>
 
       {/* Mobile Navigation Menu */}
-      <div
-        className={cn(
-          "fixed inset-0 top-16 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-40 md:hidden transition-transform duration-300 ease-in-out",
-          isMenuOpen ? "translate-x-0" : "translate-x-full"
-        )}
-      >
-        <nav className="container py-6 space-y-4 bg-border ">
+      {renderMobileMenu && (
+        <div
+          className={cn(
+            "fixed inset-0 top-16 z-40 md:hidden transition-opacity duration-300 ease-in-out",
+            isMenuOpen
+              ? "opacity-100 pointer-events-auto bg-black/30"
+              : "opacity-0 pointer-events-none bg-transparent"
+          )}
+          onClick={(e) => e.target === e.currentTarget && setIsMenuOpen(false)}
+        >
+          {/* Sliding panel */}
+          <div
+            className={cn(
+              "absolute right-0 top-0 h-[calc(100vh-4rem)] w-80 max-w-[90%] bg-background shadow-xl transition-transform duration-300 ease-in-out will-change-transform",
+              isMenuOpen ? "translate-x-0" : "translate-x-full"
+            )}
+          >
+            <nav className="p-4 py-6 space-y-2">
           <Link to="/" className={cn(
             "flex items-center space-x-2 p-3 rounded-lg text-muted-foreground hover:text-foreground hover:bg-purple-100 dark:hover:bg-purple-900/20 transition-colors",
             location.pathname === "/" && "text-primary bg-purple-100 dark:bg-purple-900/20"
@@ -201,8 +224,10 @@ const Header = () => {
             <Mail className="size-5" />
             <span>Contact</span>
           </Link>
-        </nav>
-      </div>
+            </nav>
+          </div>
+        </div>
+      )}
     </header>
   );
 };

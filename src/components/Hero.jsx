@@ -45,28 +45,7 @@ const Hero = () => {
             showcase their best work and discover amazing talent.
           </p>
           </div>
-          <div className="relative z-20 flex flex-col sm:flex-row justify-center gap-4">
-            <Link to="/create">
-              <Button 
-                size="lg" 
-                className="bg-purple-gradient hover:bg-blue-500 hover:opacity-90 hover:scale-105 transition-all duration-300 font-quicksand relative overflow-hidden group"
-              >
-                <span className="relative z-10">Create Your Portfolio</span>
-                <span className="absolute inset-0 bg-gradient-to-r from-purple-700 to-indigo-900 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-md"></span>
-              </Button>
-            </Link>
-            <Link to="/explore">
-              <Button 
-                size="lg" 
-                variant="outline" 
-                className="group relative overflow-hidden isolate z-10 font-quicksand border hover:scale-105 transition-all duration-300 hover:border-purple-400 hover:bg-purple-50/60 dark:hover:bg-purple-900/20 hover:text-purple-700 dark:hover:text-purple-300"
-              >
-                <span className="relative z-10">Explore Portfolios</span>
-                <ArrowRight className="ml-2 size-4 transition-transform duration-300 group-hover:translate-x-2 relative z-10" />
-                <span className="pointer-events-none absolute inset-0 bg-gradient-to-r from-purple-500/10 to-indigo-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-              </Button>
-            </Link>
-          </div>
+          
         
         <div className="mt-16 relative z-10">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

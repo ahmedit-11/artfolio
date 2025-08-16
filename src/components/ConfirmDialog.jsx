@@ -1,11 +1,16 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
 
-const ConfirmDialog = ({ isOpen, onClose, onConfirm, title, message }) => {
+const ConfirmDialog = ({ isOpen, onClose, onConfirm, title, message, placement = 'center' }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 dark:bg-black/70 flex items-center justify-center p-4 z-50">
+    <div
+      className={cn(
+        "fixed inset-0 bg-black/50 dark:bg-black/70 flex p-4 z-50",
+        placement === 'bottom' ? 'items-end justify-center pb-8' : 'items-center justify-center'
+      )}
+    >
       <div className="bg-background border border-border rounded-xl shadow-2xl max-w-sm w-full">
         <div className="p-6">
           <h3 className="text-lg font-bold text-foreground mb-2">{title || 'Confirm Action'}</h3>

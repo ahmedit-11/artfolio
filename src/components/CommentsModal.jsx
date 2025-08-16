@@ -3,8 +3,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { X, Heart, Reply, Send, Loader2 } from "lucide-react";
+import { X, Heart, Reply, Send, Loader2, Flag, MoreHorizontal } from "lucide-react";
 import { cn } from "@/lib/utils";
+import ReportModal from "./ReportModal";
+import { reportAPI } from "@/lib/api";
 
 // Mock comments data
 const mockComments = [
@@ -56,6 +58,8 @@ const CommentsModal = ({ isOpen, onClose, portfolioId, portfolioTitle }) => {
   const [replyTo, setReplyTo] = useState(null);
   const [replyText, setReplyText] = useState("");
   const [isLoading, setIsLoading] = useState(true);
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [reportingComment, setReportingComment] = useState(null);
 
   // Simulate loading comments
   useEffect(() => {
@@ -143,6 +147,33 @@ const CommentsModal = ({ isOpen, onClose, portfolioId, portfolioTitle }) => {
     }
   };
 
+  const handleReportComment = (comment, isReply = false) => {
+    setReportingComment({
+      ...comment,
+      isReply,
+      displayText: isReply ? `Reply by ${comment.author}` : `Comment by ${comment.author}`
+    });
+    setShowReportModal(true);
+  };
+
+  const handleSubmitReport = async (reportData) => {
+    try {
+      await reportAPI.reportComment(reportingComment.id, {
+        reason: reportData.reason,
+        reason_type: reportData.reasonType
+      });
+      console.log('Comment reported successfully');
+    } catch (error) {
+      console.error('Failed to report comment:', error);
+      throw error;
+    }
+  };
+
+  const handleCloseReportModal = () => {
+    setShowReportModal(false);
+    setReportingComment(null);
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -212,6 +243,15 @@ const CommentsModal = ({ isOpen, onClose, portfolioId, portfolioTitle }) => {
                           <Reply className="size-3 mr-1" />
                           Reply
                         </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleReportComment(comment)}
+                          className="text-xs h-auto p-1 hover:bg-red-100 dark:hover:bg-red-900/20 hover:text-red-600"
+                        >
+                          <Flag className="size-3 mr-1" />
+                          Report
+                        </Button>
                       </div>
 
                       {/* Reply form */}
@@ -252,18 +292,29 @@ const CommentsModal = ({ isOpen, onClose, portfolioId, portfolioTitle }) => {
                                   <span className="text-xs text-muted-foreground">{reply.timestamp}</span>
                                 </div>
                                 <p className="text-sm mb-2 text-muted-foreground">{reply.content}</p>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => handleLikeComment(reply.id, true, comment.id)}
-                                  className={cn(
-                                    "text-xs h-auto p-1 hover:bg-purple-100 dark:hover:bg-purple-900/20",
-                                    reply.isLiked && "text-purple-600"
-                                  )}
-                                >
-                                  <Heart className={cn("size-3 mr-1", reply.isLiked && "fill-current")} />
-                                  {reply.likes}
-                                </Button>
+                                <div className="flex items-center space-x-3">
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => handleLikeComment(reply.id, true, comment.id)}
+                                    className={cn(
+                                      "text-xs h-auto p-1 hover:bg-purple-100 dark:hover:bg-purple-900/20",
+                                      reply.isLiked && "text-purple-600"
+                                    )}
+                                  >
+                                    <Heart className={cn("size-3 mr-1", reply.isLiked && "fill-current")} />
+                                    {reply.likes}
+                                  </Button>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => handleReportComment(reply, true)}
+                                    className="text-xs h-auto p-1 hover:bg-red-100 dark:hover:bg-red-900/20 hover:text-red-600"
+                                  >
+                                    <Flag className="size-3 mr-1" />
+                                    Report
+                                  </Button>
+                                </div>
                               </div>
                             </div>
                           ))}
@@ -299,6 +350,17 @@ const CommentsModal = ({ isOpen, onClose, portfolioId, portfolioTitle }) => {
           </div>
         </form>
       </div>
+
+      {/* Report Modal */}
+      {reportingComment && (
+        <ReportModal
+          isOpen={showReportModal}
+          onClose={handleCloseReportModal}
+          portfolioId={reportingComment.id}
+          portfolioTitle={reportingComment.displayText}
+          onSubmit={handleSubmitReport}
+        />
+      )}
     </div>
   );
 };

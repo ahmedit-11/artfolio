@@ -22,7 +22,7 @@ const Cookies = () => {
       <main className="flex-grow animate-fade-in">
         <div className="container mx-auto px-4 py-12 max-w-6xl">
           <PageTitle
-            subtitle="This Cookie Policy explains how Artfolio uses cookies and similar technologies to recognize you when you visit our website."
+            subtitle="This Cookie Policy explains how Artova uses cookies and similar technologies to recognize you when you visit our website."
             className="mb-6"
           >
             Cookie Policy
@@ -95,7 +95,7 @@ const Cookies = () => {
 
               <section id="contact" className="scroll-mt-24">
                 <h2 className="text-xl font-semibold mb-2 font-quicksand">8. Contact Us</h2>
-                <p className="text-muted-foreground">Questions about our use of cookies? Email us at <a className="underline" href="mailto:privacy@artfolio.app">privacy@artfolio.app</a> or visit our <Link className="underline" to="/contact">Contact</Link> page.</p>
+                <p className="text-muted-foreground">Questions about our use of cookies? Email us at <a className="underline" href="mailto:privacy@Artova.app">privacy@Artova.app</a> or visit our <Link className="underline" to="/contact">Contact</Link> page.</p>
               </section>
             </article>
           </div>

@@ -27,9 +27,14 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Token expired or invalid - clear cookie and redirect to login
-      Cookies.remove('token');
-      window.location.href = '/signin';
+      // Don't redirect if this is a login attempt (let the login page handle the error)
+      const isLoginAttempt = error.config?.url?.includes('/login');
+      
+      if (!isLoginAttempt) {
+        // Token expired or invalid - clear cookie and redirect to login
+        Cookies.remove('token');
+        window.location.href = '/signin';
+      }
     }
     return Promise.reject(error);
   }
@@ -88,6 +93,26 @@ export const authAPI = {
   // Update user profile
   updateProfile: async (profileData) => {
     const response = await api.put('/user/profile', profileData);
+    return response.data;
+  },
+
+  // Forgot password
+  forgotPassword: async (email) => {
+    await getCsrfCookie();
+    const response = await api.post('/forgot-password', { email });
+    return response.data;
+  },
+
+  // Reset password
+  resetPassword: async (resetData) => {
+    await getCsrfCookie();
+    const response = await api.post('/reset-password', resetData);
+    return response.data;
+  },
+
+  // Change password
+  changePassword: async (passwordData) => {
+    const response = await api.put('/user/change-password', passwordData);
     return response.data;
   }
 };
@@ -255,6 +280,27 @@ export const adminAPI = {
   // Get ban logs
   getBanLogs: async (params = {}) => {
     const response = await api.get('/admin/ban-logs', { params });
+    return response.data;
+  }
+};
+
+// Report API calls
+export const reportAPI = {
+  // Report portfolio
+  reportPortfolio: async (portfolioId, reportData) => {
+    const response = await api.post(`/portfolios/${portfolioId}/report`, reportData);
+    return response.data;
+  },
+
+  // Report user
+  reportUser: async (userId, reportData) => {
+    const response = await api.post(`/users/${userId}/report`, reportData);
+    return response.data;
+  },
+
+  // Report comment
+  reportComment: async (commentId, reportData) => {
+    const response = await api.post(`/comments/${commentId}/report`, reportData);
     return response.data;
   }
 };

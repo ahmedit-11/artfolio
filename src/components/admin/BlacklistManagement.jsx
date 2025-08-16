@@ -5,7 +5,7 @@ import { Search, User, Shield, ShieldX, Clock, Timer, AlertTriangle, Unlock, Use
 import { cn } from '@/lib/utils';
 import { toast } from 'react-toastify';
 import BanDetailsModal from './BanDetailsModal';
-import ConfirmDialog from './ConfirmDialog';
+import ConfirmDialog from '@/components/ConfirmDialog';
 import StatCard from './StatCard';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 

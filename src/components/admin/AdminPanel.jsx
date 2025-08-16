@@ -3,13 +3,20 @@
 import React, { useState, useEffect } from 'react';
 import { Users, Flag, Shield, FileText, AlertTriangle, ShieldOff, LogOut, Sun, Moon } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useNavigate } from 'react-router-dom';
+import { authAPI } from '../../lib/api';
+import { toast } from 'react-toastify';
 import UserManagement from './UserManagement';
 import ReportsManagement from './ReportsManagement';
 import BlacklistManagement from './BlacklistManagement';
 import BanLogs from './BanLogs';
+import ConfirmDialog from '@/components/ConfirmDialog';
 
 const AdminPanel = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('users');
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(() => {
     // Check if user has a saved preference
     const saved = localStorage.getItem('admin-theme');
@@ -35,6 +42,26 @@ const AdminPanel = () => {
   // Handle theme toggle
   const toggleTheme = () => {
     setIsDarkMode(!isDarkMode);
+  };
+
+  // Handle logout
+  const handleLogoutClick = () => {
+    setShowLogoutDialog(true);
+  };
+
+  const handleLogout = async () => {
+    setShowLogoutDialog(false);
+    setIsLoggingOut(true);
+    try {
+      await authAPI.logout();
+      toast.success("Logged out successfully!");
+    } catch (error) {
+      console.error("Logout error:", error);
+      toast.success("Logged out successfully!");
+    } finally {
+      setIsLoggingOut(false);
+      navigate("/signin");
+    }
   };
 
   const tabs = [
@@ -81,15 +108,15 @@ const AdminPanel = () => {
               
               {/* Logout Button */}
               <button
-                onClick={() => {
-                  // TODO: Add logout logic here
-                  console.log('Logout clicked');
-                }}
-                className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors"
+                onClick={handleLogoutClick}
+                disabled={isLoggingOut}
+                className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 bg-red-500 hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg transition-colors"
                 title="Logout"
               >
                 <LogOut className="size-4" />
-                <span className="text-xs sm:text-sm font-medium hidden sm:inline">Logout</span>
+                <span className="text-xs sm:text-sm font-medium hidden sm:inline">
+                  {isLoggingOut ? "Logging out..." : "Logout"}
+                </span>
               </button>
             </div>
           </div>
@@ -124,6 +151,14 @@ const AdminPanel = () => {
           {ActiveComponent && <ActiveComponent />}
         </div>
       </div>
+
+      <ConfirmDialog
+        isOpen={showLogoutDialog}
+        onClose={() => setShowLogoutDialog(false)}
+        onConfirm={handleLogout}
+        title="Sign Out"
+        message="Are you sure you want to sign out of your admin account?"
+      />
     </div>
   );
 };

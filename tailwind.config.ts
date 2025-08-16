@@ -78,6 +78,7 @@ export default {
       },
       fontFamily: {
         quicksand: ["Quicksand", "sans-serif"],
+        poppins: ["Poppins", "sans-serif"],
       },
       backgroundImage: {
         "purple-gradient": "linear-gradient(135deg, #8A2BE2, #4B0082)",

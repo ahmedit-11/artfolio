@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -9,7 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { User, Settings, LogOut } from "lucide-react";
+import { User, Settings } from "lucide-react";
 
 const PROFILE_KEY = "artfolio_profile";
 function loadProfile() {
@@ -37,42 +37,39 @@ const AvatarMenu = () => {
   };
 
   return (
-   
-    <DropdownMenu>
-      <DropdownMenuTrigger className="focus:outline-none">
-        <Avatar className="size-9 border-2 border-purple-200 dark:border-purple-800 hover:border-purple-500 dark:hover:border-purple-500 transition-colors cursor-pointer">
-          <AvatarImage src={avatar} alt={fullName} />
-          <AvatarFallback className="bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300">
-            {fullName.charAt(0)}
-          </AvatarFallback>
-        </Avatar>
-      </DropdownMenuTrigger>
-      
-      <DropdownMenuContent align="end" className="w-56">
-        <DropdownMenuLabel>
-          <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">{fullName}</p>
-            <p className="text-xs leading-none text-muted-foreground">@{username}</p>
-          </div>
-        </DropdownMenuLabel>
-        <DropdownMenuSeparator />
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger className="focus:outline-none">
+          <Avatar className="size-9 border-2 mr-5 border-purple-200 dark:border-purple-800 hover:border-purple-500 dark:hover:border-purple-500 transition-colors cursor-pointer">
+            <AvatarImage src={avatar} alt={fullName} />
+            <AvatarFallback className="bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300">
+              {fullName.charAt(0)}
+            </AvatarFallback>
+          </Avatar>
+        </DropdownMenuTrigger>
         
-        <DropdownMenuItem className="cursor-pointer" onClick={handleProfileClick}>
-          <User className="size-4 mr-2" />
-          <span>Profile</span>
-        </DropdownMenuItem>
-        
-        <DropdownMenuItem className="cursor-pointer" onClick={handleSettingsClick}>
-          <Settings className="size-4 mr-2" />
-          <span>Settings</span>
-        </DropdownMenuItem>
-        
-   
-        
-      
-      </DropdownMenuContent>
-    </DropdownMenu>
+        <DropdownMenuContent align="end" className="w-56">
+          <DropdownMenuLabel>
+            <div className="flex flex-col space-y-1">
+              <p className="text-sm font-medium leading-none">{fullName}</p>
+              <p className="text-xs leading-none text-muted-foreground">@{username}</p>
+            </div>
+          </DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          
+          <DropdownMenuItem className="cursor-pointer" onClick={handleProfileClick}>
+            <User className="size-4 mr-2" />
+            <span>Profile</span>
+          </DropdownMenuItem>
+          
+          <DropdownMenuItem className="cursor-pointer" onClick={handleSettingsClick}>
+            <Settings className="size-4 mr-2" />
+            <span>Settings</span>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </>
   );
 };
 
-export default AvatarMenu; 
+export default AvatarMenu;

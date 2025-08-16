@@ -125,7 +125,7 @@ const ProfileSettings = () => {
 
   return (
     <div className="container max-w-2xl mx-auto px-4 py-8 bg-background animate-fade-in">
-      <Button variant="ghost" onClick={() => navigate("/settings")} className="mb-4">&larr; Back to Settings</Button>
+      <Button variant="ghost" onClick={() => navigate(-1)} className="mb-4">&larr; Back to Settings</Button>
       <Card className="p-6">
         <h2 className="text-2xl font-bold mb-4">Edit Profile</h2>
         <form onSubmit={handleSave} className="space-y-6">

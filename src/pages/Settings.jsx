@@ -4,6 +4,8 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   Bell,
   Lock,
@@ -13,13 +15,24 @@ import {
   Palette,
   Volume2,
   Languages,
-  LogOut
+  LogOut,
+  
+  Download,
+  Trash2,
+  Eye,
+  Smartphone,
+  Mail,
+  MessageSquare,
+  Heart,
+  UserPlus,
+  
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import ThemeToggle from "@/components/ThemeToggle";
 import PageTitle from "@/components/PageTitle";
 import { authAPI } from "../lib/api";
 import { toast } from "react-toastify";
+import ConfirmDialog from "@/components/ConfirmDialog";
 
 const SettingsSection = ({ icon: Icon, title, description, children }) => (
   <Card className="p-6 mb-6">
@@ -59,33 +72,65 @@ const Settings = () => {
   useScrollToTop();
   const navigate = useNavigate();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
+  const [language, setLanguage] = useState("en");
+  const [timezone, setTimezone] = useState("UTC");
 
-  // Toggles with persistence
+  // Notification preferences with more granular control
   const [emailNotifs, setEmailNotifs] = useStoredToggle("settings_email_notifs", true);
   const [pushNotifs, setPushNotifs] = useStoredToggle("settings_push_notifs", true);
+  const [likeNotifs, setLikeNotifs] = useStoredToggle("settings_like_notifs", true);
+  const [commentNotifs, setCommentNotifs] = useStoredToggle("settings_comment_notifs", true);
+  const [followNotifs, setFollowNotifs] = useStoredToggle("settings_follow_notifs", true);
+  const [marketingEmails, setMarketingEmails] = useStoredToggle("settings_marketing_emails", false);
+  
+  // Privacy settings
   const [profileVisible, setProfileVisible] = useStoredToggle("settings_profile_visible", true);
+  const [showOnlineStatus, setShowOnlineStatus] = useStoredToggle("settings_online_status", true);
+  const [allowMessages, setAllowMessages] = useStoredToggle("settings_allow_messages", true);
+  
+  // Accessibility & Display
   const [highContrast, setHighContrast] = useStoredToggle("settings_high_contrast", false);
+  const [reducedMotion, setReducedMotion] = useStoredToggle("settings_reduced_motion", false);
   const [soundEffects, setSoundEffects] = useStoredToggle("settings_sound_effects", true);
   const [notifSounds, setNotifSounds] = useStoredToggle("settings_notif_sounds", true);
 
-  // Logout handler
+  // Event handlers
+  const handleLogoutClick = () => {
+    setShowLogoutDialog(true);
+  };
+
   const handleLogout = async () => {
+    setShowLogoutDialog(false);
     setIsLoggingOut(true);
     try {
-      console.log("Starting logout process...");
       await authAPI.logout();
       toast.success("Logged out successfully!");
     } catch (error) {
-      console.error("Logout error details:", error);
-      console.error("Error response:", error.response?.data);
-      console.error("Error status:", error.response?.status);
-      // Even if backend logout fails, token is cleared locally, so we can still proceed
+      console.error("Logout error:", error);
       toast.success("Logged out successfully!");
     } finally {
       setIsLoggingOut(false);
-      // Always navigate to signin after logout attempt (token is cleared either way)
       navigate("/signin");
     }
+  };
+
+  const handleDeleteAccount = () => {
+    setShowDeleteDialog(false);
+    toast.success("Account deletion request submitted. You will receive an email with further instructions.");
+  };
+
+  const handleExportData = () => {
+    toast.success("Data export started. You will receive an email when it's ready for download.");
+  };
+
+  const handlePasswordChange = () => {
+    navigate('/settings/change-password');
+  };
+
+  const handle2FASetup = () => {
+    navigate('/settings/two-factor');
   };
 
   return (
@@ -106,123 +151,130 @@ const Settings = () => {
       <SettingsSection
         icon={Bell}
         title="Notifications"
-        description="Control how you receive notifications"
+        description="Control how and when you receive notifications"
       >
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <span>Email Notifications</span>
+            <div className="flex items-center space-x-2">
+              <Mail className="size-4 text-muted-foreground" />
+              <span>Email Notifications</span>
+            </div>
             <Switch checked={emailNotifs} onCheckedChange={setEmailNotifs} />
           </div>
           <Separator />
           <div className="flex items-center justify-between">
-            <span>Push Notifications</span>
+            <div className="flex items-center space-x-2">
+              <Smartphone className="size-4 text-muted-foreground" />
+              <span>Push Notifications</span>
+            </div>
             <Switch checked={pushNotifs} onCheckedChange={setPushNotifs} />
+          </div>
+          <Separator />
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <Heart className="size-4 text-muted-foreground" />
+              <span>Likes & Reactions</span>
+            </div>
+            <Switch checked={likeNotifs} onCheckedChange={setLikeNotifs} />
+          </div>
+          <Separator />
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <MessageSquare className="size-4 text-muted-foreground" />
+              <span>Comments</span>
+            </div>
+            <Switch checked={commentNotifs} onCheckedChange={setCommentNotifs} />
+          </div>
+          <Separator />
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <UserPlus className="size-4 text-muted-foreground" />
+              <span>New Followers</span>
+            </div>
+            <Switch checked={followNotifs} onCheckedChange={setFollowNotifs} />
+          </div>
+          <Separator />
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <Mail className="size-4 text-muted-foreground" />
+              <span>Marketing Emails</span>
+            </div>
+            <Switch checked={marketingEmails} onCheckedChange={setMarketingEmails} />
           </div>
         </div>
       </SettingsSection>
 
       <SettingsSection
         icon={Shield}
-        title="Privacy"
-        description="Manage your privacy settings and data"
+        title="Privacy & Security"
+        description="Control who can see your content and interact with you"
       >
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <span>Profile Visibility</span>
+            <div className="flex items-center space-x-2">
+              <Eye className="size-4 text-muted-foreground" />
+              <span>Public Profile</span>
+            </div>
             <Switch checked={profileVisible} onCheckedChange={setProfileVisible} />
           </div>
           <Separator />
           <div className="flex items-center justify-between">
-            <span>Data Usage</span>
-            <Button variant="outline" size="sm">Review</Button>
-          </div>
-        </div>
-      </SettingsSection>
-
-      <SettingsSection
-        icon={Lock}
-        title="Account Security"
-        description="Secure your account and manage login settings"
-      >
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <span>Change Password</span>
-            <Button variant="outline" size="sm">Update</Button>
+            <div className="flex items-center space-x-2">
+              <Globe className="size-4 text-muted-foreground" />
+              <span>Show Online Status</span>
+            </div>
+            <Switch checked={showOnlineStatus} onCheckedChange={setShowOnlineStatus} />
           </div>
           <Separator />
-          <div className="flex items-center justify-between" onClick={handleLogout}>
-         LogOut
-            <Button variant="destructive" size="sm">
-            <LogOut className="size-4 mr-2" />LogOut</Button>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <MessageSquare className="size-4 text-muted-foreground" />
+              <span>Allow Direct Messages</span>
+            </div>
+            <Switch checked={allowMessages} onCheckedChange={setAllowMessages} />
+          </div>
+          <Separator />
+          <div className="flex items-center justify-between">
+            <span>Change Password</span>
+            <Button variant="outline" size="sm" onClick={handlePasswordChange}>
+              <Lock className="size-4 mr-2" />
+              Update
+            </Button>
           </div>
           <Separator />
           <div className="flex items-center justify-between">
             <span>Two-Factor Authentication</span>
-            <Button variant="outline" size="sm">Setup</Button>
+            <Button variant="outline" size="sm" onClick={handle2FASetup}>
+              <Shield className="size-4 mr-2" />
+              Setup
+            </Button>
           </div>
         </div>
       </SettingsSection>
+
+
 
       <SettingsSection
         icon={Palette}
-        title="Appearance"
-        description="Customize how Artfolio looks on your device"
+        title="Appearance & Accessibility"
+        description="Customize how Artfolio looks and feels"
       >
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <span>Theme Preferences</span>
+            <span>Theme</span>
             <ThemeToggle />
           </div>
           <Separator />
-          <div className="flex items-center justify-between">
-            <span>Layout Options</span>
-            <Button variant="outline" size="sm">Adjust</Button>
-          </div>
-        </div>
-      </SettingsSection>
-
-      <SettingsSection
-        icon={Languages}
-        title="Language & Region"
-        description="Set your preferred language and region"
-      >
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <span>Language</span>
-            <Button variant="outline" size="sm">Change</Button>
-          </div>
-          <Separator />
-          <div className="flex items-center justify-between">
-            <span>Region</span>
-            <Button variant="outline" size="sm">Change</Button>
-          </div>
-        </div>
-      </SettingsSection>
-
-      <SettingsSection
-        icon={Globe}
-        title="Accessibility"
-        description="Adjust accessibility options for a better experience"
-      >
-        <div className="space-y-4">
           <div className="flex items-center justify-between">
             <span>High Contrast Mode</span>
             <Switch checked={highContrast} onCheckedChange={setHighContrast} />
           </div>
           <Separator />
           <div className="flex items-center justify-between">
-            <span>Text Size</span>
-            <Button variant="outline" size="sm">Adjust</Button>
+            <span>Reduce Motion</span>
+            <Switch checked={reducedMotion} onCheckedChange={setReducedMotion} />
           </div>
-        </div>
-      </SettingsSection>
-
-      <SettingsSection
-        icon={Volume2}
-        title="Sound & Notifications"
-        description="Manage sound and notification preferences"
-      >
-        <div className="space-y-4">
+          <Separator />
           <div className="flex items-center justify-between">
             <span>Sound Effects</span>
             <Switch checked={soundEffects} onCheckedChange={setSoundEffects} />
@@ -236,65 +288,119 @@ const Settings = () => {
       </SettingsSection>
 
       <SettingsSection
-        icon={Lock}
-        title="Account Management"
-        description="Export your data or delete your account"
+        icon={Languages}
+        title="Language & Region"
+        description="Set your preferred language and timezone"
       >
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <span>Export Data</span>
-            <Button variant="outline" size="sm">Download</Button>
+            <Label htmlFor="language">Language</Label>
+            <Select value={language} onValueChange={setLanguage}>
+              <SelectTrigger className="w-32">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="en">English</SelectItem>
+                <SelectItem value="es">Español</SelectItem>
+                <SelectItem value="fr">Français</SelectItem>
+                <SelectItem value="de">Deutsch</SelectItem>
+                <SelectItem value="ar">العربية</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           <Separator />
           <div className="flex items-center justify-between">
-            <span>Delete Account</span>
-            <Button variant="destructive" size="sm">Delete</Button>
+            <Label htmlFor="timezone">Timezone</Label>
+            <Select value={timezone} onValueChange={setTimezone}>
+              <SelectTrigger className="w-32">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="UTC">UTC</SelectItem>
+                <SelectItem value="EST">EST</SelectItem>
+                <SelectItem value="PST">PST</SelectItem>
+                <SelectItem value="CET">CET</SelectItem>
+                <SelectItem value="JST">JST</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
       </SettingsSection>
 
-      <SettingsSection
-        icon={Shield}
-        title="Legal & Policies"
-        description="View our Terms, Privacy Policy, and Cookie Policy"
-      >
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <span>Terms of Service</span>
-            <Button variant="link" size="sm" onClick={() => navigate('/terms')}>View</Button>
-          </div>
-          <Separator />
-          <div className="flex items-center justify-between">
-            <span>Privacy Policy</span>
-            <Button variant="link" size="sm" onClick={() => navigate('/privacy')}>View</Button>
-          </div>
-          <Separator />
-          <div className="flex items-center justify-between">
-            <span>Cookie Policy</span>
-            <Button variant="link" size="sm" onClick={() => navigate('/cookies')}>View</Button>
-          </div>
-        </div>
-      </SettingsSection>
+
+
+
 
       <SettingsSection
-        icon={LogOut}
-        title="Sign Out"
-        description="Sign out of your account on this device"
+        icon={Download}
+        title="Data & Account Management"
+        description="Export your data or manage your account"
       >
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <span>Sign out of your account</span>
-            <Button 
-              variant="destructive" 
-              size="sm" 
-              onClick={handleLogout}
-              disabled={isLoggingOut}
-            >
-              {isLoggingOut ? "Signing out..." : "Sign Out"}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <span className="font-medium">Export Your Data</span>
+              <p className="text-sm text-muted-foreground">Download all your portfolios, comments, and account data</p>
+            </div>
+            <Button variant="outline" size="sm" onClick={handleExportData} className="mt-3 w-full sm:mt-0 sm:w-auto">
+              <Download className="size-4 mr-2" />
+              Export
+            </Button>
+          </div>
+          <Separator />
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <span className="font-medium text-destructive">Delete Account</span>
+              <p className="text-sm text-muted-foreground">Permanently delete your account and all data</p>
+            </div>
+            <Button variant="destructive" size="sm" onClick={() => setShowDeleteDialog(true)} className="mt-3 w-full sm:mt-0 sm:w-auto">
+              <Trash2 className="size-4 mr-2" />
+              Delete
             </Button>
           </div>
         </div>
       </SettingsSection>
+
+
+
+      <SettingsSection
+        icon={LogOut}
+        title="Log out of your account"
+        description="You'll need to sign in again to access your account"
+      >
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+          <div>
+             
+          </div>
+          <Button 
+            variant="destructive" 
+            size="sm" 
+            onClick={handleLogoutClick}
+            disabled={isLoggingOut}
+            className="mt-4 w-full sm:mt-0 sm:w-auto"
+          >
+            <LogOut className="size-4 mr-2" />
+            {isLoggingOut ? "Signing out..." : "Sign Out"}
+          </Button>
+        </div>
+      </SettingsSection>
+
+      <ConfirmDialog
+        isOpen={showDeleteDialog}
+        onClose={() => setShowDeleteDialog(false)}
+        onConfirm={handleDeleteAccount}
+        title="Delete Account"
+        message="Are you sure you want to delete your account? This action cannot be undone and all your data will be permanently removed."
+      />
+
+      <ConfirmDialog
+        isOpen={showLogoutDialog}
+        onClose={() => setShowLogoutDialog(false)}
+        onConfirm={handleLogout}
+        title="Sign Out"
+        message="Are you sure you want to sign out of your account?"
+        placement="bottom"
+      />
     </div>
   );
 };

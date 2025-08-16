@@ -114,7 +114,7 @@ const Contact = () => {
                     <Mail className="w-5 h-5 text-purple-600 dark:text-purple-400 mt-0.5" aria-hidden="true" />
                     <div>
                       <span className="text-foreground">Email</span>
-                      <div><a href="mailto:support@artfolio.app" className="hover:underline">support@artfolio.app</a></div>
+                      <div><a href="mailto:support@Artova.app" className="hover:underline">support@Artova.app</a></div>
                     </div>
                   </li>
                   <li className="flex items-start gap-3">

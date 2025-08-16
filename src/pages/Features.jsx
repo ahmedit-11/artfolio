@@ -13,11 +13,11 @@ const Features = () => {
       <main className="flex-grow animate-fade-in">
         <div className="container mx-auto px-4 py-16 max-w-6xl">
           <header className="mb-12 text-center">
-            <h1 className="text-4xl md:text-5xl font-bold font-quicksand mb-4 bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-indigo-800">
+            <h1 className="text-4xl md:text-5xl p-5 font-bold font-quicksand mb-4 bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-indigo-800">
               Everything you need to shine
             </h1>
             <p className="text-lg text-muted-foreground font-quicksand max-w-3xl mx-auto">
-              Artfolio gives creators a polished home for their work, tools to grow an audience, and the flexibility to express a unique style.
+              Artova gives creators a polished home for their work, tools to grow an audience, and the flexibility to express a unique style.
             </p>
           </header>
 

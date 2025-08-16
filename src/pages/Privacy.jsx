@@ -23,7 +23,7 @@ const Privacy = () => {
       <main className="flex-grow animate-fade-in">
         <div className="container mx-auto px-4 py-12 max-w-6xl">
           <PageTitle
-            subtitle="Your privacy is important to us. This policy explains how Artfolio collects, uses, and protects your information."
+            subtitle="Your privacy is important to us. This policy explains how Artova collects, uses, and protects your information."
             className="mb-6"
           >
             Privacy Policy
@@ -69,7 +69,7 @@ const Privacy = () => {
               <section id="how-we-use" className="scroll-mt-24">
                 <h2 className="text-xl font-semibold mb-2 font-quicksand">2. How We Use Information</h2>
                 <p className="text-muted-foreground">
-                  We use your information to operate and improve Artfolio, personalize your experience, communicate with you, maintain safety, and comply with legal obligations.
+                  We use your information to operate and improve Artova, personalize your experience, communicate with you, maintain safety, and comply with legal obligations.
                 </p>
               </section>
 
@@ -127,7 +127,7 @@ const Privacy = () => {
               <section id="children" className="scroll-mt-24">
                 <h2 className="text-xl font-semibold mb-2 font-quicksand">10. Children’s Privacy</h2>
                 <p className="text-muted-foreground">
-                  Artfolio is not directed to children under 13 (or the minimum age in your jurisdiction). We do not knowingly collect personal information from children. If you believe a child has provided us data, please contact us so we can take appropriate steps.
+                  Artova is not directed to children under 13 (or the minimum age in your jurisdiction). We do not knowingly collect personal information from children. If you believe a child has provided us data, please contact us so we can take appropriate steps.
                 </p>
               </section>
 
@@ -141,9 +141,9 @@ const Privacy = () => {
               <section id="contact" className="scroll-mt-24">
                 <h2 className="text-xl font-semibold mb-2 font-quicksand">12. Contact Us</h2>
                 <p className="text-muted-foreground mb-2">
-                  Questions about this policy? Email us at <a className="underline" href="mailto:privacy@artfolio.app">privacy@artfolio.app</a> or use our <Link className="underline" to="/contact">Contact</Link> page.
+                  Questions about this policy? Email us at <a className="underline" href="mailto:privacy@Artova.app">privacy@Artova.app</a> or use our <Link className="underline" to="/contact">Contact</Link> page.
                 </p>
-                <p className="text-xs text-muted-foreground">Data Controller: Artfolio</p>
+                <p className="text-xs text-muted-foreground">Data Controller: Artova</p>
               </section>
             </article>
           </div>

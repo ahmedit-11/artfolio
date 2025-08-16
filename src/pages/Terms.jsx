@@ -22,7 +22,7 @@ const Terms = () => {
       <main className="flex-grow animate-fade-in">
         <div className="container mx-auto px-4 py-12 max-w-6xl">
           <PageTitle
-            subtitle="Welcome to Artfolio! Please read these Terms of Service carefully before using our website and services."
+            subtitle="Welcome to Artova! Please read these Terms of Service carefully before using our website and services."
             className="mb-6"
           >
             Terms of Service
@@ -54,7 +54,7 @@ const Terms = () => {
             <article className="md:col-span-3 space-y-8 max-w-3xl">
               <section id="acceptance" className="scroll-mt-24">
                 <h2 className="text-xl font-semibold mb-2 font-quicksand">1. Acceptance of Terms</h2>
-                <p className="text-muted-foreground">By accessing or using Artfolio, you agree to be bound by these Terms. If you disagree with any part, you may not access the service.</p>
+                <p className="text-muted-foreground">By accessing or using Artova, you agree to be bound by these Terms. If you disagree with any part, you may not access the service.</p>
               </section>
 
               <section id="accounts" className="scroll-mt-24">
@@ -64,7 +64,7 @@ const Terms = () => {
 
               <section id="content" className="scroll-mt-24">
                 <h2 className="text-xl font-semibold mb-2 font-quicksand">3. User Content</h2>
-                <p className="text-muted-foreground mb-3">You retain ownership of content you submit. By posting on Artfolio, you grant us a worldwide, non-exclusive, royalty-free license to host, display, and distribute your content to operate and promote the service.</p>
+                <p className="text-muted-foreground mb-3">You retain ownership of content you submit. By posting on Artova, you grant us a worldwide, non-exclusive, royalty-free license to host, display, and distribute your content to operate and promote the service.</p>
                 <p className="text-sm text-muted-foreground">You are solely responsible for ensuring you have the rights to the content you share.</p>
               </section>
 
@@ -79,7 +79,7 @@ const Terms = () => {
 
               <section id="ip" className="scroll-mt-24">
                 <h2 className="text-xl font-semibold mb-2 font-quicksand">5. Intellectual Property</h2>
-                <p className="text-muted-foreground">Artfolio’s trademarks, branding, and software are protected by intellectual property laws. You may not copy, modify, or distribute any part of the service without permission.</p>
+                <p className="text-muted-foreground">Artova’s trademarks, branding, and software are protected by intellectual property laws. You may not copy, modify, or distribute any part of the service without permission.</p>
               </section>
 
               <section id="termination" className="scroll-mt-24">
@@ -94,12 +94,12 @@ const Terms = () => {
 
               <section id="liability" className="scroll-mt-24">
                 <h2 className="text-xl font-semibold mb-2 font-quicksand">8. Limitation of Liability</h2>
-                <p className="text-muted-foreground">To the maximum extent permitted by law, Artfolio and its affiliates shall not be liable for any indirect, incidental, special, consequential, or punitive damages, or any loss of profits or revenues.</p>
+                <p className="text-muted-foreground">To the maximum extent permitted by law, Artova and its affiliates shall not be liable for any indirect, incidental, special, consequential, or punitive damages, or any loss of profits or revenues.</p>
               </section>
 
               <section id="indemnification" className="scroll-mt-24">
                 <h2 className="text-xl font-semibold mb-2 font-quicksand">9. Indemnification</h2>
-                <p className="text-muted-foreground">You agree to indemnify and hold harmless Artfolio and its affiliates from any claims, damages, liabilities, and expenses arising from your use of the service or violation of these Terms.</p>
+                <p className="text-muted-foreground">You agree to indemnify and hold harmless Artova and its affiliates from any claims, damages, liabilities, and expenses arising from your use of the service or violation of these Terms.</p>
               </section>
 
               <section id="law" className="scroll-mt-24">
@@ -114,7 +114,7 @@ const Terms = () => {
 
               <section id="contact" className="scroll-mt-24">
                 <h2 className="text-xl font-semibold mb-2 font-quicksand">12. Contact Us</h2>
-                <p className="text-muted-foreground">Questions about these Terms? Email us at <a className="underline" href="mailto:support@artfolio.app">support@artfolio.app</a> or visit our <Link className="underline" to="/contact">Contact</Link> page.</p>
+                <p className="text-muted-foreground">Questions about these Terms? Email us at <a className="underline" href="mailto:support@Artova.app">support@Artova.app</a> or visit our <Link className="underline" to="/contact">Contact</Link> page.</p>
               </section>
             </article>
           </div>
