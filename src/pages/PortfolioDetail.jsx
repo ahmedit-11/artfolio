@@ -15,6 +15,10 @@ import StarRating from "@/components/StarRating";
 import Tag from "../components/ui/tag";
 import Cookies from "js-cookie";
 import { reportAPI } from "@/lib/api";
+import  ImageGallery  from "@/components/ImageGallery";
+import  VideoPlayer from "@/components/VideoPlayer";
+import  TextContent  from "@/components/TextContent";
+import AudioPlayer  from "@/components/AudioPlayer";
 import {
   Download,
   Eye,
@@ -261,36 +265,36 @@ const PortfolioDetail = () => {
   }, [isClosing]);
 
   const navigate = useNavigate();
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isLiked, setIsLiked] = useState(false);
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [showComments, setShowComments] = useState(false);
   const [likes, setLikes] = useState(0);
-  const [showFullscreenGallery, setShowFullscreenGallery] = useState(false);
-  const [fullscreenImageIndex, setFullscreenImageIndex] = useState(0);
   const [showReportModal, setShowReportModal] = useState(false);
 
-  // For demo purposes, we'll use the images portfolio
-  const portfolio = mockPortfolios.images;
+  // Get portfolio based on URL parameter or default to images
+  const { id } = useParams();
+  const getPortfolio = () => {
+    switch (id) {
+      case '2':
+        return mockPortfolios.video;
+      case '3':
+        return mockPortfolios.audio;
+      case '4':
+        return mockPortfolios.text;
+      default:
+        return mockPortfolios.images;
+    }
+  };
+  const portfolio = getPortfolio();
 
   // Initialize likes from portfolio data
   React.useEffect(() => {
     setLikes(portfolio.stats.likes);
   }, [portfolio.stats.likes]);
 
-  const handlePrevImage = () => {
-    setCurrentImageIndex((prev) =>
-      prev === 0 ? portfolio.content.items.length - 1 : prev - 1
-    );
-  };
-
-  const handleNextImage = () => {
-    setCurrentImageIndex((prev) =>
-      prev === portfolio.content.items.length - 1 ? 0 : prev + 1
-    );
-  };
+  // Image navigation is now handled by ImageGallery component
 
   const handleLike = () => {
     if (isLiked) {
@@ -321,144 +325,48 @@ const PortfolioDetail = () => {
     }
   };
 
-  const openFullscreenGallery = (imageIndex) => {
-    setFullscreenImageIndex(imageIndex);
-    setShowFullscreenGallery(true);
-  };
-
-  const closeFullscreenGallery = () => {
-    setShowFullscreenGallery(false);
-  };
-
-  const navigateFullscreenImage = (direction) => {
-    if (direction === 'prev') {
-      setFullscreenImageIndex(prev =>
-        prev === 0 ? portfolio.content.items.length - 1 : prev - 1
-      );
-    } else {
-      setFullscreenImageIndex(prev =>
-        prev === portfolio.content.items.length - 1 ? 0 : prev + 1
-      );
-    }
-  };
-
-  const handleKeyDown = (e) => {
-    if (showFullscreenGallery) {
-      if (e.key === 'Escape') {
-        closeFullscreenGallery();
-      } else if (e.key === 'ArrowLeft') {
-        navigateFullscreenImage('prev');
-      } else if (e.key === 'ArrowRight') {
-        navigateFullscreenImage('next');
-      }
-    }
-  };
-
-  React.useEffect(() => {
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [showFullscreenGallery]);
+  // Fullscreen gallery functionality is now handled by ImageGallery component
 
   const renderContent = () => {
     switch (portfolio.content.type) {
       case "images":
+        const imageUrls = portfolio.content.items.map(item => item.url);
         return (
-          <div className="space-y-8 ">
-            {/* Cover Image */}
-            <div
-              className="relative aspect-[16/9] rounded-xl overflow-hidden bg-secondary/20 cursor-pointer group"
-              onClick={() => openFullscreenGallery(0)}
-            >
-              <img
-                src={portfolio.content.items[0].url}
-                alt={portfolio.title}
-                className="w-full h-full object-cover transition-transform group-hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
-            </div>
-
-            {/* Gallery Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {portfolio.content.items.slice(1).map((item, index) => (
-                <div
-                  key={item.id}
-                  className="relative aspect-[4/3] rounded-xl overflow-hidden bg-secondary/20 cursor-pointer group"
-                  onClick={() => openFullscreenGallery(index + 1)}
-                >
-                  <img
-                    src={item.url}
-                    alt={`${portfolio.title} - Image ${item.id}`}
-                    className="w-full h-full object-cover transition-transform group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors" />
-                </div>
-              ))}
-            </div>
-          </div>
+          <ImageGallery
+            images={imageUrls}
+            title={portfolio.title}
+            showThumbnails={true}
+            showDownloadButton={true}
+            aspectRatio="aspect-video"
+          />
         );
       case "video":
         return (
-          <div className="aspect-video relative rounded-xl overflow-hidden">
-            <video
-              className="w-full h-full object-cover"
-              controls
-              poster={portfolio.content.thumbnail}
-            >
-              <source src={portfolio.content.url} type="video/mp4" />
-              Your browser does not support the video tag.
-            </video>
-          </div>
+          <VideoPlayer
+            videoUrl={portfolio.content.url}
+            title={portfolio.title}
+          />
         );
       case "audio":
         return (
-          <Card className="p-6">
-            <div className="flex items-center space-x-4">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setIsPlaying(!isPlaying)}
-                className="size-12 rounded-full bg-purple-100 dark:bg-purple-900/20"
-              >
-                {isPlaying ? (
-                  <Pause className="size-6 text-purple-600" />
-                ) : (
-                  <Play className="size-6 text-purple-600" />
-                )}
-              </Button>
-              <div className="flex-1">
-                <div className="h-2 bg-purple-100 dark:bg-purple-900/20 rounded-full">
-                  <div className="h-full w-1/3 bg-purple-600 rounded-full"></div>
-                </div>
-                <div className="flex justify-between text-sm text-muted-foreground mt-2">
-                  <span>0:00</span>
-                  <span>{portfolio.content.duration}</span>
-                </div>
-              </div>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setIsMuted(!isMuted)}
-                className="text-muted-foreground hover:text-foreground"
-              >
-                {isMuted ? (
-                  <VolumeX className="size-5" />
-                ) : (
-                  <Volume2 className="size-5" />
-                )}
-              </Button>
-            </div>
-          </Card>
+          <AudioPlayer
+            audioUrl={portfolio.content.url}
+            title={portfolio.title}
+            artist={portfolio.creator?.name || "Unknown Artist"}
+            cover={portfolio.image}
+            showDownload={true}
+          />
         );
       case "text":
+        const textContent = portfolio.content.sections.map(section => 
+          `<h2>${section.title}</h2><p>${section.content}</p>`
+        ).join('');
         return (
-          <div className="space-y-8">
-            {portfolio.content.sections.map((section, index) => (
-              <Card key={index} className="p-6 prose dark:prose-invert max-w-none">
-                <h2>{section.title}</h2>
-                <p>{section.content}</p>
-              </Card>
-            ))}
-          </div>
+          <TextContent 
+            content={textContent} 
+            title={portfolio.title}
+            estimatedReadTime={portfolio.content.readTime || "5 min read"}
+          />
         );
       default:
         return null;
@@ -635,53 +543,7 @@ const PortfolioDetail = () => {
         onSubmit={handleReport}
       />
 
-      {/* Fullscreen Image Gallery */}
-      {showFullscreenGallery && (
-        <div className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center">
-          <div className="relative w-full h-full flex items-center justify-center">
-            {/* Close button */}
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={closeFullscreenGallery}
-              className="absolute top-4 right-4 z-10 text-white hover:bg-white/20"
-            >
-              <X className="size-6" />
-            </Button>
-
-            {/* Navigation buttons */}
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => navigateFullscreenImage('prev')}
-              className="absolute left-4 z-10 text-white hover:bg-white/20"
-            >
-              <ChevronLeft className="size-8" />
-            </Button>
-
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => navigateFullscreenImage('next')}
-              className="absolute right-4 z-10 text-white hover:bg-white/20"
-            >
-              <ChevronRight className="size-8" />
-            </Button>
-
-            {/* Image */}
-            <img
-              src={portfolio.content.items[fullscreenImageIndex].url}
-              alt={`${portfolio.title} - Image ${fullscreenImageIndex + 1}`}
-              className="max-w-full max-h-full object-contain"
-            />
-
-            {/* Image counter */}
-            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-white bg-black/50 px-3 py-1 rounded-full text-sm">
-              {fullscreenImageIndex + 1} / {portfolio.content.items.length}
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Fullscreen functionality is now handled by ImageGallery component */}
     </div>
   );
 };

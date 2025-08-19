@@ -4,6 +4,42 @@ import React, { useEffect,Suspense } from "react";
 import { SearchProvider } from "@/contexts/SearchContext";
 
 // Import routing components from react-router-dom
+// import { BrowserRouter, Routes, Route } from "react-router-dom";
+// import Layout from "@/components/Layout";
+// import SearchPage from "@/pages/search/Search";
+// import Index from "./pages/home/Index";
+// import NotFound from "./pages/static-pages/NotFound";
+// import SignIn from "./pages/auth/SignIn";
+// import SignUp from "./pages/auth/SignUp";
+// import ForgotPassword from "./pages/auth/ForgotPassword";
+// import ResetPassword from "./pages/auth/ResetPassword";
+// import ChangePassword from "./pages/auth/ChangePassword";
+// import Settings from "./pages/settings/Settings";
+// import Profile from "./pages/profile/Profile";
+// import ProfileSettings from "./pages/ProfileSettings";
+// import Terms from "./pages/static-pages/Terms";
+// import Privacy from "./pages/static-pages/Privacy";
+// import FollowingPage from "./pages/following/Following";
+// import TrendingPage from "./pages/trending/Trending";
+// import ExplorePage from "./pages/explore/Explore";
+// import ForYouPage from "./pages/for-you/ForYou";
+// import Contact from "./pages/static-pages/Contact";
+// import About from "./pages/static-pages/About";
+// import Features from "./pages/static-pages/Features";
+// import CookiesPage from "./pages/static-pages/Cookies";
+// import PortfolioDetail from "./pages/portfolio-detail/PortfolioDetail";
+// import CreatePortfolio from "./pages/create-portfolio/CreatePortfolio";
+// import AdminPanel from "./components/admin/AdminPanel";
+// import { ToastContainer } from "react-toastify";
+
+
+
+
+
+
+
+
+
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "@/components/Layout";
 import SearchPage from "@/pages/Search";
