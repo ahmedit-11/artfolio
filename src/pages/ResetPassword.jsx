@@ -103,7 +103,7 @@ const ResetPassword = () => {
     return (
       <div className="flex bg-background flex-col min-h-screen">
         <Header />
-        <main className="flex-grow flex items-center justify-center p-4 md:p-8">
+        <main className="flex-grow flex items-center justify-center p-4 md:p-8 animate-fade-in">
           <div className="w-full max-w-md">
             <div className="text-center mb-8 animate-fade-in">
               <PageTitle subtitle="Your password has been successfully reset">
@@ -121,7 +121,7 @@ const ResetPassword = () => {
                   Your password has been reset successfully. You can now sign in with your new password.
                 </CardDescription>
               </CardHeader>
-              <CardFooter className="flex flex-col space-y-4">
+              <CardFooter className="flex flex-col space-y-4 animate-fade-in animation-delay-300">
                 <Button
                   onClick={() => navigate('/signin')}
                   className="w-full bg-purple-gradient hover:opacity-90 transition-all font-quicksand"
@@ -140,7 +140,7 @@ const ResetPassword = () => {
   return (
     <div className="flex bg-background flex-col min-h-screen">
       <Header />
-      <main className="flex-grow flex items-center justify-center p-4 md:p-8">
+      <main className="flex-grow flex items-center justify-center p-4 md:p-8 animate-fade-in">
         <div className="w-full max-w-md">
           <div className="text-center mb-8 animate-fade-in">
             <PageTitle subtitle="Enter your new password">
@@ -155,9 +155,9 @@ const ResetPassword = () => {
                 Enter a strong password for your account
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="animate-fade-in animation-delay-300">
               <form onSubmit={handleResetPassword} className="space-y-4">
-                <div className="space-y-2">
+                <div className="space-y-2 animate-fade-in animation-delay-450">
                   <Label htmlFor="password" className="font-quicksand">New Password</Label>
                   <TooltipProvider>
                     <div className="relative">
@@ -189,7 +189,7 @@ const ResetPassword = () => {
                   </p>
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-2 animate-fade-in animation-delay-600">
                   <Label htmlFor="password_confirmation" className="font-quicksand">Confirm New Password</Label>
                   <TooltipProvider>
                     <div className="relative">
@@ -220,7 +220,7 @@ const ResetPassword = () => {
                 
                 <Button
                   type="submit"
-                  className="w-full bg-purple-gradient hover:opacity-90 transition-all font-quicksand"
+                  className="w-full bg-purple-gradient hover:opacity-90 transition-all font-quicksand animate-fade-in animation-delay-750"
                   disabled={isLoading}
                 >
                   {isLoading ? (
@@ -237,7 +237,7 @@ const ResetPassword = () => {
                 </Button>
               </form>
             </CardContent>
-            <CardFooter className="flex flex-col space-y-4">
+            <CardFooter className="flex flex-col space-y-4 animate-fade-in animation-delay-900">
               <div className="text-center text-sm text-muted-foreground font-quicksand">
                 Remember your password?{" "}
                 <Link

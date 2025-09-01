@@ -137,17 +137,17 @@ const Profile = () => {
   return (
     <div className="min-h-screen bg-background animate-fade-in">
       {/* Header Section */}
-      <div className="w-full bg-gradient-to-b from-purple-100/20 to-background dark:from-purple-900/10 pt-16 pb-8">
+      <div className="w-full bg-gradient-to-b from-purple-100/20 to-background dark:from-purple-900/10 pt-16 pb-8 animate-fade-in animation-delay-150">
         <div className="container max-w-4xl mx-auto px-4">
-          <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
+          <div className="flex flex-col md:flex-row items-center md:items-start gap-6 animate-fade-in animation-delay-300">
             {/* Avatar */}
-            <Avatar className="size-32 border-4 border-background shadow-lg">
+            <Avatar className="size-32 border-4 border-background shadow-lg animate-fade-in animation-delay-450">
               <AvatarImage src={avatar} alt={fullName} />
               <AvatarFallback>{fullName.charAt(0)}</AvatarFallback>
             </Avatar>
 
             {/* User Info */}
-            <div className="flex-1 text-center md:text-left">
+            <div className="flex-1 text-center md:text-left animate-fade-in animation-delay-600">
               <h1 className="text-3xl font-bold">{fullName}</h1>
               <p className="text-lg text-muted-foreground mb-4">@{username}</p>
               
@@ -196,8 +196,8 @@ const Profile = () => {
       </div>
 
       {/* Bio & Social Links */}
-      <div className="container max-w-4xl mx-auto px-4 py-8">
-        <div className="bg-card rounded-lg p-6 shadow-sm">
+      <div className="container max-w-4xl mx-auto px-4 py-8 animate-fade-in animation-delay-750">
+        <div className="bg-card rounded-lg p-6 shadow-sm animate-fade-in animation-delay-900">
           <p className="text-lg mb-6">{bio}</p>
           
           <Separator className="my-6" />
@@ -225,14 +225,16 @@ const Profile = () => {
         </div>
 
         {/* Portfolios Section */}
-        <div className="mt-12">
+        <div className="mt-12 animate-fade-in animation-delay-1050">
           <h2 className="text-2xl font-bold mb-6">Portfolios</h2>
           
           {portfolios.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {portfolios.map((portfolio) => (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in animation-delay-1200">
+              {portfolios.map((portfolio, index) => (
                 <PortfolioCard
                   key={portfolio.id}
+                  className="animate-fade-in"
+                  style={{ animationDelay: `${1350 + (index * 150)}ms` }}
                   image={portfolio.image}
                   title={portfolio.title}
                   creator={portfolio.creator}
@@ -245,7 +247,7 @@ const Profile = () => {
               ))}
             </div>
           ) : (
-            <div className="text-center py-12 bg-card rounded-lg">
+            <div className="text-center py-12 bg-card rounded-lg animate-fade-in animation-delay-1350">
               <p className="text-lg text-muted-foreground">
                 No portfolios created yet.
                 {isCurrentUser && (

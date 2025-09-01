@@ -13,15 +13,17 @@ const About = () => {
       <Header />
       <main className="flex-grow animate-fade-in">
         <div className="container mx-auto px-4 py-16 max-w-6xl">
-          <PageTitle
-            subtitle="Artova is a social portfolio platform for creatives to showcase their work, connect with a global community, and find inspiration. Our mission is to empower artists, designers, and creators to share their stories and grow their careers."
-            className="mb-10"
-          >
-            About Artova
-          </PageTitle>
+          <div className="animate-fade-in animation-delay-150">
+            <PageTitle
+              subtitle="Artova is a social portfolio platform for creatives to showcase their work, connect with a global community, and find inspiration. Our mission is to empower artists, designers, and creators to share their stories and grow their careers."
+              className="mb-10"
+            >
+              About Artova
+            </PageTitle>
+          </div>
 
           {/* Mission Section */}
-          <section aria-labelledby="mission" className="mb-16">
+          <section aria-labelledby="mission" className="mb-16 animate-fade-in animation-delay-300">
             <h2 id="mission" className="sr-only">Our mission</h2>
             <div className="bg-card border border-border rounded-2xl p-8 md:p-10">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
@@ -71,24 +73,24 @@ const About = () => {
           </section>
 
           {/* Values Section */}
-          <section aria-labelledby="values" className="mb-16">
+          <section aria-labelledby="values" className="mb-16 animate-fade-in animation-delay-450">
             <h2 id="values" className="text-xl font-semibold mb-6">What we value</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              <div className="bg-card border border-border rounded-xl p-6">
+              <div className="bg-card border border-border rounded-xl p-6 animate-fade-in animation-delay-600">
                 <div className="flex items-center gap-3 mb-2">
                   <Heart className="w-6 h-6 text-purple-600 dark:text-purple-400" aria-hidden="true" />
                   <h3 className="font-semibold">Creativity First</h3>
                 </div>
                 <p className="text-sm text-muted-foreground">Your work deserves a stage that enhances, not distracts.</p>
               </div>
-              <div className="bg-card border border-border rounded-xl p-6">
+              <div className="bg-card border border-border rounded-xl p-6 animate-fade-in animation-delay-750">
                 <div className="flex items-center gap-3 mb-2">
                   <Globe2 className="w-6 h-6 text-purple-600 dark:text-purple-400" aria-hidden="true" />
                   <h3 className="font-semibold">Global Community</h3>
                 </div>
                 <p className="text-sm text-muted-foreground">Connect across borders and backgrounds with ease.</p>
               </div>
-              <div className="bg-card border border-border rounded-xl p-6">
+              <div className="bg-card border border-border rounded-xl p-6 animate-fade-in animation-delay-900">
                 <div className="flex items-center gap-3 mb-2">
                   <ShieldCheck className="w-6 h-6 text-purple-600 dark:text-purple-400" aria-hidden="true" />
                   <h3 className="font-semibold">Trust & Safety</h3>
@@ -99,7 +101,7 @@ const About = () => {
           </section>
 
           {/* CTA Section */}
-          <section aria-labelledby="join" className="mb-4">
+          <section aria-labelledby="join" className="mb-4 animate-fade-in animation-delay-1050">
             <div className="bg-card border border-border rounded-2xl p-8 text-center">
               <h2 id="join" className="text-2xl font-bold font-quicksand mb-2">Join the Artova community</h2>
               <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">

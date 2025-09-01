@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
+
 const ThemeToggle = () => {
   const [isDarkMode, setIsDarkMode] = useState(() => {
     // Check localStorage first
@@ -31,12 +32,14 @@ const ThemeToggle = () => {
     <Button variant="outline" size="sm" onClick={toggleTheme}>
       {isDarkMode ? (
         <>
-        <Moon className="size-[1.2rem]" />
-        <span>Dark</span> </>
+          <Moon className="size-[1.2rem]" />
+          <span>Dark</span>{" "}
+        </>
       ) : (
         <>
-        <Sun className="size-[1.2rem]" />
-        <span>Light</span> </>
+          <Sun className="size-[1.2rem]" />
+          <span>Light</span>{" "}
+        </>
       )}
       <span className="sr-only">Toggle theme</span>
     </Button>

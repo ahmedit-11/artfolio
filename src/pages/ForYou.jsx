@@ -3,6 +3,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PortfolioCard from "@/components/PortfolioCard";
 import { useScrollToTop } from "../utils/scrollToTop";
+import PageTitle from "@/components/PageTitle"
 const forYouItems = [
   {
     id: 1,
@@ -54,20 +55,15 @@ const ForYouPage = () => {
       <main className="flex-grow animate-fade-in">
         <section className="py-12 bg-gradient-to-b from-background to-secondary/30">
           <div className="container px-4 mx-auto">
-            <div className="max-w-2xl">
-              <h1 className="text-3xl font-bold font-quicksand mb-3">
-                <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-indigo-700">
-                  For You
-                </span>
-              </h1>
-              <p className="text-muted-foreground font-quicksand">
-                Discover personalized portfolio recommendations tailored to your interests and preferences.
-              </p>
-            </div>
-            <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {forYouItems.map((item) => (
+            <PageTitle subtitle="Discover personalized portfolio recommendations tailored to your interests and preferences.">
+              For You
+            </PageTitle>
+            <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 animate-fade-in animation-delay-300">
+              {forYouItems.map((item, index) => (
                 <PortfolioCard
                   key={item.id}
+                  className="transition-all duration-500 hover:shadow-lg hover:-translate-y-3 hover:scale-105 hover:shadow-purple-200/40 dark:hover:shadow-purple-900/20 animate-fade-in"
+                  style={{ animationDelay: `${600 + (index * 200)}ms` }}
                   image={item.image}
                   title={item.title}
                   creator={item.creator}

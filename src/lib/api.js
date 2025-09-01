@@ -6,7 +6,7 @@ import Cookies from 'js-cookie';
 
 // Create axios instance with base configuration
 const api = axios.create({
-  baseURL: 'http://192.168.1.110:8000/api',
+  baseURL: 'http://127.0.0.1:8000/api',
   withCredentials: true,
 });
 
@@ -29,11 +29,14 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       // Don't redirect if this is a login attempt (let the login page handle the error)
       const isLoginAttempt = error.config?.url?.includes('/login');
-      
-      if (!isLoginAttempt) {
+      const skipRedirect = error.config?.skipAuthRedirect;
+
+      if (!isLoginAttempt && !skipRedirect) {
         // Token expired or invalid - clear cookie and redirect to login
         Cookies.remove('token');
-        window.location.href = '/signin';
+        if (window.location.pathname !== '/signin') {
+          window.location.replace('/signin');
+        }
       }
     }
     return Promise.reject(error);
@@ -42,7 +45,7 @@ api.interceptors.response.use(
 
 // CSRF token helper
 const getCsrfCookie = async () => {
-  await axios.get('http://192.168.1.110:8000/sanctum/csrf-cookie', {
+  await axios.get('http://127.0.0.1:8000/sanctum/csrf-cookie', {
     withCredentials: true
   });
 };
@@ -55,6 +58,17 @@ export const authAPI = {
     const response = await api.post('/login', credentials);
     if (response.data?.data?.access_token) {
       Cookies.set('token', response.data.data.access_token);
+      // Store user data in localStorage for chat
+      if (response.data?.data?.user) {
+        const user = {
+          id: response.data.data.user.id,
+          name: response.data.data.user.name,
+          email: response.data.data.user.email,
+          profile_picture: response.data.data.user.profile_picture,
+          avatar: response.data.data.user.profile_picture
+        };
+        localStorage.setItem('user', JSON.stringify(user));
+      }
     }
     return response.data;
   },
@@ -65,6 +79,17 @@ export const authAPI = {
     const response = await api.post('/register', userData);
     if (response.data?.data?.access_token) {
       Cookies.set('token', response.data.data.access_token);
+      // Store user data in localStorage for chat
+      if (response.data?.data?.user) {
+        const user = {
+          id: response.data.data.user.id,
+          name: response.data.data.user.name,
+          email: response.data.data.user.email,
+          profile_picture: response.data.data.user.profile_picture,
+          avatar: response.data.data.user.profile_picture
+        };
+        localStorage.setItem('user', JSON.stringify(user));
+      }
     }
     return response.data;
   },
@@ -86,13 +111,25 @@ export const authAPI = {
 
   // Get current user profile
   getProfile: async () => {
-    const response = await api.get('/user/profile');
+    const response = await api.get('/user/profile', { skipAuthRedirect: true });
     return response.data;
   },
 
   // Update user profile
   updateProfile: async (profileData) => {
     const response = await api.put('/user/profile', profileData);
+    return response.data;
+  },
+
+  // Search users
+  searchUsers: async (query) => {
+    const response = await api.get('/users', { params: { search: query, per_page: 100 } });
+    return response.data;
+  },
+  
+  // Get all users (paginated)
+  getAllUsers: async (page = 1, perPage = 100) => {
+    const response = await api.get('/users', { params: { page, per_page: perPage } });
     return response.data;
   },
 
@@ -341,32 +378,32 @@ export const notificationAPI = {
   }
 };
 
-// Chat API calls
-export const chatAPI = {
-  // Get conversations
-  getConversations: async () => {
-    const response = await api.get('/conversations');
-    return response.data;
-  },
-
-  // Get messages for conversation
-  getMessages: async (conversationId) => {
-    const response = await api.get(`/conversations/${conversationId}/messages`);
-    return response.data;
-  },
-
-  // Send message
-  sendMessage: async (conversationId, messageData) => {
-    const response = await api.post(`/conversations/${conversationId}/messages`, messageData);
-    return response.data;
-  },
-
-  // Start new conversation
-  startConversation: async (userId) => {
-    const response = await api.post('/conversations', { user_id: userId });
-    return response.data;
-  }
-};
-
 // Export the configured axios instance for custom calls
 export default api;
+// Chat API calls
+// export const chatAPI = {
+//   // Get conversations
+//   getConversations: async () => {
+//     const response = await api.get('/conversations');
+//     return response.data;
+//   },
+
+//   // Get messages for conversation
+//   getMessages: async (conversationId) => {
+//     const response = await api.get(`/conversations/${conversationId}/messages`);
+//     return response.data;
+//   },
+
+//   // Send message
+//   sendMessage: async (conversationId, messageData) => {
+//     const response = await api.post(`/conversations/${conversationId}/messages`, messageData);
+//     return response.data;
+//   },
+
+//   // Start new conversation
+//   startConversation: async (userId) => {
+//     const response = await api.post('/conversations', { user_id: userId });
+//     return response.data;
+//   }
+// };
+

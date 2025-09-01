@@ -18,45 +18,24 @@ import {
 import { Button } from "@/components/ui/button";
 import { Bell, Heart, MessageCircle, User as UserIcon, X } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { useNotifications } from "@/contexts/NotificationContext";
+import { useChat } from "@/contexts/ChatContext";
+import { useNavigate } from "react-router-dom";
 
-// Temporary static notifications until API integration
-const mockNotifications = [
-  {
-    id: 1,
-    actorName: "Alex",
-    type: "like",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Alex",
-    action: 'liked your artwork "Dreamscape"',
-    time: "2m",
-    isNew: true,
-  },
-  {
-    id: 2,
-    actorName: "Maria",
-    type: "follow",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Maria",
-    action: "started following you",
-    time: "1h",
-    isNew: true,
-  },
-  {
-    id: 3,
-    actorName: "John",
-    type: "comment",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=John",
-    action: 'commented on "Sunset Boulevard"',
-    time: "3h",
-    isNew: false,
-  },
-];
+// Notifications are provided by NotificationContext
 
 
 
 // Notification item component for reuse
-const NotificationItem = ({ notification, onRemove }) => (
-  <div className={`flex items-start space-x-3 py-3 px-4 hover:bg-muted/50 transition-colors relative group ${
+const NotificationItem = ({ notification, onRemove, onClick }) => (
+  <div
+    className={`flex items-start space-x-3 py-3 px-4 hover:bg-muted/50 transition-colors relative group cursor-pointer ${
     notification.isNew ? 'bg-blue-50/50 dark:bg-blue-950/20' : ''
-  }`}>
+  }`}
+    onClick={() => onClick?.(notification)}
+    role="button"
+    tabIndex={0}
+  >
     {/* New notification indicator */}
     {notification.isNew && (
       <div className="absolute left-2 top-1/2 -translate-y-1/2 w-2 h-2 bg-blue-500 rounded-full" />
@@ -72,6 +51,7 @@ const NotificationItem = ({ notification, onRemove }) => (
         {notification.type === "like" && <Heart className="size-3 text-pink-500" />}
         {notification.type === "follow" && <UserIcon className="size-3 text-cyan-500" />}
         {notification.type === "comment" && <MessageCircle className="size-3 text-amber-500" />}
+        {notification.type === "message" && <MessageCircle className="size-3 text-purple-500" />}
       </span>
     </div>
     
@@ -100,13 +80,15 @@ const NotificationItem = ({ notification, onRemove }) => (
 const NotificationDropdown = () => {
   const [desktopOpen, setDesktopOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [notifications, setNotifications] = useState(mockNotifications);
+  const { notifications, removeNotification, markAllAsRead, unreadCount } = useNotifications();
+  const { conversations, setSelectedConversation, startNewChat } = useChat();
+  const navigate = useNavigate();
 
   const handleRemoveNotification = (id) => {
-    setNotifications(prev => prev.filter(n => n.id !== id));
+    removeNotification(id);
   };
 
-  const newNotificationsCount = notifications.filter(n => n.isNew).length;
+  const newNotificationsCount = unreadCount;
 
   const createTriggerButton = (onClick) => (
     <Button
@@ -126,11 +108,41 @@ const NotificationDropdown = () => {
     </Button>
   );
 
+  const handleNotificationClick = async (n) => {
+    try {
+      if (n.type === "message") {
+        // Try to select by chatId first
+        let targetConv = null;
+        if (n.chatId) {
+          targetConv = conversations.find(
+            (c) => c.chatId === n.chatId || c.id === n.chatId
+          );
+        }
+
+        if (targetConv) {
+          setSelectedConversation(targetConv);
+        } else if (n.userId) {
+          const conv = await startNewChat(String(n.userId));
+          if (conv) setSelectedConversation(conv);
+        }
+
+        navigate("/chat");
+        setDesktopOpen(false);
+        setMobileOpen(false);
+      }
+    } catch (err) {
+      console.error("Failed to handle notification click", err);
+    }
+  };
+
   return (
     <>
       {/* Desktop: DropdownMenu with blur background */}
       <div className="hidden md:block">
-        <DropdownMenu open={desktopOpen} onOpenChange={setDesktopOpen}>
+        <DropdownMenu open={desktopOpen} onOpenChange={(open) => {
+          setDesktopOpen(open);
+          if (open) markAllAsRead();
+        }}>
           <DropdownMenuTrigger asChild>
             {createTriggerButton()}
           </DropdownMenuTrigger>
@@ -144,7 +156,7 @@ const NotificationDropdown = () => {
             <div className="max-h-[20rem] overflow-y-auto">
               {notifications.map((n) => (
                 <div key={n.id} className="border-b border-border/50 last:border-b-0">
-                  <NotificationItem notification={n} onRemove={handleRemoveNotification} />
+                  <NotificationItem notification={n} onRemove={handleRemoveNotification} onClick={handleNotificationClick} />
                 </div>
               ))}
               {notifications.length === 0 && (
@@ -159,7 +171,10 @@ const NotificationDropdown = () => {
 
       {/* Mobile: Sheet */}
       <div className="md:hidden">
-        <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
+        <Sheet open={mobileOpen} onOpenChange={(open) => {
+          setMobileOpen(open);
+          if (open) markAllAsRead();
+        }}>
           <SheetTrigger asChild>
             {createTriggerButton()}
           </SheetTrigger>
@@ -173,7 +188,7 @@ const NotificationDropdown = () => {
             <div className="flex-1 overflow-y-auto">
               {notifications.map((n) => (
                 <div key={n.id} className="border-b border-border/50 last:border-b-0">
-                  <NotificationItem notification={n} onRemove={handleRemoveNotification} />
+                  <NotificationItem notification={n} onRemove={handleRemoveNotification} onClick={handleNotificationClick} />
                 </div>
               ))}
               {notifications.length === 0 && (

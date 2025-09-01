@@ -73,7 +73,7 @@ const SignIn = () => {
   return (
     <div className="flex bg-background flex-col min-h-screen">
       <Header />
-      <main className="flex-grow flex items-center justify-center  p-4 md:p-8">
+      <main className="flex-grow flex items-center justify-center p-4 md:p-8 animate-fade-in">
         <div className="w-full max-w-md">
           <div className="text-center mb-8 animate-fade-in">
             <PageTitle subtitle="Sign in to continue your creative journey">
@@ -88,9 +88,9 @@ const SignIn = () => {
                 Enter your credentials to access your account
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="animate-fade-in animation-delay-300">
               <form onSubmit={handleSignIn} className="space-y-4">
-                <div className="space-y-2">
+                <div className="space-y-2 animate-fade-in animation-delay-450">
                   <Label htmlFor="email" className="font-quicksand">Email</Label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -105,7 +105,7 @@ const SignIn = () => {
                     />
                   </div>
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-2 animate-fade-in animation-delay-600">
                   <div className="flex items-center justify-between">
                     <Label htmlFor="password" className="font-quicksand">Password</Label>
                     <Link
@@ -130,7 +130,7 @@ const SignIn = () => {
                       <Input
                         id="password"
                         type={showPassword ? "text" : "password"}
-                        placeholder="••••••••"
+                        placeholder="* * * * * * * *"
                         className="pl-10 font-quicksand"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
@@ -141,8 +141,8 @@ const SignIn = () => {
                 </div>
                 
                 <Button
+                  className="w-full bg-purple-gradient hover:opacity-90 transition-all font-quicksand group animate-fade-in animation-delay-750"
                   type="submit"
-                  className="w-full bg-purple-gradient hover:opacity-90 transition-all font-quicksand group"
                   disabled={isLoading}
                 >
                   {isLoading ? (
@@ -163,7 +163,7 @@ const SignIn = () => {
               
               
             </CardContent>
-            <CardFooter className="flex flex-col space-y-4">
+            <CardFooter className="flex flex-col space-y-4 animate-fade-in animation-delay-900">
               <div className="text-center text-sm text-muted-foreground font-quicksand">
                 Don't have an account?{" "}
                 <Link

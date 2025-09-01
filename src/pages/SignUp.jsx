@@ -134,7 +134,7 @@ const SignUp = () => {
     <div className="flex flex-col bg-background min-h-screen">
       <ToastContainer />
       <Header />
-      <main className="flex-grow flex items-center  justify-center p-4 md:p-8">
+      <main className="flex-grow flex items-center justify-center p-4 md:p-8 animate-fade-in">
         <div className="w-full max-w-md">
           <div className="text-center mb-8 animate-fade-in">
             <PageTitle subtitle="Create an account to showcase your creative work">
@@ -149,9 +149,9 @@ const SignUp = () => {
                 Enter your details to create your account
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="animate-fade-in animation-delay-300">
               <form onSubmit={handleSignUp} className="space-y-4">
-                <div className="space-y-2">
+                <div className="space-y-2 animate-fade-in animation-delay-450">
                   <Label htmlFor="name" className="font-quicksand">Full Name</Label>
                   <div className="relative">
                     <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -166,7 +166,7 @@ const SignUp = () => {
                     />
                   </div>
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-2 animate-fade-in animation-delay-600">
                   <Label htmlFor="email" className="font-quicksand">Email</Label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -181,7 +181,7 @@ const SignUp = () => {
                     />
                   </div>
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-2 animate-fade-in animation-delay-750">
                   <Label htmlFor="password" className="font-quicksand">Password</Label>
                   <div className="relative">
                     <TooltipProvider>
@@ -199,7 +199,7 @@ const SignUp = () => {
                     <Input
                       id="password"
                       type={showPassword ? "text" : "password"}
-                      placeholder="********"
+                      placeholder="* * * * * * * *"
                       className="pl-10 font-quicksand"
                       value={password}
                       onChange={handlePasswordChange}
@@ -207,7 +207,7 @@ const SignUp = () => {
                     />
                   </div>
                   {/* Password Requirements */}
-                  <div className="bg-muted/50 p-3 rounded-lg space-y-2">
+                  <div className="bg-muted/50 p-3 rounded-lg space-y-2 animate-fade-in animation-delay-900">
                     <h4 className="font-medium text-sm mb-2 font-quicksand">Password Requirements:</h4>
                     <div className="grid grid-cols-1 gap-1 text-xs">
                       <div className={`flex items-center space-x-2 font-quicksand ${
@@ -263,7 +263,7 @@ const SignUp = () => {
                     </div>
                   </div>
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-2 animate-fade-in animation-delay-1050">
                   <Label htmlFor="confirmPassword" className="font-quicksand">Confirm Password</Label>
                   <div className="relative">
                     <TooltipProvider>
@@ -281,7 +281,7 @@ const SignUp = () => {
                     <Input
                       id="confirmPassword"
                       type={showConfirmPassword ? "text" : "password"}
-                      placeholder="********"
+                      placeholder="* * * * * * * *"
                       className="pl-10 font-quicksand"
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
@@ -289,7 +289,7 @@ const SignUp = () => {
                     />
                   </div>
                 </div>
-                <div className="flex items-center space-x-2">
+                <div className="flex items-center space-x-2 animate-fade-in animation-delay-1200">
                   <Checkbox id="terms" checked={acceptTerms} onCheckedChange={setAcceptTerms} required />
                   <label htmlFor="terms" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 font-quicksand">
                     I agree to the <Link to="/terms" className="text-primary hover:underline">Terms of Service</Link> and <Link to="/privacy" className="text-primary hover:underline">Privacy Policy</Link>
@@ -297,7 +297,7 @@ const SignUp = () => {
                 </div>
                 <Button
                   type="submit"
-                  className="w-full bg-purple-gradient hover:opacity-90 transition-all font-quicksand group"
+                  className="w-full bg-purple-gradient hover:opacity-90 transition-all font-quicksand group animate-fade-in animation-delay-1350"
                   disabled={isLoading || !isPasswordValid || password !== confirmPassword || !acceptTerms}
                 >
                   {isLoading ? (
@@ -316,7 +316,7 @@ const SignUp = () => {
 
            
             </CardContent>
-            <CardFooter className="flex flex-col space-y-4">
+            <CardFooter className="flex flex-col space-y-4 animate-fade-in animation-delay-1500">
               <div className="text-center text-sm text-muted-foreground font-quicksand">
                 Already have an account?{" "}
                 <Link

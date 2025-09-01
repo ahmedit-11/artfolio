@@ -13,8 +13,8 @@ import axios from 'axios';
 // Import react-toastify CSS
 import 'react-toastify/dist/ReactToastify.css';
 
-axios.defaults.baseURL = "http://192.168.1.110:8000/api"
- axios.defaults.withCredentials = true;
+// axios.defaults.baseURL = "http://192.168.1.110:8000/api"
+//  axios.defaults.withCredentials = true;
  // Attach Authorization header from cookie token on each request
  axios.interceptors.request.use(
    (config) => {

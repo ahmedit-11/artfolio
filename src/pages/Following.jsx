@@ -62,10 +62,12 @@ const FollowingPage = () => {
             <PageTitle subtitle="Stay updated with your favorite creators and their latest portfolio updates.">
               Following
             </PageTitle>
-            <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {filtered.map((portfolio) => (
+            <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 animate-fade-in animation-delay-300">
+              {filtered.map((portfolio, index) => (
                 <PortfolioCard
                   key={portfolio.id}
+                  className="transition-all duration-500 hover:shadow-lg hover:-translate-y-3 hover:scale-105 hover:shadow-purple-200/40 dark:hover:shadow-purple-900/20 animate-fade-in"
+                  style={{ animationDelay: `${600 + (index * 200)}ms` }}
                   image={portfolio.image}
                   title={portfolio.title}
                   creator={portfolio.creator}

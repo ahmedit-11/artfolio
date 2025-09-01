@@ -51,9 +51,10 @@ const SearchPage = () => {
     <div className="flex flex-col min-h-screen bg-background">
       <Header />
       <main className="flex-grow container px-4 py-8 space-y-6 animate-fade-in">
-        <SearchBar
-          className="w-full"
-          placeholder="Search portfolios..." autoFocus
+        <div className="animate-fade-in animation-delay-150">
+          <SearchBar
+            className="w-full"
+            placeholder="Search portfolios..." autoFocus
           onSubmit={(val) => {
             if (!val) return;
             setQuery(val);
@@ -63,9 +64,10 @@ const SearchPage = () => {
               return updated;
             });
           }}
-        />
+          />
+        </div>
         {/* Filters */}
-        <div className="flex gap-2">
+        <div className="flex gap-2 animate-fade-in animation-delay-300">
           {[
             { key: "all", label: "All" },
             { key: "following", label: "Following" },
@@ -82,7 +84,7 @@ const SearchPage = () => {
         </div>
 
         {/* Popular & history */}
-        <section className="space-y-4">
+        <section className="space-y-4 animate-fade-in animation-delay-450">
           <div>
             <h2 className="font-semibold mb-2">Popular searches</h2>
             <div className="flex flex-wrap gap-2">
@@ -96,7 +98,7 @@ const SearchPage = () => {
           {history.length > 0 && (
             <div>
               <h2 className="font-semibold mb-2">Recent searches</h2>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-2 animate-fade-in animation-delay-750">
                 {history.map((h) => (
                   <Button key={h} size="sm" variant="ghost" onClick={() => setQuery(h)}>
                     {h}

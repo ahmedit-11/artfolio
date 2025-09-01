@@ -1,7 +1,9 @@
 // App.jsx
 // Main application component that sets up routing and theme preference for the app.
 import React, { useEffect,Suspense } from "react";
-import { SearchProvider } from "@/contexts/SearchContext";
+import { SearchProvider } from './contexts/SearchContext';
+import { ChatProvider } from './contexts/ChatContext';
+import { NotificationProvider } from './contexts/NotificationContext';
 
 // Import routing components from react-router-dom
 // import { BrowserRouter, Routes, Route } from "react-router-dom";
@@ -66,6 +68,12 @@ import CookiesPage from "./pages/Cookies";
 import PortfolioDetail from "./pages/PortfolioDetail";
 import CreatePortfolio from "./pages/CreatePortfolio";
 import AdminPanel from "./components/admin/AdminPanel";
+// import Chat from "./pages/chat/Chat";
+// import ChatTest from "./pages/chat/ChatTest";
+// import TestAuth from "./pages/chat/TestAuth";
+// import TestUsers from "./pages/chat/TestUsers";
+// import SimpleChatTest from "./pages/chat/SimpleChatTest";
+import SimpleChat from "./pages/chat/SimpleChat";
 import { ToastContainer } from "react-toastify";
 
 // const SignUp = lazy(() => import("./pages/SignUp"));
@@ -110,7 +118,9 @@ const App = () => {
   // Layout wraps the main pages, while other routes are defined for authentication, legal, and error pages
   return (
     <SearchProvider>
-      <BrowserRouter>
+      <NotificationProvider>
+        <BrowserRouter>
+          <ChatProvider>
       <Suspense fallback={
           <div className="flex items-center justify-center min-h-screen">
             <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-purple-600"></div>
@@ -125,8 +135,13 @@ const App = () => {
             <Route path="/settings/change-password" element={<ChangePassword />} />
             <Route path="/portfolio/:id" element={<PortfolioDetail />} />
             <Route path="/create" element={<CreatePortfolio />} />
+            <Route path="/chat" element={<SimpleChat />} />
+            {/* <Route path="/chat-old" element={<Chat />} /> */}
+            {/* <Route path="/chat-test" element={<ChatTest />} />
+            <Route path="/test-auth" element={<TestAuth />} />
+            <Route path="/test-users" element={<TestUsers />} />
+            <Route path="/simple-chat" element={<SimpleChatTest />} /> */}
           </Route>
-  
           <Route path="/signin" element={<SignIn />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -147,8 +162,9 @@ const App = () => {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
-      </BrowserRouter>
-  
+          </ChatProvider>
+        </BrowserRouter>
+      </NotificationProvider>
       {/* ToastContainer  */}
       <ToastContainer position="top-right" autoClose={3000} limit={3} />
     </SearchProvider>

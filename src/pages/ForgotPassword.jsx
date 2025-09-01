@@ -51,7 +51,7 @@ const ForgotPassword = () => {
     return (
       <div className="flex bg-background flex-col min-h-screen">
         <Header />
-        <main className="flex-grow flex items-center justify-center p-4 md:p-8">
+        <main className="flex-grow flex items-center justify-center p-4 md:p-8 animate-fade-in">
           <div className="w-full max-w-md">
             <div className="text-center mb-8 animate-fade-in">
               <PageTitle subtitle="Check your email for reset instructions">
@@ -69,13 +69,13 @@ const ForgotPassword = () => {
                   We've sent a password reset link to <strong>{email}</strong>
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-4 animate-fade-in animation-delay-300">
                 <div className="text-center text-sm text-muted-foreground font-quicksand">
                   <p>If you don't see the email in your inbox, please check your spam folder.</p>
                   <p className="mt-2">The reset link will expire in 60 minutes.</p>
                 </div>
               </CardContent>
-              <CardFooter className="flex flex-col space-y-4">
+              <CardFooter className="flex flex-col space-y-4 animate-fade-in animation-delay-450">
                 <Button
                   onClick={() => setIsEmailSent(false)}
                   variant="outline"
@@ -104,7 +104,7 @@ const ForgotPassword = () => {
   return (
     <div className="flex bg-background flex-col min-h-screen">
       <Header />
-      <main className="flex-grow flex items-center justify-center p-4 md:p-8">
+      <main className="flex-grow flex items-center justify-center p-4 md:p-8 animate-fade-in">
         <div className="w-full max-w-md">
           <div className="text-center mb-8 animate-fade-in">
             <PageTitle subtitle="Enter your email to receive reset instructions">
@@ -119,9 +119,9 @@ const ForgotPassword = () => {
                 Enter your email address and we'll send you a link to reset your password
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="animate-fade-in animation-delay-300">
               <form onSubmit={handleForgotPassword} className="space-y-4">
-                <div className="space-y-2">
+                <div className="space-y-2 animate-fade-in animation-delay-450">
                   <Label htmlFor="email" className="font-quicksand">Email Address</Label>
                   <div className="relative">
                     <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -139,7 +139,7 @@ const ForgotPassword = () => {
                 
                 <Button
                   type="submit"
-                  className="w-full bg-purple-gradient hover:opacity-90 transition-all font-quicksand"
+                  className="w-full bg-purple-gradient hover:opacity-90 transition-all font-quicksand animate-fade-in animation-delay-600"
                   disabled={isLoading}
                 >
                   {isLoading ? (
@@ -153,7 +153,7 @@ const ForgotPassword = () => {
                 </Button>
               </form>
             </CardContent>
-            <CardFooter className="flex flex-col space-y-4">
+            <CardFooter className="flex flex-col space-y-4 animate-fade-in animation-delay-750">
               <div className="text-center text-sm text-muted-foreground font-quicksand">
                 Remember your password?{" "}
                 <Link

@@ -34,6 +34,9 @@ const Footer = () => {
               <li>
                 <span className="text-muted-foreground opacity-60">Support (Coming soon...)</span>
               </li>
+              <li>
+                <span className="text-muted-foreground opacity-60">Blogs (Coming soon...)</span>
+              </li>
             </ul>
           </div>
 

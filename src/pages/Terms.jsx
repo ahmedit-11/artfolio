@@ -21,18 +21,20 @@ const Terms = () => {
       <Header />
       <main className="flex-grow animate-fade-in">
         <div className="container mx-auto px-4 py-12 max-w-6xl">
-          <PageTitle
-            subtitle="Welcome to Artova! Please read these Terms of Service carefully before using our website and services."
-            className="mb-6"
-          >
-            Terms of Service
-          </PageTitle>
+          <div className="animate-fade-in animation-delay-150">
+            <PageTitle
+              subtitle="Welcome to Artova! Please read these Terms of Service carefully before using our website and services."
+              className="mb-6"
+            >
+              Terms of Service
+            </PageTitle>
+          </div>
 
-          <div className="text-xs text-muted-foreground mb-8">Last updated: August 10, 2025</div>
+          <div className="text-xs text-muted-foreground mb-8 animate-fade-in animation-delay-300">Last updated: August 10, 2025</div>
 
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 animate-fade-in animation-delay-450">
             {/* Table of contents */}
-            <nav className="md:col-span-1 bg-card border border-border rounded-2xl p-5 h-max md:sticky md:top-24">
+            <nav className="md:col-span-1 bg-card border border-border rounded-2xl p-5 h-max md:sticky md:top-24 animate-fade-in animation-delay-600">
               <h2 className="text-sm font-semibold mb-3">Contents</h2>
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li><a href="#acceptance" onClick={(e)=>handleTocClick(e,'acceptance')} className="hover:underline">1. Acceptance of Terms</a></li>
@@ -51,24 +53,24 @@ const Terms = () => {
             </nav>
 
             {/* Terms content */}
-            <article className="md:col-span-3 space-y-8 max-w-3xl">
-              <section id="acceptance" className="scroll-mt-24">
+            <article className="md:col-span-3 space-y-8 max-w-3xl animate-fade-in animation-delay-750">
+              <section id="acceptance" className="scroll-mt-24 animate-fade-in animation-delay-900">
                 <h2 className="text-xl font-semibold mb-2 font-quicksand">1. Acceptance of Terms</h2>
                 <p className="text-muted-foreground">By accessing or using Artova, you agree to be bound by these Terms. If you disagree with any part, you may not access the service.</p>
               </section>
 
-              <section id="accounts" className="scroll-mt-24">
+              <section id="accounts" className="scroll-mt-24 animate-fade-in animation-delay-1050">
                 <h2 className="text-xl font-semibold mb-2 font-quicksand">2. User Accounts</h2>
                 <p className="text-muted-foreground">You are responsible for maintaining the confidentiality of your account credentials and for all activities under your account. Notify us immediately of any unauthorized use.</p>
               </section>
 
-              <section id="content" className="scroll-mt-24">
+              <section id="content" className="scroll-mt-24 animate-fade-in animation-delay-1200">
                 <h2 className="text-xl font-semibold mb-2 font-quicksand">3. User Content</h2>
                 <p className="text-muted-foreground mb-3">You retain ownership of content you submit. By posting on Artova, you grant us a worldwide, non-exclusive, royalty-free license to host, display, and distribute your content to operate and promote the service.</p>
                 <p className="text-sm text-muted-foreground">You are solely responsible for ensuring you have the rights to the content you share.</p>
               </section>
 
-              <section id="guidelines" className="scroll-mt-24">
+              <section id="guidelines" className="scroll-mt-24 animate-fade-in animation-delay-1350">
                 <h2 className="text-xl font-semibold mb-2 font-quicksand">4. Acceptable Use Guidelines</h2>
                 <ul className="list-disc pl-5 text-sm text-muted-foreground space-y-1">
                   <li>No illegal, infringing, or harmful content</li>
@@ -77,42 +79,42 @@ const Terms = () => {
                 </ul>
               </section>
 
-              <section id="ip" className="scroll-mt-24">
+              <section id="ip" className="scroll-mt-24 animate-fade-in animation-delay-1500">
                 <h2 className="text-xl font-semibold mb-2 font-quicksand">5. Intellectual Property</h2>
                 <p className="text-muted-foreground">Artova’s trademarks, branding, and software are protected by intellectual property laws. You may not copy, modify, or distribute any part of the service without permission.</p>
               </section>
 
-              <section id="termination" className="scroll-mt-24">
+              <section id="termination" className="scroll-mt-24 animate-fade-in animation-delay-1650">
                 <h2 className="text-xl font-semibold mb-2 font-quicksand">6. Termination</h2>
                 <p className="text-muted-foreground">We may suspend or terminate access to the service at any time if you violate these Terms or for other reasons, with or without notice.</p>
               </section>
 
-              <section id="disclaimers" className="scroll-mt-24">
+              <section id="disclaimers" className="scroll-mt-24 animate-fade-in animation-delay-1800">
                 <h2 className="text-xl font-semibold mb-2 font-quicksand">7. Disclaimers</h2>
                 <p className="text-muted-foreground">The service is provided on an “AS IS” and “AS AVAILABLE” basis without warranties of any kind. Your use is at your sole risk.</p>
               </section>
 
-              <section id="liability" className="scroll-mt-24">
+              <section id="liability" className="scroll-mt-24 animate-fade-in animation-delay-1950">
                 <h2 className="text-xl font-semibold mb-2 font-quicksand">8. Limitation of Liability</h2>
                 <p className="text-muted-foreground">To the maximum extent permitted by law, Artova and its affiliates shall not be liable for any indirect, incidental, special, consequential, or punitive damages, or any loss of profits or revenues.</p>
               </section>
 
-              <section id="indemnification" className="scroll-mt-24">
+              <section id="indemnification" className="scroll-mt-24 animate-fade-in animation-delay-2100">
                 <h2 className="text-xl font-semibold mb-2 font-quicksand">9. Indemnification</h2>
                 <p className="text-muted-foreground">You agree to indemnify and hold harmless Artova and its affiliates from any claims, damages, liabilities, and expenses arising from your use of the service or violation of these Terms.</p>
               </section>
 
-              <section id="law" className="scroll-mt-24">
+              <section id="law" className="scroll-mt-24 animate-fade-in animation-delay-2250">
                 <h2 className="text-xl font-semibold mb-2 font-quicksand">10. Governing Law</h2>
                 <p className="text-muted-foreground">These Terms are governed by the laws of the applicable jurisdiction without regard to its conflict of law provisions.</p>
               </section>
 
-              <section id="changes" className="scroll-mt-24">
+              <section id="changes" className="scroll-mt-24 animate-fade-in animation-delay-2400">
                 <h2 className="text-xl font-semibold mb-2 font-quicksand">11. Changes to These Terms</h2>
                 <p className="text-muted-foreground">We may update these Terms from time to time. We will post the updated version on this page and revise the “Last updated” date above.</p>
               </section>
 
-              <section id="contact" className="scroll-mt-24">
+              <section id="contact" className="scroll-mt-24 animate-fade-in animation-delay-2550">
                 <h2 className="text-xl font-semibold mb-2 font-quicksand">12. Contact Us</h2>
                 <p className="text-muted-foreground">Questions about these Terms? Email us at <a className="underline" href="mailto:support@Artova.app">support@Artova.app</a> or visit our <Link className="underline" to="/contact">Contact</Link> page.</p>
               </section>

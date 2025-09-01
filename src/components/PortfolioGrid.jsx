@@ -173,8 +173,8 @@ const PortfolioGrid = ({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {sortedItems.map((item) => (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 animate-fade-in animation-delay-150">
+        {sortedItems.map((item, index) => (
           <PortfolioCard
             key={item.id}
             image={item.image}
@@ -184,7 +184,8 @@ const PortfolioGrid = ({
             likes={item.likes}
             comments={item.comments}
             tags={item.tags}
-            className="transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:shadow-purple-200/40 dark:hover:shadow-purple-900/20"
+            className="transition-all duration-500 hover:shadow-lg hover:-translate-y-3 hover:scale-105 hover:shadow-purple-200/40 dark:hover:shadow-purple-900/20 animate-fade-in"
+            style={{ animationDelay: `${300 + (index * 150)}ms` }}
             onCardClick={() => onItemClick(item)}
             onCreatorClick={() => onCreatorClick(item.creator)}
             onCommentClick={() => onCommentClick(item)}

@@ -34,8 +34,8 @@ import { authAPI } from "../lib/api";
 import { toast } from "react-toastify";
 import ConfirmDialog from "@/components/ConfirmDialog";
 
-const SettingsSection = ({ icon: Icon, title, description, children }) => (
-  <Card className="p-6 mb-6">
+const SettingsSection = ({ icon: Icon, title, description, children, className }) => (
+  <Card className={`p-6 mb-6 ${className || ''}`}>
     <div className="flex items-start space-x-4">
       <div className="p-2 rounded-lg bg-purple-100 dark:bg-purple-900/20">
         <Icon className="size-6 text-purple-600 dark:text-purple-400" />
@@ -136,7 +136,7 @@ const Settings = () => {
   return (
 
     <div className="container max-w-4xl mx-auto px-4 py-8 bg-background animate-fade-in">
-      <PageTitle subtitle="Manage your account preferences and customize your experience" className="mb-8">
+      <PageTitle subtitle="Manage your account preferences and customize your experience" className="mb-8 animate-fade-in animation-delay-150">
         Settings
       </PageTitle>
 
@@ -144,6 +144,7 @@ const Settings = () => {
         icon={User}
         title="Profile Settings"
         description="Manage your profile information and preferences"
+        className="animate-fade-in animation-delay-300"
       >
         <Button variant="outline" size="sm" onClick={() => navigate('/settings/profile')}>Edit Profile</Button>
       </SettingsSection>
@@ -152,6 +153,7 @@ const Settings = () => {
         icon={Bell}
         title="Notifications"
         description="Control how and when you receive notifications"
+        className="animate-fade-in animation-delay-450"
       >
         <div className="space-y-4">
           <div className="flex items-center justify-between">
@@ -208,6 +210,7 @@ const Settings = () => {
         icon={Shield}
         title="Privacy & Security"
         description="Control who can see your content and interact with you"
+        className="animate-fade-in animation-delay-600"
       >
         <div className="space-y-4">
           <div className="flex items-center justify-between">
@@ -258,6 +261,7 @@ const Settings = () => {
         icon={Palette}
         title="Appearance & Accessibility"
         description="Customize how Artfolio looks and feels"
+        className="animate-fade-in animation-delay-750"
       >
         <div className="space-y-4">
           <div className="flex items-center justify-between">
@@ -291,6 +295,7 @@ const Settings = () => {
         icon={Languages}
         title="Language & Region"
         description="Set your preferred language and timezone"
+        className="animate-fade-in animation-delay-900"
       >
         <div className="space-y-4">
           <div className="flex items-center justify-between">
@@ -335,6 +340,7 @@ const Settings = () => {
         icon={Download}
         title="Data & Account Management"
         description="Export your data or manage your account"
+        className="animate-fade-in animation-delay-1050"
       >
         <div className="space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
@@ -367,6 +373,7 @@ const Settings = () => {
         icon={LogOut}
         title="Log out of your account"
         description="You'll need to sign in again to access your account"
+        className="animate-fade-in animation-delay-1200"
       >
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
           <div>

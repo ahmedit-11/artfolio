@@ -381,7 +381,7 @@ const PortfolioDetail = () => {
   return (
     <div className={cn("min-h-screen bg-background", isClosing ? "animate-fade-out" : "animate-fade-in")}>
       {/* Header */}
-      <div className="sticky top-0 z-50 bg-background/80 backdrop-blur-lg border-b">
+      <div className="sticky top-0 z-50 bg-background/80 backdrop-blur-lg border-b animate-fade-in animation-delay-150">
         <div className="container max-w-6xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
              <Button
@@ -409,12 +409,12 @@ const PortfolioDetail = () => {
       </div>
 
       {/* Main Content */}
-      <div className="container max-w-6xl mx-auto px-4 py-8">
+      <div className="container max-w-6xl mx-auto px-4 py-8 animate-fade-in animation-delay-300">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left Column - Content */}
-          <div className="lg:col-span-2 space-y-8">
+          <div className="lg:col-span-2 space-y-8 animate-fade-in animation-delay-450">
             {/* Title and Creator */}
-            <div>
+            <div className="animate-fade-in animation-delay-600">
               <PageTitle>
               {portfolio.title}
               </PageTitle>
@@ -434,19 +434,21 @@ const PortfolioDetail = () => {
             </div>
 
             {/* Content */}
-            {renderContent()}
+            <div className="animate-fade-in animation-delay-750">
+              {renderContent()}
+            </div>
 
             {/* Description */}
-            <Card className="p-6">
+            <Card className="p-6 animate-fade-in animation-delay-900">
               <h2 className="text-xl font-semibold mb-4">About this Project</h2>
               <p className="text-muted-foreground">{portfolio.description}</p>
             </Card>
           </div>
 
           {/* Right Column - Sidebar */}
-          <div className="space-y-6">
+          <div className="space-y-6 animate-fade-in animation-delay-1050">
             {/* Stats */}
-            <Card className="p-6 ">
+            <Card className="p-6 animate-fade-in animation-delay-1200">
               <div className="" onClick={handelTranslate}>
                 <h3 className="font-semibold mb-4">Stats</h3>
                 <div className="flex flex-col gap-4  items-center justify-between">
@@ -475,24 +477,24 @@ const PortfolioDetail = () => {
                     </div>
                     <div className="text-sm text-muted-foreground">Comments</div>
                   </Button>
-                  {/* <div className="text-center p-3 bg-purple-50 dark:bg-purple-900/10 rounded-lg">
-                    <Share2 className="size-5 mx-auto mb-2 text-purple-600" />
-                    <div className="font-semibold">{portfolio.stats.shares}</div>
-                    <div className="text-sm text-muted-foreground">Shares</div>
-                  </div> */}
-                  <div className="text-center items-center col-span-2 align-center  p-3 bg-purple-50 dark:bg-purple-900/10 rounded-lg">
+                  <div className="text-center p-3 bg-purple-50 dark:bg-purple-900/10 rounded-lg">
+                                <Calendar className="ssize-5 mx-auto mb-2 text-purple-600" />
+    
+                    <div className="font-semibold">{portfolio.createdAt}</div>
+                    <div className="text-sm text-muted-foreground">Created At</div>
+                  </div>
+                  <div className="text-center items-center  align-center  p-3 bg-purple-50 dark:bg-purple-900/10 rounded-lg">
                     <Star className="size-5 mx-auto mb-2  text-purple-600" />
                     <div className="font-semibold">{portfolio.stats.rating}</div>
-                    <div className="text-sm text-muted-foreground">Rating</div>
+                    <div className="text-sm text-muted-foreground">Avg Rating</div>
                   </div>
                 </div>
-              <StarRating />
               </div>
               </div>
             </Card>
 
             {/* Tags */}
-            <Card className="p-6">
+            <Card className="p-6 animate-fade-in animation-delay-1350">
               <h3 className="font-semibold mb-4">Tags</h3>
               <div className="flex flex-wrap gap-2">
                 {portfolio.tags.map((tag) => (
@@ -502,26 +504,14 @@ const PortfolioDetail = () => {
                 ))}
               </div>
             </Card>
+            {/* Ratings */}
+                        <Card className="p-6 animate-fade-in animation-delay-1500">
+                          <h3 className="font-semibold mb-3">Rate this portfolio</h3>
+                          <StarRating 
+                          />
+                        </Card>
 
-            {/* Dates */}
-            <Card className="p-6">
-              <h3 className="font-semibold mb-4">Dates</h3>
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Created</span>
-                  <span>
-                    {new Date(portfolio.createdAt).toLocaleDateString()}
-                  </span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Updated</span>
-                  <span>
-                    {new Date(portfolio.updatedAt).toLocaleDateString()}
-                  </span>
-                </div>
-              </div>
-             
-            </Card>
+           
           </div>
         </div>
       </div>

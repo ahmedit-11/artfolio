@@ -13,10 +13,10 @@ import StarRating from "@/components/StarRating";
 import Tag from "@/components/ui/tag";
 import Cookies from "js-cookie";
 import { reportAPI } from "@/lib/api";
-import { ImageGallery } from "@/components/ImageGallery";
-import { VideoPlayer } from "@/components/VideoPlayer";
-import { TextContent } from "@/components/TextContent";
-import { AudioPlayer } from "@/components/AudioPlayer";
+import ImageGallery  from "@/components/ImageGallery";
+import  VideoPlayer  from "@/components/VideoPlayer";
+import  TextContent  from "@/components/TextContent";
+import AudioPlayer  from "@/components/AudioPlayer";
 import {
   Download,
   Eye,
@@ -165,7 +165,7 @@ const mockPortfolios = {
   }
 };
 
-const PortfolioDetail = () => {
+const Detail = () => {
   useScrollToTop();
   const { id } = useParams();
   const navigate = useNavigate();
@@ -445,4 +445,4 @@ const PortfolioDetail = () => {
   );
 };
 
-export default PortfolioDetail;
+export default Detail;

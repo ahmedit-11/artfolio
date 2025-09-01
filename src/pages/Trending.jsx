@@ -54,15 +54,17 @@ const TrendingPage = () => {
     <div className="flex flex-col min-h-screen bg-background bg-background">
       <Header />
       <main className="flex-grow animate-fade-in">
-        <section className="py-12 ">
+        <section className="py-12 bg-gradient-to-b from-background to-secondary/30">
           <div className="container px-4 mx-auto">
             <PageTitle subtitle="Explore the most popular and trending portfolios that are making waves in the creative community.">
               Trending Now
             </PageTitle>
-            <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {portfolios.map((portfolio) => (
+            <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 animate-fade-in animation-delay-300">
+              {portfolios.map((portfolio, index) => (
                 <PortfolioCard
                   key={portfolio.id}
+                  className="transition-all duration-500 hover:shadow-lg hover:-translate-y-3 hover:scale-105 hover:shadow-purple-200/40 dark:hover:shadow-purple-900/20 animate-fade-in"
+                  style={{ animationDelay: `${600 + (index * 200)}ms` }}
                   image={portfolio.image}
                   title={portfolio.title}
                   creator={portfolio.creator}

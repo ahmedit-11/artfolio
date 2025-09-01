@@ -1,0 +1,50 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // TESTING MODE: Open access for 30 days
+    // Remove these rules and uncomment the secure rules below for production
+    
+    // Allow all reads and writes for testing
+    match /{document=**} {
+      allow read, write: if true;
+    }
+    
+    /* PRODUCTION RULES - Uncomment these after testing
+    // Users collection - users can read/write their own profile
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow read: if request.auth != null; // Allow reading other users for search
+    }
+
+    // Chats collection
+    match /chats/{chatId} {
+      // Allow read/write if user is participant in the chat
+      allow read, write: if request.auth != null && 
+        request.auth.uid in resource.data.users;
+      
+      // Allow create if user is one of the participants
+      allow create: if request.auth != null && 
+        request.auth.uid in request.resource.data.users;
+
+      // Messages subcollection
+      match /messages/{messageId} {
+        // Allow read if user is participant in parent chat
+        allow read: if request.auth != null && 
+          request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.users;
+        
+        // Allow create if user is participant and is the sender
+        allow create: if request.auth != null && 
+          request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.users &&
+          request.auth.uid == request.resource.data.senderId;
+      }
+
+      // Typing indicators subcollection
+      match /typing/{userId} {
+        // Allow read/write if user is participant in parent chat
+        allow read, write: if request.auth != null && 
+          request.auth.uid in get(/databases/$(database)/documents/chats/$(chatId)).data.users;
+      }
+    }
+    */
+  }
+}

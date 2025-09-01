@@ -39,11 +39,12 @@ const ExplorePage = () => {
             <PageTitle subtitle="Discover creative categories and find inspiration from a variety of portfolios.">
               Explore Categories
             </PageTitle>
-            <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {categories.map((category) => (
+            <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 animate-fade-in animation-delay-300">
+              {categories.map((category, index) => (
                 <Card
                   key={category.name}
-                  className="overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:shadow-purple-200/40 dark:hover:shadow-purple-900/20"
+                  className="overflow-hidden transition-all duration-500 hover:shadow-lg hover:-translate-y-3 hover:scale-105 hover:shadow-purple-200/40 dark:hover:shadow-purple-900/20 animate-fade-in"
+                  style={{ animationDelay: `${600 + (index * 200)}ms` }}
                 >
                   <div className="relative h-48 overflow-hidden">
                     <img

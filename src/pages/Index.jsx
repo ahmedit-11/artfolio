@@ -11,18 +11,30 @@ import CallToAction from "@/components/CallToAction";
 const Index = () => {
   useScrollToTop();
   return (
-    <>
-      <Hero />
-      <FeaturedCategories />
-      <Following 
-        title="Following"
-        viewAllText="View All"
-        onViewAllClick={() => console.log("View all clicked")}
-      />
-      <ForYou />
-      <TrendingPortfolios />
-      <CallToAction />
-    </>
+    <div className="animate-fade-in">
+      <div className="animate-fade-in">
+        <Hero />
+      </div>
+      <div className="animate-fade-in animation-delay-300">
+        <FeaturedCategories />
+      </div>
+      <div className="animate-fade-in animation-delay-600">
+        <Following 
+          title="Following"
+          viewAllText="View All"
+          onViewAllClick={() => console.log("View all clicked")}
+        />
+      </div>
+      <div className="animate-fade-in animation-delay-900">
+        <ForYou />
+      </div>
+      <div className="animate-fade-in animation-delay-1200">
+        <TrendingPortfolios />
+      </div>
+      <div className="animate-fade-in animation-delay-1500">
+        <CallToAction />
+      </div>
+    </div>
   );
 };
 

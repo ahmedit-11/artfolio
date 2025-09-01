@@ -1,7 +1,7 @@
 // AdminPanel.jsx
 // Main admin control panel component with navigation tabs
 import React, { useState, useEffect } from 'react';
-import { Users, Flag, Shield, FileText, AlertTriangle, ShieldOff, LogOut, Sun, Moon } from 'lucide-react';
+import { Users, Flag, Shield, FileText, AlertTriangle, ShieldOff, LogOut, Sun, Moon, Settings } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { authAPI } from '../../lib/api';
@@ -10,8 +10,9 @@ import UserManagement from './UserManagement';
 import ReportsManagement from './ReportsManagement';
 import BlacklistManagement from './BlacklistManagement';
 import BanLogs from './BanLogs';
+import AccountManagement from './AccountManagement';
 import ConfirmDialog from '@/components/ConfirmDialog';
-
+import PageTitle from '@/components/PageTitle'
 const AdminPanel = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('users');
@@ -69,6 +70,7 @@ const AdminPanel = () => {
     { id: 'reports', label: 'Reports', icon: AlertTriangle,color:"orange", component: ReportsManagement },
     { id: 'blacklist', label: 'Blacklist', icon: ShieldOff,color:"red", component: BlacklistManagement },
     { id: 'logs', label: 'Ban Logs', icon: FileText,color:"#998fa3", component: BanLogs },
+    { id: 'account', label: 'Account Management', icon: Settings,color:"blue", component: AccountManagement },
   ];
 
   const ActiveComponent = tabs.find(tab => tab.id === activeTab)?.component;
@@ -83,7 +85,8 @@ const AdminPanel = () => {
             <div className='flex items-start'>
               <Shield className='text-primary size-8 sm:size-10 mr-2 flex-shrink-0'/>
               <div>
-                <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-1 sm:mb-2">Admin Control Panel</h1>
+                <PageTitle > Admin Control Panel</PageTitle>
+                
                 <p className="text-sm sm:text-base text-muted-foreground">Manage users, reports, and moderation actions</p>
               </div>
             </div>
@@ -106,18 +109,7 @@ const AdminPanel = () => {
                 </span>
               </button>
               
-              {/* Logout Button */}
-              <button
-                onClick={handleLogoutClick}
-                disabled={isLoggingOut}
-                className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 bg-red-500 hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg transition-colors"
-                title="Logout"
-              >
-                <LogOut className="size-4" />
-                <span className="text-xs sm:text-sm font-medium hidden sm:inline">
-                  {isLoggingOut ? "Logging out..." : "Logout"}
-                </span>
-              </button>
+           
             </div>
           </div>
         </div>

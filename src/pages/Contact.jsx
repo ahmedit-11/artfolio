@@ -33,16 +33,18 @@ const Contact = () => {
       <Header />
       <main className="flex-grow p-4 md:p-10 animate-fade-in">
         <div className="container mx-auto max-w-6xl">
-          <PageTitle
-            subtitle="Have a question, feedback, or just want to say hello? Send us a message and we'll get back to you within 1–2 business days."
-            className="mb-8"
-          >
-            Contact Us
-          </PageTitle>
+          <div className="animate-fade-in animation-delay-150">
+            <PageTitle
+              subtitle="Have a question, feedback, or just want to say hello? Send us a message and we'll get back to you within 1–2 business days."
+              className="mb-8"
+            >
+              Contact Us
+            </PageTitle>
+          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-5 gap-6 animate-fade-in animation-delay-300">
             {/* Form */}
-            <div className="md:col-span-3 bg-card border border-border rounded-2xl p-6 md:p-8">
+            <div className="md:col-span-3 bg-card border border-border rounded-2xl p-6 md:p-8 animate-fade-in animation-delay-450">
               {loading ? (
                 <div className="flex items-center justify-center py-10"><Loader /></div>
               ) : submitted ? (
@@ -106,15 +108,15 @@ const Contact = () => {
             </div>
 
             {/* Contact Info */}
-            <aside className="md:col-span-2 space-y-4">
-              <div className="bg-card border border-border rounded-2xl p-6">
+            <aside className="md:col-span-2 space-y-4 animate-fade-in animation-delay-600">
+              <div className="bg-card border border-border rounded-2xl p-6 animate-fade-in animation-delay-750">
                 <h3 className="font-semibold mb-4">Reach us directly</h3>
                 <ul className="space-y-3 text-sm text-muted-foreground">
                   <li className="flex items-start gap-3">
                     <Mail className="w-5 h-5 text-purple-600 dark:text-purple-400 mt-0.5" aria-hidden="true" />
                     <div>
                       <span className="text-foreground">Email</span>
-                      <div><a href="mailto:support@Artova.app" className="hover:underline">support@Artova.app</a></div>
+                      <div><a href="mailto:contact@Artova.app" className="hover:underline">contact@Artova.app</a></div>
                     </div>
                   </li>
                   <li className="flex items-start gap-3">
@@ -128,20 +130,20 @@ const Contact = () => {
                     <Phone className="w-5 h-5 text-purple-600 dark:text-purple-400 mt-0.5" aria-hidden="true" />
                     <div>
                       <span className="text-foreground">Phone</span>
-                      <div>+1 (555) 012-3456</div>
+                      <div>+963 996-944-873</div>
                     </div>
                   </li>
                   <li className="flex items-start gap-3">
                     <MapPin className="w-5 h-5 text-purple-600 dark:text-purple-400 mt-0.5" aria-hidden="true" />
                     <div>
                       <span className="text-foreground">Location</span>
-                      <div>San Francisco, CA</div>
+                      <div>Syria</div>
                     </div>
                   </li>
                 </ul>
               </div>
 
-              <div className="bg-card border border-border rounded-2xl p-6">
+              <div className="bg-card border border-border rounded-2xl p-6 animate-fade-in animation-delay-900">
                 <h3 className="font-semibold mb-2">Response times</h3>
                 <p className="text-sm text-muted-foreground">We aim to reply within 1–2 business days. For urgent issues, include “URGENT” in your subject line.</p>
               </div>
