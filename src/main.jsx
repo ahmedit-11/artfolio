@@ -12,9 +12,11 @@ import axios from 'axios';
  import Cookies from 'js-cookie';
 // Import react-toastify CSS
 import 'react-toastify/dist/ReactToastify.css';
-
-// axios.defaults.baseURL = "http://192.168.1.110:8000/api"
-//  axios.defaults.withCredentials = true;
+import { Provider } from 'react-redux';
+import { PersistGate } from 'redux-persist/integration/react';
+import { store, persistor } from './store';
+axios.defaults.baseURL = "http://127.0.0.1:8000/api";
+axios.defaults.withCredentials = false;
  // Attach Authorization header from cookie token on each request
  axios.interceptors.request.use(
    (config) => {
@@ -30,6 +32,10 @@ import 'react-toastify/dist/ReactToastify.css';
 // Create the root element and render the App inside React.StrictMode for highlighting potential problems
 createRoot(document.getElementById("root")).render(
   <React.StrictMode>
+   <Provider store={store}>
+    <PersistGate persistor={persistor}>
     <App />
+    </PersistGate>
+  </Provider>
   </React.StrictMode>
 );

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useScrollToTop } from "../utils/scrollToTop";
 import { useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
@@ -6,22 +6,16 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Plus, X, UploadCloud } from "lucide-react";
+import { Plus, X, UploadCloud, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import PageTitle from "@/components/PageTitle";
 import Tag from "@/components/ui/tag";
-
-/*
-  ============================
-  CreatePortfolio Page
-  ============================
-  Purpose:
-    Let creators compose a new portfolio entry via form fields that mirror
-    the data structure displayed on PortfolioDetail & cards.
-
-  NOTE: No backend yet. Submit handler just prints captured data to console.
-  Wherever you see `// TODO:` comments provide the place to integrate API calls later.
-*/
+import { useDispatch, useSelector } from "react-redux";
+import { getAllCatThunk } from "../store/Categories/thunk/getAllCatThunk";
+import { createPortfolioThunk } from "../store/createPortfolio/thunk/createPortfolioThunk";
+import { getAllTagsThunk } from "../store/tags/thunk/getAllTagsThunk";
+import { createTagThunk } from "../store/tags/thunk/createTagThunk";
+import {toast} from 'react-toastify';
 
 const commonTags = [
   "UI/UX",
@@ -38,12 +32,21 @@ const CreatePortfolio = () => {
   // Always scroll to top on mount
   useScrollToTop();
   const navigate = useNavigate();
-
+  const dispatch = useDispatch();
+  const { categories } = useSelector(state => state.categories)
+  const { tags } = useSelector(state => state.tags)
+  const {loading,data,error} = useSelector(state=>state.createPortfolio)
+useEffect(()=>{
+  dispatch(getAllCatThunk())
+  dispatch(getAllTagsThunk())
+},[dispatch])
   // Core form state
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [coverImage, setCoverImage] = useState(null); // File object
   const [coverPreview, setCoverPreview] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
   const [selectedTags, setSelectedTags] = useState([]);
   const [customTag, setCustomTag] = useState("");
 
@@ -56,6 +59,12 @@ const CreatePortfolio = () => {
     if (!file) return;
     setCoverImage(file);
     setCoverPreview(URL.createObjectURL(file));
+  };
+
+  // Category helpers
+  const selectCategory = (category) => {
+    setSelectedCategory(category);
+    setShowCategoryDropdown(false);
   };
 
   // Tag helpers
@@ -93,29 +102,86 @@ const CreatePortfolio = () => {
     setMediaItems((prev) => prev.filter((m) => m.id !== id));
   };
 
-  // Submit (for now just logs)
-  const handleSubmit = (e) => {
+  // Submit handler
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const payload = {
-      title,
-      description,
-      coverImage, // In real API send presigned upload or multipart
-      tags: selectedTags,
-      media: mediaItems,
-      createdAt: new Date().toISOString(),
-    };
+    // Laravel backend requires at least 1 media file
+    const fileItems = mediaItems.filter(item => item.value && item.value instanceof File);
+    
+    if (fileItems.length === 0) {
+      toast.error("Please add at least one media file (image, video, or audio).");
+      return;
+    }
 
-    console.log("CreatePortfolio payload =>", payload);
+    try {
+      // Step 1: Create tags dynamically and get their IDs using Redux
+      const tagIds = [];
+      if (selectedTags.length > 0) {
+        for (const tagName of selectedTags) {
+          // Check if tag already exists in Redux store
+          const existingTag = tags.find(tag => tag.name.toLowerCase() === tagName.toLowerCase());
+          
+          if (existingTag) {
+            // Use existing tag ID
+            tagIds.push(existingTag.id);
+          } else {
+            // Try to create new tag using Redux thunk
+            try {
+              const tagResponse = await dispatch(createTagThunk({ name: tagName }));
+              if (tagResponse.payload && tagResponse.payload.tag) {
+                tagIds.push(tagResponse.payload.tag.id);
+              }
+            } catch (error) {
+              // Silently skip this tag if creation fails
+              console.warn(`Could not create tag: ${tagName}`, error);
+            }
+          }
+        }
+      }
 
-    // TODO: Replace with POST /api/portfolios when backend is ready.
-    // Example:
-    // const formData = new FormData();
-    // ...append each field & file
-    // await fetch("/api/portfolios", { method: "POST", body: formData });
+      // Step 2: Create FormData for portfolio submission
+      const formData = new FormData();
+      
+      // Add basic fields
+      formData.append('title', title);
+      formData.append('description', description);
+      
+      // Backend expects category_ids as array
+      if (selectedCategory?.id) {
+        formData.append('category_ids[]', selectedCategory.id);
+      }
+      
+      // Add the created tag IDs
+      tagIds.forEach(tagId => {
+        formData.append('tag_ids[]', tagId);
+      });
+      
+      // Add cover image if selected
+      if (coverImage) {
+        formData.append('cover_image', coverImage);
+      }
+      
+      // Add required media files (backend requires min:1)
+      fileItems.forEach((item) => {
+        formData.append('media[]', item.value);
+      });
 
-    // For now simulate success and redirect back or to detail page.
-    navigate(-1);
+
+      // Step 3: Submit the portfolio
+      const res = await dispatch(createPortfolioThunk(formData));
+      
+      if (res.payload && res.payload.message === 'Project created successfully!') {
+        toast.success("Portfolio created successfully!");
+        navigate("/");
+      } else {
+        toast.error("Failed to create portfolio. Please try again.");
+        console.error("Portfolio creation failed:", res);
+      }
+    } catch (error) {
+      console.error("Create portfolio error:", error);
+      toast.error("An error occurred while creating portfolio.");
+    }
   };
 
   return (
@@ -147,6 +213,68 @@ const CreatePortfolio = () => {
             rows={5}
             required
           />
+        </Card>
+
+        {/* Category Selection */}
+        <Card className="p-6 space-y-4">
+          <h2 className="font-semibold text-lg">Category</h2>
+          <p className="text-sm text-muted-foreground">
+            Choose the category that best describes your portfolio
+          </p>
+          
+          <div className="relative">
+            <Button
+              type="button"
+              variant="outline"
+              className={cn(
+                "w-full justify-between",
+                !selectedCategory && "text-muted-foreground"
+              )}
+              onClick={() => setShowCategoryDropdown(!showCategoryDropdown)}
+            >
+              {selectedCategory ? selectedCategory.name : "Select a category"}
+              <ChevronDown className={cn(
+                "size-4 transition-transform",
+                showCategoryDropdown && "rotate-180"
+              )} />
+            </Button>
+
+            {showCategoryDropdown && (
+              <div className="absolute top-full left-0 right-0 z-10 mt-1 bg-background border rounded-md shadow-lg max-h-60 overflow-y-auto">
+                {categories.map((category) => (
+                  <button
+                    key={category.id}
+                    type="button"
+                    className={cn(
+                      "w-full px-4 py-2 text-left hover:bg-muted transition-colors",
+                      selectedCategory?.id === category.id && "bg-muted"
+                    )}
+                    onClick={() => selectCategory(category)}
+                  >
+                    {category.name}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {selectedCategory && (
+            <div className="flex items-center gap-2 p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+              <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+              <span className="text-sm font-medium text-purple-700 dark:text-purple-300">
+                Selected: {selectedCategory.name}
+              </span>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="ml-auto h-6 w-6 p-0 text-purple-600 hover:text-purple-700"
+                onClick={() => setSelectedCategory(null)}
+              >
+                <X className="size-3" />
+              </Button>
+            </div>
+          )}
         </Card>
 
         {/* Cover Image */}

@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useScrollToTop } from "../utils/scrollToTop";
 import { Link, useNavigate } from "react-router-dom";
 import Cookies from "js-cookie"
+import { useDispatch, useSelector } from "react-redux";
+import { loginThunk } from "../store/auth/thunk/loginThunk";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,15 +16,15 @@ import Footer from "@/components/Footer";
 import { toast } from "react-toastify";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
 import PageTitle from "@/components/PageTitle";
-import { authAPI } from "../lib/api";
 const SignIn = () => {
   useScrollToTop();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [acceptTerms, setAcceptTerms] = useState(false);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { loading } = useSelector(state => state.auth);
 
   const handleSignIn = async (e) => {
     e.preventDefault();
@@ -32,15 +34,10 @@ const SignIn = () => {
       e.preventDefault();
     }
     
-    setIsLoading(true);
-    
     try {
-      const response = await authAPI.login({
-        email,
-        password,
-      });
+      const res = await dispatch(loginThunk({ email, password }));
       
-      if (response && response.success) {
+      if (res.payload && res.payload.message === 'Login successful!') {
         toast.success("Login Successfully!");
         navigate("/");
       } else {
@@ -57,8 +54,6 @@ const SignIn = () => {
       }
       
       toast.error(message);
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -143,9 +138,9 @@ const SignIn = () => {
                 <Button
                   className="w-full bg-purple-gradient hover:opacity-90 transition-all font-quicksand group animate-fade-in animation-delay-750"
                   type="submit"
-                  disabled={isLoading}
+                  disabled={loading}
                 >
-                  {isLoading ? (
+                  {loading ? (
                     <span className="flex items-center">
                       <span className="animate-spin mr-2">◌</span>
                       Signing In...

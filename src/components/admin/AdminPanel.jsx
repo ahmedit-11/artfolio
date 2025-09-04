@@ -1,7 +1,7 @@
 // AdminPanel.jsx
 // Main admin control panel component with navigation tabs
 import React, { useState, useEffect } from 'react';
-import { Users, Flag, Shield, FileText, AlertTriangle, ShieldOff, LogOut, Sun, Moon, Settings } from 'lucide-react';
+import { Users, Flag, Shield, FileText, AlertTriangle, ShieldOff, LogOut, Sun, Moon, Settings, Tag, Hash } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { authAPI } from '../../lib/api';
@@ -11,6 +11,8 @@ import ReportsManagement from './ReportsManagement';
 import BlacklistManagement from './BlacklistManagement';
 import BanLogs from './BanLogs';
 import AccountManagement from './AccountManagement';
+import CategoryManagement from './CategoryManagement';
+
 import ConfirmDialog from '@/components/ConfirmDialog';
 import PageTitle from '@/components/PageTitle'
 const AdminPanel = () => {
@@ -67,6 +69,8 @@ const AdminPanel = () => {
 
   const tabs = [
     { id: 'users', label: 'User Management', icon: Users,color:"#998fa3", component: UserManagement },
+    { id: 'categories', label: 'Categories', icon: Tag,color:"#8B5CF6", component: CategoryManagement },
+    // { id: 'tags', label: 'Tags', icon: Hash,color:"#10B981", component: TagManagement },
     { id: 'reports', label: 'Reports', icon: AlertTriangle,color:"orange", component: ReportsManagement },
     { id: 'blacklist', label: 'Blacklist', icon: ShieldOff,color:"red", component: BlacklistManagement },
     { id: 'logs', label: 'Ban Logs', icon: FileText,color:"#998fa3", component: BanLogs },

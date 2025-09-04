@@ -134,7 +134,7 @@ const AccountManagement = () => {
       </div>
 
       {/* Statistics Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4 mb-6">
         <StatCard
           title="Account Status"
           value="Active"
@@ -147,12 +147,7 @@ const AccountManagement = () => {
           icon={User}
           theme="blue"
         />
-        <StatCard
-          title="Last Login"
-          value="Today"
-          icon={LogOut}
-          theme="gray"
-        />
+     
       </div>
 
       {/* Section Navigation */}
@@ -206,12 +201,7 @@ const AccountManagement = () => {
                   <label className="text-sm font-medium text-muted-foreground">Account ID</label>
                   <p className="text-foreground font-medium">{currentUser.id || 'N/A'}</p>
                 </div>
-                <div>
-                  <label className="text-sm font-medium text-muted-foreground">Status</label>
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400">
-                    Active
-                  </span>
-                </div>
+              
               </div>
             </div>
 
@@ -228,7 +218,7 @@ const AccountManagement = () => {
                 </button>
                 <button
                   onClick={() => setShowLogoutDialog(true)}
-                  className="flex items-center gap-2 px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition-colors"
+                  className="flex items-center gap-2 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors"
                 >
                   <LogOut className="size-4" />
                   Logout

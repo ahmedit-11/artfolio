@@ -7,7 +7,7 @@ import Cookies from 'js-cookie';
 // Create axios instance with base configuration
 const api = axios.create({
   baseURL: 'http://127.0.0.1:8000/api',
-  withCredentials: true,
+  withCredentials: false,
 });
 
 // Request interceptor to attach auth token
@@ -43,29 +43,28 @@ api.interceptors.response.use(
   }
 );
 
-// CSRF token helper
-const getCsrfCookie = async () => {
-  await axios.get('http://127.0.0.1:8000/sanctum/csrf-cookie', {
-    withCredentials: true
-  });
-};
+// CSRF token helper - Not needed when supports_credentials: false
+// const getCsrfCookie = async () => {
+//   await axios.get('http://127.0.0.1:8000/sanctum/csrf-cookie', {
+//     withCredentials: false
+//   });
+// };
 
 // Authentication API calls
 export const authAPI = {
   // Login user
   login: async (credentials) => {
-    await getCsrfCookie();
     const response = await api.post('/login', credentials);
-    if (response.data?.data?.access_token) {
-      Cookies.set('token', response.data.data.access_token);
+    if (response.data?.access_token) {
+      Cookies.set('token', response.data.access_token);
       // Store user data in localStorage for chat
-      if (response.data?.data?.user) {
+      if (response.data?.user) {
         const user = {
-          id: response.data.data.user.id,
-          name: response.data.data.user.name,
-          email: response.data.data.user.email,
-          profile_picture: response.data.data.user.profile_picture,
-          avatar: response.data.data.user.profile_picture
+          id: response.data.user.id,
+          name: response.data.user.name,
+          email: response.data.user.email,
+          profile_picture: response.data.user.profile_picture,
+          avatar: response.data.user.profile_picture
         };
         localStorage.setItem('user', JSON.stringify(user));
       }
@@ -75,18 +74,17 @@ export const authAPI = {
 
   // Register user
   register: async (userData) => {
-    await getCsrfCookie();
     const response = await api.post('/register', userData);
-    if (response.data?.data?.access_token) {
-      Cookies.set('token', response.data.data.access_token);
+    if (response.data?.access_token) {
+      Cookies.set('token', response.data.access_token);
       // Store user data in localStorage for chat
-      if (response.data?.data?.user) {
+      if (response.data?.user) {
         const user = {
-          id: response.data.data.user.id,
-          name: response.data.data.user.name,
-          email: response.data.data.user.email,
-          profile_picture: response.data.data.user.profile_picture,
-          avatar: response.data.data.user.profile_picture
+          id: response.data.user.id,
+          name: response.data.user.name,
+          email: response.data.user.email,
+          profile_picture: response.data.user.profile_picture,
+          avatar: response.data.user.profile_picture
         };
         localStorage.setItem('user', JSON.stringify(user));
       }
@@ -117,7 +115,7 @@ export const authAPI = {
 
   // Update user profile
   updateProfile: async (profileData) => {
-    const response = await api.put('/user/profile', profileData);
+    const response = await api.post('/user/profile', profileData);
     return response.data;
   },
 
@@ -135,14 +133,12 @@ export const authAPI = {
 
   // Forgot password
   forgotPassword: async (email) => {
-    await getCsrfCookie();
     const response = await api.post('/forgot-password', { email });
     return response.data;
   },
 
   // Reset password
   resetPassword: async (resetData) => {
-    await getCsrfCookie();
     const response = await api.post('/reset-password', resetData);
     return response.data;
   },
@@ -154,100 +150,92 @@ export const authAPI = {
   }
 };
 
-// Portfolio API calls
-export const portfolioAPI = {
-  // Get all portfolios
+// Project API calls (backend uses 'projects' not 'portfolios')
+export const projectAPI = {
+  // Get all projects
   getAll: async (params = {}) => {
-    const response = await api.get('/portfolios', { params });
+    const response = await api.get('/projects', { params });
     return response.data;
   },
 
-  // Get single portfolio
+  // Get single project by slug (for public viewing)
+  getBySlug: async (slug) => {
+    const response = await api.get(`/projects/${slug}`);
+    return response.data;
+  },
+
+  // Get single project by ID (for authenticated operations)
   getById: async (id) => {
-    const response = await api.get(`/portfolios/${id}`);
+    const response = await api.get(`/projects/${id}`);
     return response.data;
   },
 
-  // Create new portfolio
-  create: async (portfolioData) => {
-    const response = await api.post('/portfolios', portfolioData);
+  // Get personalized projects (For You page)
+  getForYou: async () => {
+    const response = await api.get('/projects/for-you');
     return response.data;
   },
 
-  // Update portfolio
-  update: async (id, portfolioData) => {
-    const response = await api.put(`/portfolios/${id}`, portfolioData);
+  // Create new project
+  create: async (projectData) => {
+    const response = await api.post('/projects', projectData);
     return response.data;
   },
 
-  // Delete portfolio
+  // Update project
+  update: async (id, projectData) => {
+    const response = await api.put(`/projects/${id}`, projectData);
+    return response.data;
+  },
+
+  // Delete project
   delete: async (id) => {
-    const response = await api.delete(`/portfolios/${id}`);
+    const response = await api.delete(`/projects/${id}`);
     return response.data;
   },
 
-  // Search portfolios
-  search: async (query, filters = {}) => {
-    const response = await api.get('/portfolios/search', {
-      params: { q: query, ...filters }
-    });
+  // Search projects
+  search: async (params = {}) => {
+    const response = await api.get('/search/projects', { params });
+    return response.data;
+  },
+
+  // Get trending projects
+  getTrending: async () => {
+    const response = await api.get('/trending-projects');
+    return response.data;
+  },
+
+  // Toggle like on project
+  toggleLike: async (projectId) => {
+    const response = await api.post(`/projects/${projectId}/toggle-like`);
+    return response.data;
+  },
+
+  // Add comment to project
+  addComment: async (projectId, commentData) => {
+    const response = await api.post(`/projects/${projectId}/comments`, commentData);
     return response.data;
   }
 };
 
 // User API calls
 export const userAPI = {
-  // Get all users
-  getAll: async (params = {}) => {
-    const response = await api.get('/users', { params });
-    return response.data;
-  },
-
-  // Get user by ID
-  getById: async (id) => {
-    const response = await api.get(`/users/${id}`);
+  // Search users
+  search: async (params = {}) => {
+    const response = await api.get('/search/users', { params });
     return response.data;
   },
 
   // Follow/unfollow user
   toggleFollow: async (userId) => {
-    const response = await api.post(`/users/${userId}/follow`);
-    return response.data;
-  },
-
-  // Get user's followers
-  getFollowers: async (userId) => {
-    const response = await api.get(`/users/${userId}/followers`);
-    return response.data;
-  },
-
-  // Get user's following
-  getFollowing: async (userId) => {
-    const response = await api.get(`/users/${userId}/following`);
+    const response = await api.post(`/users/${userId}/toggle-follow`);
     return response.data;
   }
 };
 
 // Comment API calls
 export const commentAPI = {
-  // Get comments for portfolio
-  getByPortfolio: async (portfolioId) => {
-    const response = await api.get(`/portfolios/${portfolioId}/comments`);
-    return response.data;
-  },
-
-  // Create comment
-  create: async (portfolioId, commentData) => {
-    const response = await api.post(`/portfolios/${portfolioId}/comments`, commentData);
-    return response.data;
-  },
-
-  // Update comment
-  update: async (commentId, commentData) => {
-    const response = await api.put(`/comments/${commentId}`, commentData);
-    return response.data;
-  },
-
   // Delete comment
   delete: async (commentId) => {
     const response = await api.delete(`/comments/${commentId}`);
@@ -255,23 +243,29 @@ export const commentAPI = {
   }
 };
 
-// Interaction API calls (likes, ratings)
-export const interactionAPI = {
-  // Like/unlike portfolio
-  toggleLike: async (portfolioId) => {
-    const response = await api.post(`/portfolios/${portfolioId}/like`);
+// Discovery API calls
+export const discoveryAPI = {
+  // Get categories
+  getCategories: async () => {
+    const response = await api.get('/categories');
     return response.data;
   },
 
-  // Rate portfolio
-  rate: async (portfolioId, rating) => {
-    const response = await api.post(`/portfolios/${portfolioId}/rate`, { rating });
+  // Get tags
+  getTags: async () => {
+    const response = await api.get('/tags');
     return response.data;
   },
 
-  // Get portfolio interactions
-  getByPortfolio: async (portfolioId) => {
-    const response = await api.get(`/portfolios/${portfolioId}/interactions`);
+  // Get projects by category
+  getProjectsByCategory: async (categorySlug) => {
+    const response = await api.get(`/categories/${categorySlug}/projects`);
+    return response.data;
+  },
+
+  // Get projects by tag
+  getProjectsByTag: async (tagSlug) => {
+    const response = await api.get(`/tags/${tagSlug}/projects`);
     return response.data;
   }
 };
@@ -279,8 +273,8 @@ export const interactionAPI = {
 // Admin API calls
 export const adminAPI = {
   // Get dashboard stats
-  getStats: async () => {
-    const response = await api.get('/admin/stats');
+  getDashboard: async () => {
+    const response = await api.get('/admin/dashboard');
     return response.data;
   },
 
@@ -290,93 +284,155 @@ export const adminAPI = {
     return response.data;
   },
 
-  // Ban user
-  banUser: async (userId, banData) => {
-    const response = await api.post(`/admin/users/${userId}/ban`, banData);
+  // Update user
+  updateUser: async (userId, userData) => {
+    const response = await api.post(`/admin/users/${userId}/update`, userData);
     return response.data;
   },
 
-  // Unban user
-  unbanUser: async (userId) => {
-    const response = await api.post(`/admin/users/${userId}/unban`);
+  // Delete user
+  deleteUser: async (userId) => {
+    const response = await api.delete(`/admin/users/${userId}`);
     return response.data;
   },
 
-  // Get reports
+  // Get all projects for admin
+  getProjects: async (params = {}) => {
+    const response = await api.get('/admin/projects', { params });
+    return response.data;
+  },
+
+  // Update project
+  updateProject: async (projectId, projectData) => {
+    const response = await api.post(`/admin/projects/${projectId}/update`, projectData);
+    return response.data;
+  },
+
+  // Delete project
+  deleteProject: async (projectId) => {
+    const response = await api.delete(`/admin/projects/${projectId}`);
+    return response.data;
+  },
+
+  // Get all comments for admin
+  getComments: async (params = {}) => {
+    const response = await api.get('/admin/comments', { params });
+    return response.data;
+  },
+
+  // Delete comment
+  deleteComment: async (commentId) => {
+    const response = await api.delete(`/admin/comments/${commentId}`);
+    return response.data;
+  },
+
+  // Categories management
+  getCategories: async (params = {}) => {
+    const response = await api.get('/admin/categories', { params });
+    return response.data;
+  },
+
+  createCategory: async (categoryData) => {
+    const response = await api.post('/admin/categories', categoryData);
+    return response.data;
+  },
+
+  updateCategory: async (categoryId, categoryData) => {
+    const response = await api.post(`/admin/categories/${categoryId}/update`, categoryData);
+    return response.data;
+  },
+
+  deleteCategory: async (categoryId) => {
+    const response = await api.delete(`/admin/categories/${categoryId}`);
+    return response.data;
+  },
+
+  // Tags management
+  getTags: async (params = {}) => {
+    const response = await api.get('/admin/tags', { params });
+    return response.data;
+  },
+
+  createTag: async (tagData) => {
+    const response = await api.post('/admin/tags', tagData);
+    return response.data;
+  },
+
+  updateTag: async (tagId, tagData) => {
+    const response = await api.post(`/admin/tags/${tagId}/update`, tagData);
+    return response.data;
+  },
+
+  deleteTag: async (tagId) => {
+    const response = await api.delete(`/admin/tags/${tagId}`);
+    return response.data;
+  },
+
+  // Contact messages
+  getContactMessages: async (params = {}) => {
+    const response = await api.get('/admin/contact-messages', { params });
+    return response.data;
+  },
+
+  deleteContactMessage: async (messageId) => {
+    const response = await api.delete(`/admin/contact-messages/${messageId}`);
+    return response.data;
+  },
+
+  // Reports management
   getReports: async (params = {}) => {
     const response = await api.get('/admin/reports', { params });
     return response.data;
   },
 
-  // Handle report
-  handleReport: async (reportId, action, data = {}) => {
-    const response = await api.post(`/admin/reports/${reportId}/${action}`, data);
+  acceptReport: async (reportId, banData) => {
+    const response = await api.post(`/admin/reports/${reportId}/accept`, banData);
     return response.data;
   },
 
-  // Get ban logs
-  getBanLogs: async (params = {}) => {
-    const response = await api.get('/admin/ban-logs', { params });
+  rejectReport: async (reportId) => {
+    const response = await api.post(`/admin/reports/${reportId}/reject`);
     return response.data;
   }
 };
 
-// Report API calls
-export const reportAPI = {
-  // Report portfolio
-  reportPortfolio: async (portfolioId, reportData) => {
-    const response = await api.post(`/portfolios/${portfolioId}/report`, reportData);
+// Contact API calls
+export const contactAPI = {
+  // Submit contact message
+  submit: async (messageData) => {
+    const response = await api.post('/contact', messageData);
     return response.data;
   },
-
-  // Report user
-  reportUser: async (userId, reportData) => {
-    const response = await api.post(`/users/${userId}/report`, reportData);
-    return response.data;
-  },
-
-  // Report comment
-  reportComment: async (commentId, reportData) => {
-    const response = await api.post(`/comments/${commentId}/report`, reportData);
+  // Get contact messages (admin only)
+  getMessages: async (params = {}) => {
+    const response = await api.get('/admin/contact-messages', { params });
     return response.data;
   }
 };
 
-// Categories and Tags API
-export const categoryAPI = {
-  // Get all categories
-  getAll: async () => {
-    const response = await api.get('/categories');
-    return response.data;
-  },
+// Keep portfolioAPI for backward compatibility (alias to projectAPI)
+export const portfolioAPI = projectAPI;
 
-  // Get all tags
-  getTags: async () => {
-    const response = await api.get('/tags');
-    return response.data;
-  }
-};
+// Notifications API - Note: Backend endpoints need to be implemented
+// export const notificationAPI = {
+//   // Get user notifications
+//   getAll: async () => {
+//     const response = await api.get('/notifications');
+//     return response.data;
+//   },
 
-// Notifications API
-export const notificationAPI = {
-  // Get user notifications
-  getAll: async () => {
-    const response = await api.get('/notifications');
-    return response.data;
-  },
+//   // Mark notification as read
+//   markAsRead: async (notificationId) => {
+//     const response = await api.put(`/notifications/${notificationId}/read`);
+//     return response.data;
+//   },
 
-  // Mark notification as read
-  markAsRead: async (notificationId) => {
-    const response = await api.put(`/notifications/${notificationId}/read`);
-    return response.data;
-  },
-
-  // Mark all notifications as read
-  markAllAsRead: async () => {
-    const response = await api.put('/notifications/read-all');
-    return response.data;
-  }
-};
+//   // Mark all notifications as read
+//   markAllAsRead: async () => {
+//     const response = await api.put('/notifications/read-all');
+//     return response.data;
+//   }
+// };
 
 // Export the configured axios instance for custom calls
 export default api;
@@ -407,3 +463,11 @@ export default api;
 //   }
 // };
 
+// Report API calls
+export const reportAPI = {
+  // Submit report
+  submit: async (reportData) => {
+    const response = await api.post('/reports', reportData);
+    return response.data;
+  }
+};

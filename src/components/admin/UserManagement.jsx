@@ -1,7 +1,7 @@
 // UserManagement.jsx
 // Component for managing all registered users in the system
 import React, { useState, useEffect } from 'react';
-import { Search, Eye, MoreHorizontal, Calendar, Mail, Image, FileText, Users, UserCheck, UserX } from 'lucide-react';
+import { Search, Eye, MoreHorizontal, Calendar, Mail, Image, FileText, Users, UserCheck, UserX,ThumbsUp, Heart } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'react-toastify';
 import StatCard from './StatCard';
@@ -166,10 +166,10 @@ const UserManagement = () => {
               <tr className="border-b border-border">
                 <th className="text-left py-3 px-2 sm:px-4 font-medium text-muted-foreground text-xs sm:text-sm">User</th>
                 <th className="text-left py-3 px-2 sm:px-4 font-medium text-muted-foreground text-xs sm:text-sm hidden md:table-cell">Registration Date</th>
-                <th className="text-left py-3 px-2 sm:px-4 font-medium text-muted-foreground text-xs sm:text-sm hidden lg:table-cell">Posts</th>
+                <th className="text-left py-3 px-2 sm:px-4 font-medium text-muted-foreground text-xs sm:text-sm hidden lg:table-cell">Portfolios</th>
                 <th className="text-left py-3 px-2 sm:px-4 font-medium text-muted-foreground text-xs sm:text-sm hidden lg:table-cell">Followers</th>
                 <th className="text-left py-3 px-2 sm:px-4 font-medium text-muted-foreground text-xs sm:text-sm">Status</th>
-                <th className="text-left py-3 px-2 sm:px-4 font-medium text-muted-foreground text-xs sm:text-sm hidden sm:table-cell">Last Login</th>
+
                 <th className="text-left py-3 px-2 sm:px-4 font-medium text-muted-foreground text-xs sm:text-sm">Actions</th>
               </tr>
             </thead>
@@ -200,15 +200,13 @@ const UserManagement = () => {
                   <td className="py-3 sm:py-4 px-2 sm:px-4">
                     {getStatusBadge(user.status)}
                   </td>
-                  <td className="py-3 sm:py-4 px-2 sm:px-4 text-xs sm:text-sm text-muted-foreground hidden sm:table-cell">
-                    {formatDate(user.lastLogin)}
-                  </td>
+                 
                   <td className="py-3 sm:py-4 px-2 sm:px-4">
                     <button
                       onClick={() => setSelectedUser(user)}
                       className="bg-purple-600 hover:bg-purple-700 text-white px-2 sm:px-4 py-1.5 sm:py-2 rounded-lg text-xs sm:text-sm font-medium transition-colors flex items-center gap-1 sm:gap-2"
                     >
-                      <span className="hidden sm:inline">Visit Profile</span>
+                      <span className="hidden sm:inline">View Details</span>
                       <span className="sm:hidden">View</span>
                       <Eye className="size-3 sm:size-4 text-white" />
                     </button>
@@ -254,7 +252,7 @@ const UserManagement = () => {
                   <div className="bg-muted/50 rounded-lg p-3 sm:p-4 text-center">
                     <FileText className="size-5 sm:size-6 text-purple-600 mx-auto mb-1 sm:mb-2" />
                     <div className="text-lg sm:text-2xl font-bold text-foreground">{selectedUser.postsCount}</div>
-                    <div className="text-xs sm:text-sm text-muted-foreground">Posts</div>
+                    <div className="text-xs sm:text-sm text-muted-foreground">Portfolios</div>
                   </div>
                   <div className="bg-muted/50 rounded-lg p-3 sm:p-4 text-center">
                     <UserCheck className="size-5 sm:size-6 text-blue-600 mx-auto mb-1 sm:mb-2" />
@@ -267,6 +265,7 @@ const UserManagement = () => {
                     <div className="text-xs sm:text-sm text-muted-foreground">Following</div>
                   </div>
                   <div className="bg-muted/50 rounded-lg p-3 sm:p-4 text-center">
+                  <Heart className="size-5 sm:size-6 text-red-600 mx-auto mb-1 sm:mb-2" />
                     <div className="text-lg sm:text-2xl font-bold text-foreground">{selectedUser.totalLikes}</div>
                     <div className="text-xs sm:text-sm text-muted-foreground">Total Likes</div>
                   </div>
@@ -281,13 +280,13 @@ const UserManagement = () => {
                     </div>
                     <span className="text-foreground sm:ml-auto">{formatDate(selectedUser.registrationDate)}</span>
                   </div>
-                  <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 text-xs sm:text-sm">
+                  {/* <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 text-xs sm:text-sm">
                     <div className="flex items-center gap-2">
                       <Calendar className="size-4 text-muted-foreground flex-shrink-0" />
                       <span className="text-muted-foreground">Last Login:</span>
                     </div>
                     <span className="text-foreground sm:ml-auto">{formatDate(selectedUser.lastLogin)}</span>
-                  </div>
+                  </div> */}
                 </div>
               </div>
             </div>

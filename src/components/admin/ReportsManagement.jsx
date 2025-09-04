@@ -131,22 +131,10 @@ const ReportsManagement = () => {
     );
   };
 
-  const getSeverityBadge = (severity) => {
-    const severityStyles = {
-      low: 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400',
-      medium: 'bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-400',
-      high: 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400'
-    };
+ 
 
-    return (
-      <span className={cn(
-        'px-2 py-1 rounded-full text-xs font-medium',
-        severityStyles[severity] || severityStyles.medium
-      )}>
-        {severity.charAt(0).toUpperCase() + severity.slice(1)}
-      </span>
-    );
-  };
+
+   
 
   const handleBanUser = async () => {
     if (!banReason.trim()) {
@@ -355,7 +343,7 @@ const ReportsManagement = () => {
                 <th className="text-left py-3 px-2 sm:px-4 font-medium text-muted-foreground text-xs sm:text-sm hidden md:table-cell">Reported By</th>
                 <th className="text-left py-3 px-2 sm:px-4 font-medium text-muted-foreground text-xs sm:text-sm">Reason</th>
                 <th className="text-left py-3 px-2 sm:px-4 font-medium text-muted-foreground text-xs sm:text-sm hidden lg:table-cell">Date</th>
-                <th className="text-left py-3 px-2 sm:px-4 font-medium text-muted-foreground text-xs sm:text-sm hidden sm:table-cell">Severity</th>
+
                 <th className="text-left py-3 px-2 sm:px-4 font-medium text-muted-foreground text-xs sm:text-sm">Status</th>
                 <th className="text-left py-3 px-2 sm:px-4 font-medium text-muted-foreground text-xs sm:text-sm">Actions</th>
               </tr>
@@ -386,9 +374,7 @@ const ReportsManagement = () => {
                   <td className="py-3 sm:py-4 px-2 sm:px-4 text-xs sm:text-sm text-muted-foreground hidden lg:table-cell">
                     {formatDate(report.reportDate)}
                   </td>
-                  <td className="py-3 sm:py-4 px-2 sm:px-4 hidden sm:table-cell">
-                    {getSeverityBadge(report.severity)}
-                  </td>
+                 
                   <td className="py-3 sm:py-4 px-2 sm:px-4">
                     {getStatusBadge(report.status)}
                   </td>
@@ -473,10 +459,7 @@ const ReportsManagement = () => {
                       <span className="text-muted-foreground">Date:</span>
                       <span className="text-foreground">{formatDate(selectedReport.reportDate)}</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Severity:</span>
-                      {getSeverityBadge(selectedReport.severity)}
-                    </div>
+                  
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Status:</span>
                       {getStatusBadge(selectedReport.status)}

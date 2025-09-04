@@ -14,8 +14,8 @@ import { ToastContainer, toast } from 'react-toastify';
 import PageTitle from "@/components/PageTitle";
 
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
-import { authAPI } from "../lib/api";
-// import { title } from "process";
+import { useDispatch, useSelector } from "react-redux";
+import { registerThunk } from "../store/auth/thunk/registrerThunk";
 
 const SignUp = () => {
   useScrollToTop();
@@ -25,7 +25,6 @@ const SignUp = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const [acceptTerms, setAcceptTerms] = useState(false);
   const [passwordRequirements, setPasswordRequirements] = useState({
     length: false,
@@ -35,6 +34,8 @@ const SignUp = () => {
     special: false
   });
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { loading } = useSelector(state => state.auth);
   // Validate password requirements
   const validatePassword = (password) => {
     const requirements = {
@@ -73,48 +74,37 @@ const SignUp = () => {
       return;
     }
 
-    setIsLoading(true);
     try {
-      const response = await authAPI.register({
+      const res = await dispatch(registerThunk({
         name,
         email,
         password,
         password_confirmation: confirmPassword
-      });
-      setIsLoading(false);
-      // toast({
-      //   title: "Account created!",
-      //   description: "Welcome to Purplefolio! Let's create your first portfolio.",
-      // });
-      toast.success("register has done suussussfuly")
-      setTimeout(() => {
-        navigate("/signin"); // Redirect to home page
-      }, 500);
+      }));
+      
+      if (res.payload && res.payload.message === 'Registration successful!') {
+        toast.success("Registration successful!");
+        setTimeout(() => {
+          navigate("/signin");
+        }, 500);
+      } else {
+        toast.error("Registration failed. Please try again.");
+      }
     } catch (error) {
-      console.log(error)
-
-      // if(error.)
-      setIsLoading(false);
-      if (error.message == "Network Error") {
-        toast.error("you don,t have a connection with internet")
+      console.error("Registration error:", error);
+      let message = "An error occurred. Please try again.";
+      
+      if (error.response && error.response.data && error.response.data.message) {
+        message = error.response.data.message;
+      } else if (error.response && error.response.data && error.response.data.errors) {
+        // Laravel validation errors
+        const errors = error.response.data.errors;
+        message = Object.values(errors).flat().join(" ");
+      } else if (error.message) {
+        message = error.message;
       }
-      if (error.message == "Request failed with status code 422") {
-        toast.error("this email has been taken")
-      }
-      console.log(error.message)
-      let message = "Something went wrong. Please try again.";
-      if (error.response && error.response.data) {
-        if (typeof error.response.data === "string") {
-          message = error.response.data;
-        } else if (error.response.data.message) {
-          message = error.response.data.message;
-        } else if (error.response.data.errors) {
-          // Laravel validation errors
-          const errors = error.response.data.errors;
-          message = Object.values(errors).flat().join(" ");
-        }
-      }
-     
+      
+      toast.error(message);
     }
   };
 
@@ -298,9 +288,9 @@ const SignUp = () => {
                 <Button
                   type="submit"
                   className="w-full bg-purple-gradient hover:opacity-90 transition-all font-quicksand group animate-fade-in animation-delay-1350"
-                  disabled={isLoading || !isPasswordValid || password !== confirmPassword || !acceptTerms}
+                  disabled={loading || !isPasswordValid || password !== confirmPassword || !acceptTerms}
                 >
-                  {isLoading ? (
+                  {loading ? (
                     <span className="flex items-center">
                       <span className="animate-spin mr-2">◌</span>
                       Creating Account...

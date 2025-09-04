@@ -74,6 +74,7 @@ import AdminPanel from "./components/admin/AdminPanel";
 // import TestUsers from "./pages/chat/TestUsers";
 // import SimpleChatTest from "./pages/chat/SimpleChatTest";
 import SimpleChat from "./pages/chat/SimpleChat";
+import CategoryPage from "./pages/CategoryPage";
 import { ToastContainer } from "react-toastify";
 
 // const SignUp = lazy(() => import("./pages/SignUp"));
@@ -135,6 +136,7 @@ const App = () => {
             <Route path="/settings/change-password" element={<ChangePassword />} />
             <Route path="/portfolio/:id" element={<PortfolioDetail />} />
             <Route path="/create" element={<CreatePortfolio />} />
+            <Route path="/category/:slug" element={<CategoryPage />} />
             <Route path="/chat" element={<SimpleChat />} />
             {/* <Route path="/chat-old" element={<Chat />} /> */}
             {/* <Route path="/chat-test" element={<ChatTest />} />

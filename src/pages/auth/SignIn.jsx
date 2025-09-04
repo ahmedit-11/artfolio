@@ -34,10 +34,7 @@ const SignIn = () => {
     try {
       const response = await authAPI.login(formData);
       
-      if (response.success) {
-        // Store token in cookie
-        Cookies.set('token', response.data.access_token, { expires: 7 });
-        
+      if (response.access_token) {
         toast.success('Login successful!');
         navigate('/');
       } else {

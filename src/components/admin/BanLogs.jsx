@@ -201,23 +201,8 @@ const BanLogs = () => {
     );
   };
 
-  const getSeverityBadge = (severity) => {
-    const severityStyles = {
-      low: 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400',
-      medium: 'bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-400',
-      high: 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400',
-      critical: 'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400'
-    };
-
-    return (
-      <span className={cn(
-        'px-2 py-1 rounded-full text-xs font-medium',
-        severityStyles[severity] || severityStyles.medium
-      )}>
-        {severity.charAt(0).toUpperCase() + severity.slice(1)}
-      </span>
-    );
-  };
+ 
+;
 
   const getStatusBadge = (status) => {
     const statusStyles = {
@@ -251,7 +236,7 @@ const BanLogs = () => {
           log.banDuration,
           `"${log.reason}"`,
           log.adminPerformed.name,
-          log.severity,
+         
           log.status
         ].join(','))
       ].join('\n');
@@ -374,7 +359,7 @@ const BanLogs = () => {
                 <th className="text-left py-3 px-2 sm:px-4 font-medium text-muted-foreground text-xs sm:text-sm">Action</th>
                 <th className="text-left py-3 px-2 sm:px-4 font-medium text-muted-foreground text-xs sm:text-sm hidden md:table-cell">Duration</th>
                 <th className="text-left py-3 px-2 sm:px-4 font-medium text-muted-foreground text-xs sm:text-sm hidden lg:table-cell">Admin</th>
-                <th className="text-left py-3 px-2 sm:px-4 font-medium text-muted-foreground text-xs sm:text-sm hidden sm:table-cell">Severity</th>
+                
                 <th className="text-left py-3 px-2 sm:px-4 font-medium text-muted-foreground text-xs sm:text-sm hidden sm:table-cell">Status</th>
                 <th className="text-left py-3 px-2 sm:px-4 font-medium text-muted-foreground text-xs sm:text-sm">Details</th>
               </tr>
@@ -406,9 +391,7 @@ const BanLogs = () => {
                   <td className="py-3 sm:py-4 px-2 sm:px-4 text-xs sm:text-sm text-muted-foreground hidden lg:table-cell">
                     {log.adminPerformed.name}
                   </td>
-                  <td className="py-3 sm:py-4 px-2 sm:px-4 hidden sm:table-cell">
-                    {getSeverityBadge(log.severity)}
-                  </td>
+                
                   <td className="py-3 sm:py-4 px-2 sm:px-4 hidden sm:table-cell">
                     {getStatusBadge(log.status)}
                   </td>
