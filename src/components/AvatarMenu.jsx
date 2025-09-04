@@ -1,5 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -10,23 +11,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { User, Settings } from "lucide-react";
-
-const PROFILE_KEY = "artfolio_profile";
-function loadProfile() {
-  try {
-    const data = localStorage.getItem(PROFILE_KEY);
-    return data ? JSON.parse(data) : null;
-  } catch {
-    return null;
-  }
-}
+import { getProfileImageUrl } from "@/utils/imageUtils";
 
 const AvatarMenu = () => {
-  const storedProfile = loadProfile();
-  const username = "creative_artist";
-  const fullName = storedProfile?.fullName || "Sarah Anderson";
-  const avatar = storedProfile?.avatar || "https://api.dicebear.com/7.x/avataaars/svg?seed=creative_artist";
   const navigate = useNavigate();
+  const { currentUser } = useSelector(state => state.currentUser);
 
   const handleProfileClick = () => {
     navigate('/profile');
@@ -36,14 +25,20 @@ const AvatarMenu = () => {
     navigate('/settings');
   };
 
+  // Get user data with fallbacks
+  const fullName = currentUser?.name || "User";
+  const email = currentUser?.email || "";
+  const profilePicture = currentUser?.profile_picture || currentUser?.avatar;
+  const avatarUrl = profilePicture ? getProfileImageUrl(profilePicture) : null;
+
   return (
     <>
       <DropdownMenu>
         <DropdownMenuTrigger className="focus:outline-none">
           <Avatar className="size-9 border-2 mr-5 border-purple-200 dark:border-purple-800 hover:border-purple-500 dark:hover:border-purple-500 transition-colors cursor-pointer">
-            <AvatarImage src={avatar} alt={fullName} />
+            <AvatarImage src={avatarUrl} alt={fullName} />
             <AvatarFallback className="bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300">
-              {fullName.charAt(0)}
+              {fullName.charAt(0).toUpperCase()}
             </AvatarFallback>
           </Avatar>
         </DropdownMenuTrigger>
@@ -52,7 +47,7 @@ const AvatarMenu = () => {
           <DropdownMenuLabel>
             <div className="flex flex-col space-y-1">
               <p className="text-sm font-medium leading-none">{fullName}</p>
-              <p className="text-xs leading-none text-muted-foreground">@{username}</p>
+              <p className="text-xs leading-none text-muted-foreground">{email}</p>
             </div>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />

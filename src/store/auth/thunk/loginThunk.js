@@ -1,7 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
-import { email } from "zod";
 import Cookies from 'js-cookie'
+
 export const loginThunk = createAsyncThunk("loginThunk", async (data) => {
     try {
         const response = await axios.post("/login",{
@@ -11,7 +11,9 @@ export const loginThunk = createAsyncThunk("loginThunk", async (data) => {
         Cookies.set('token',response.data.access_token)
         return response.data;   
     } catch (error) {
-        console.log(error)
-        return error.response.data;
+        console.error("Login error:", error);
+        console.error("Error response:", error.response?.data);
+        console.error("Error status:", error.response?.status);
+        return Promise.reject(error.response?.data || error.message);
     }
 });

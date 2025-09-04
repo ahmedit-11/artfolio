@@ -35,25 +35,19 @@ const SignIn = () => {
     }
     
     try {
-      const res = await dispatch(loginThunk({ email, password }));
+      const result = await dispatch(loginThunk({ email, password }));
       
-      if (res.payload && res.payload.message === 'Login successful!') {
+      if (loginThunk.fulfilled.match(result)) {
         toast.success("Login Successfully!");
         navigate("/");
       } else {
-        toast.error("Login failed. Please try again.");
+        // Handle error from thunk
+        const errorMessage = result.payload || "Login failed. Please try again.";
+        toast.error(errorMessage);
       }
-    } catch (error) {
-      console.error("Login error:", error);
-      let message = "An error occurred. Please try again.";
-      
-      if (error.response && error.response.data && error.response.data.message) {
-        message = error.response.data.message;
-      } else if (error.message) {
-        message = error.message;
-      }
-      
-      toast.error(message);
+    } catch (err) {
+      console.error("Login error:", err);
+      toast.error("An unexpected error occurred");
     }
   };
 

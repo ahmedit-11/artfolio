@@ -6,6 +6,11 @@ import users from "./users/userSlice"
 import auth from "./auth/authSlice"
 import createPortfolio from "./createPortfolio/createPortfolioSlice"
 import tags from "./tags/tagsSlice"
+import updatePortfolio from "./updatePortfolio/updateportfolioSlice"
+import currentUser from "./currentUser/currentUserSlice"
+import updateProfile from "./updateProfile/updateProfileSlice"
+import userPortfolios from "./userPortfolios/userPortfoliosSlice"
+import deletePortfolio from "./deletePortfolio/deletPortfolioSlice"
 import {
   FLUSH,
   PAUSE,
@@ -40,15 +45,40 @@ const persistTags = {
   key: "tags",
   storage,
 };
+const persistUpdatePortfolio = {
+  key: "updatePortfolio",
+  storage,
+};
+const persistCurrentUser = {
+  key: "currentUser",
+  storage,
+};
+const persistUpdateProfile = {
+  key: "updateProfile",
+  storage,
+};
+const persistUserPortfolios = {
+  key: "userPortfolios",
+  storage,
+};
+const persistDeletePortfolio = {
+  key: "deletePortfolio",
+  storage
+}
 
 const rootReducer = combineReducers({
       allPortfolio: persistReducer(persistAllPortfolio, allPortfolio),
       categories: persistReducer(persistCategories, categories),
       users: persistReducer(persistUsers, users),
       auth: persistReducer(persistAuth, auth),
+      currentUser: persistReducer(persistCurrentUser, currentUser),
       createPortfolio: persistReducer(persistCreatePortfolio, createPortfolio),
       tags: persistReducer(persistTags, tags),
-  });
+      updatePortfolio: persistReducer(persistUpdatePortfolio, updatePortfolio),
+      updateProfile: persistReducer(persistUpdateProfile, updateProfile),
+      userPortfolios: persistReducer(persistUserPortfolios, userPortfolios),
+      deletePortfolio: persistReducer(persistDeletePortfolio,deletePortfolio)
+    });
 export const store = configureStore({
   reducer: rootReducer,
   middleware: (getDefaultMiddleware) =>

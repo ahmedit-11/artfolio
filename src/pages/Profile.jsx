@@ -2,46 +2,22 @@ import React from "react";
 import { useScrollToTop } from "../utils/scrollToTop";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import {
-  Twitter,
-  Linkedin,
-  Github,
-  Instagram,
-  Facebook,
-  Globe,
-  MapPin,
-  Calendar,
-  ExternalLink,
-  Edit,
-  Plus,
-  Link as LinkIcon,
-} from "lucide-react";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import PortfolioCard from "@/components/PortfolioCard";
+import { Calendar, LinkIcon, MapPin, ExternalLink, Edit, MessageCircle, UserPlus, UserMinus, Settings, Share2, MoreHorizontal, Users, Heart, Eye, Clock,Twitter,Facebook,Linkedin,Github,Instagram,Globe,Plus,Trash2,Loader2,Edit3 } from 'lucide-react';
+import BioWithLinks from '../components/BioWithLinks';
 import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { getCurrentUserThunk } from "@/store/currentUser/thunk/getCurrentUserThunk";
+import { getUserPortfoliosThunk } from "@/store/userPortfolios/thunk/getUserPortfoliosThunk";
+import { deletePortfolioThunk } from "@/store/deletePortfolio/thunk/deletePortfolioThunk";
+import { useEffect, useState } from "react";
+import { toast } from 'react-toastify';
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { getProfileImageUrl, getPortfolioImageUrl } from "@/utils/imageUtils";
+import PortfolioCard from "@/components/PortfolioCard";
+import ConfirmDialog from "@/components/ConfirmDialog"
 
-// Social platforms config
-const SOCIAL_PLATFORMS = [
-  { key: "twitter", label: "Twitter", icon: Twitter },
-  { key: "github", label: "GitHub", icon: Github },
-  { key: "linkedin", label: "LinkedIn", icon: Linkedin },
-  { key: "instagram", label: "Instagram", icon: Instagram },
-  { key: "facebook", label: "Facebook", icon: Facebook },
-  { key: "website", label: "Website", icon: Globe },
-];
 
-const SocialLink = ({ href, icon: Icon, label }) => (
-  <a
-    href={href}
-    target="_blank"
-    rel="noopener noreferrer"
-    className="flex items-center space-x-2 text-muted-foreground hover:text-foreground transition-colors"
-  >
-    <Icon className="size-4" />
-    <span>{label}</span>
-    <ExternalLink className="size-3" />
-  </a>
-);
+
 
 const ProfileStats = ({ label, value }) => (
   <div className="flex flex-col items-center">
@@ -50,89 +26,112 @@ const ProfileStats = ({ label, value }) => (
   </div>
 );
 
-// Utility to get profile data from localStorage
-const PROFILE_KEY = "artfolio_profile";
-function loadProfile() {
-  try {
-    const data = localStorage.getItem(PROFILE_KEY);
-    return data ? JSON.parse(data) : null;
-  } catch {
-    return null;
-  }
-}
-
 const Profile = () => {
   useScrollToTop();
-  const storedProfile = loadProfile();
-  const userData = {
-    username: "creative_artist",
-    fullName: storedProfile?.fullName || "Sarah Anderson",
-    avatar: storedProfile?.avatar || "https://api.dicebear.com/7.x/avataaars/svg?seed=creative_artist",
-    bio: storedProfile?.bio || "Digital artist and UI designer passionate about creating immersive experiences. Always exploring new techniques and pushing creative boundaries.",
-    location: "San Francisco, CA",
-    joinedDate: "January 2024",
-    followers: 1234,
-    following: 567,
-    isCurrentUser: true,
-    socialLinks: storedProfile?.socialLinks || [
-      { platform: "twitter", url: "https://twitter.com/creative_artist" },
-      { platform: "github", url: "https://github.com/creative_artist" },
-      { platform: "linkedin", url: "https://linkedin.com/in/creative_artist" },
-      { platform: "website", url: "https://sarahanderson.com" },
-      { platform: "custom", label: "Behance", url: "https://behance.net/creative_artist" },
-    ],
-    portfolios: [
-      {
-        id: 1,
-        image: "https://images.unsplash.com/photo-1558655146-d09347e92766?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OHx8dWl8ZW58MHx8MHx8fDA%3D",
-        title: "Digital Art Collection 2024",
-        creator: storedProfile?.fullName || "Sarah Anderson",
-        creatorImage: storedProfile?.avatar || "https://api.dicebear.com/7.x/avataaars/svg?seed=creative_artist",
-        likes: 156,
-        comments: 23,
-        tags: ["Digital Art", "Illustration", "Creative"],
-        initialLikes: 156
-      },
-      {
-        id: 2,
-        image: "https://plus.unsplash.com/premium_photo-1747314222141-8c7240150597?q=80&w=1976&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-        title: "UI Design Portfolio",
-        creator: storedProfile?.fullName || "Sarah Anderson",
-        creatorImage: storedProfile?.avatar || "https://api.dicebear.com/7.x/avataaars/svg?seed=creative_artist",
-        likes: 89,
-        comments: 12,
-        tags: ["UI Design", "Web Design", "Creative"],
-        initialLikes: 89
-      },
-      {
-        id: 3,
-        image: "https://images.unsplash.com/photo-1746980776869-0443aaffc7f2?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-        title: "3D Art Explorations",
-        creator: storedProfile?.fullName || "Sarah Anderson",
-        creatorImage: storedProfile?.avatar || "https://api.dicebear.com/7.x/avataaars/svg?seed=creative_artist",
-        likes: 245,
-        comments: 34,
-        tags: ["3D Art", "Animation", "Creative"],
-        initialLikes: 245
-      }
-    ],
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  
+  const { currentUser, error, loading } = useSelector(state => state.currentUser);
+  const { data: userPortfolios, loading: portfoliosLoading, error: portfoliosError } = useSelector(state => state.userPortfolios);
+  const { loading: deleteLoading } = useSelector(state => state.deletePortfolio);
+  
+  // State for confirm dialog
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [portfolioToDelete, setPortfolioToDelete] = useState(null);
+
+  useEffect(() => {
+    dispatch(getCurrentUserThunk());
+  }, [dispatch])
+
+  useEffect(() => {
+    if (currentUser?.id) {
+      dispatch(getUserPortfoliosThunk(currentUser.id));
+    }
+  }, [dispatch, currentUser?.id])
+
+  // Handle portfolio deletion
+  const handleDeletePortfolio = (portfolioId) => {
+    setPortfolioToDelete(portfolioId);
+    setShowConfirmDialog(true);
   };
 
-  const {
-    username,
-    fullName,
-    avatar,
-    bio,
-    location,
-    joinedDate,
-    followers,
-    following,
-    isCurrentUser,
-    socialLinks,
-    portfolios,
-  } = userData;
+  const confirmDelete = async () => {
+    if (portfolioToDelete) {
+      try {
+        await dispatch(deletePortfolioThunk(portfolioToDelete));
+        toast.success('Portfolio deleted successfully!');
+        // Refresh portfolios after deletion
+        dispatch(getUserPortfoliosThunk(currentUser.id));
+      } catch (error) {
+        console.error('Failed to delete portfolio:', error);
+        toast.error('Failed to delete portfolio. Please try again.');
+      } finally {
+        setShowConfirmDialog(false);
+        setPortfolioToDelete(null);
+      }
+    }
+  };
 
-  const navigate = useNavigate();
+  const cancelDelete = () => {
+    setShowConfirmDialog(false);
+    setPortfolioToDelete(null);
+  };
+  
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="flex items-center gap-3">
+          <Loader2 className="size-6 animate-spin text-purple-600" />
+          <span className="text-lg">Loading profile...</span>
+        </div>
+      </div>
+    );
+  }
+  
+  // Show error state
+  if (error) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-lg text-red-500 mb-4">Error loading profile: {typeof error === 'string' ? error : 'Something went wrong'}</p>
+          <Button onClick={() => dispatch(getCurrentUserThunk())}>
+            Try Again
+          </Button>
+        </div>
+      </div>
+    );
+  }
+  
+  // Show no data state
+  if (!currentUser) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-lg text-muted-foreground">No user data found</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Safely destructure currentUser data
+  const { name, email, profile_picture, created_at, bio } = currentUser || {};
+  
+  // Convert relative URL to full URL
+  const fullProfileImageUrl = getProfileImageUrl(profile_picture);
+  
+ 
+  // Format join date
+  const joinedDate = created_at ? new Date(created_at).toLocaleDateString('en-US', { 
+    year: 'numeric', 
+    month: 'long' 
+  }) : null;
+  
+  // Mock data for missing fields (will be replaced with real data later)
+  const followers = 0;
+  const following = 0;
+  const portfolios = [];
+  
 
   return (
     <div className="min-h-screen bg-background animate-fade-in">
@@ -142,22 +141,19 @@ const Profile = () => {
           <div className="flex flex-col md:flex-row items-center md:items-start gap-6 animate-fade-in animation-delay-300">
             {/* Avatar */}
             <Avatar className="size-32 border-4 border-background shadow-lg animate-fade-in animation-delay-450">
-              <AvatarImage src={avatar} alt={fullName} />
-              <AvatarFallback>{fullName.charAt(0)}</AvatarFallback>
+              <AvatarImage 
+                src={fullProfileImageUrl} 
+                alt={name}
+                className="object-cover object-center"
+                style={{ imageRendering: 'crisp-edges' }}
+              />
+              <AvatarFallback>{name?.charAt(0) || 'U'}</AvatarFallback>
             </Avatar>
 
             {/* User Info */}
             <div className="flex-1 text-center md:text-left animate-fade-in animation-delay-600">
-              <h1 className="text-3xl font-bold">{fullName}</h1>
-              <p className="text-lg text-muted-foreground mb-4">@{username}</p>
-              
+              <h1 className="text-3xl font-bold">{name || 'Unknown User'}</h1>        
               <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 mb-4 text-sm text-muted-foreground">
-                {location && (
-                  <div className="flex items-center gap-1">
-                    <MapPin className="size-4" />
-                    <span>{location}</span>
-                  </div>
-                )}
                 {joinedDate && (
                   <div className="flex items-center gap-1">
                     <Calendar className="size-4" />
@@ -173,13 +169,13 @@ const Profile = () => {
 
               {/* Action Buttons */}
               <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
-                {isCurrentUser ? (
+                {currentUser ? (
                   <>
                     <Button variant="outline" className="space-x-2" onClick={() => navigate('/settings/profile')}>
                       <Edit className="size-4" />
                       <span>Edit Profile</span>
                     </Button>
-                    <Button variant="default" className="space-x-2">
+                    <Button variant="default" className="space-x-2" onClick={() => navigate('/create')}>
                       <Plus className="size-4" />
                       <span>New Portfolio</span>
                     </Button>
@@ -198,73 +194,97 @@ const Profile = () => {
       {/* Bio & Social Links */}
       <div className="container max-w-4xl mx-auto px-4 py-8 animate-fade-in animation-delay-750">
         <div className="bg-card rounded-lg p-6 shadow-sm animate-fade-in animation-delay-900">
-          <p className="text-lg mb-6">{bio}</p>
+          <BioWithLinks bio={bio} className="text-lg mb-6 whitespace-pre-wrap" />
           
-          <Separator className="my-6" />
+         
           
-          <div className="flex flex-col space-y-3">
-            {socialLinks.map((link, idx) => {
-              const platform = SOCIAL_PLATFORMS.find(p => p.key === link.platform);
-              const Icon = platform ? platform.icon : LinkIcon;
-              const label = platform ? platform.label : link.label || "Link";
-              return link.url ? (
-                <a
-                  key={idx}
-                  href={link.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center space-x-2 text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  <Icon className="size-4" />
-                  <span>{label}</span>
-                  <ExternalLink className="size-3" />
-                </a>
-              ) : null;
-            })}
-          </div>
+         
         </div>
 
         {/* Portfolios Section */}
         <div className="mt-12 animate-fade-in animation-delay-1050">
-          <h2 className="text-2xl font-bold mb-6">Portfolios</h2>
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-bold">My Portfolios</h2>
           
-          {portfolios.length > 0 ? (
+          </div>
+          
+          {portfoliosLoading ? (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="size-6 animate-spin text-purple-600" />
+              <span className="ml-2">Loading portfolios...</span>
+            </div>
+          ) : portfoliosError ? (
+            <div className="text-center py-12 bg-card rounded-lg">
+              <p className="text-lg text-red-500 mb-4">Error loading portfolios: {portfoliosError}</p>
+              <Button onClick={() => dispatch(getUserPortfoliosThunk(currentUser?.id))}>
+                Try Again
+              </Button>
+            </div>
+          ) : userPortfolios && Array.isArray(userPortfolios) && userPortfolios.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in animation-delay-1200">
-              {portfolios.map((portfolio, index) => (
-                <PortfolioCard
-                  key={portfolio.id}
-                  className="animate-fade-in"
-                  style={{ animationDelay: `${1350 + (index * 150)}ms` }}
-                  image={portfolio.image}
-                  title={portfolio.title}
-                  creator={portfolio.creator}
-                  creatorImage={portfolio.creatorImage}
-                  likes={portfolio.likes}
-                  comments={portfolio.comments}
-                  tags={portfolio.tags}
-                  initialLikes={portfolio.initialLikes}
-                />
+              {userPortfolios
+                .filter(portfolio => portfolio.user_id === currentUser?.id || portfolio.user?.id === currentUser?.id)
+                .map((portfolio) => (
+                <div key={portfolio.id} className="relative group">
+                  <PortfolioCard
+                    image={getPortfolioImageUrl(portfolio.media?.[0]?.file_path) || '/placeholder.svg'}
+                    title={portfolio.title}
+                    creator={name}
+                    creatorImage={fullProfileImageUrl}
+                    likes={portfolio.likes_count || 0}
+                    comments={portfolio.comments_count || 0}
+                    tags={portfolio.tags?.map(tag => tag.name) || []}
+                    initialLikes={portfolio.likes_count || 0}
+                  />
+                  <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => navigate(`/edit/${portfolio.id}`)}
+                      className="bg-blue-500 hover:bg-blue-600 text-white"
+                    >
+                      <Edit3 className="size-4" />
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => handleDeletePortfolio(portfolio.id)}
+                      disabled={deleteLoading}
+                    >
+                      {deleteLoading ? (
+                        <Loader2 className="size-4 animate-spin" />
+                      ) : (
+                        <Trash2 className="size-4" />
+                      )}
+                    </Button>
+                  </div>
+                </div>
               ))}
             </div>
           ) : (
             <div className="text-center py-12 bg-card rounded-lg animate-fade-in animation-delay-1350">
-              <p className="text-lg text-muted-foreground">
+              <p className="text-lg text-muted-foreground mb-4">
                 No portfolios created yet.
-                {isCurrentUser && (
-                  <>
-                    <br />
-                    <Button variant="link" className="mt-2">
-                      Create your first portfolio
-                    </Button>
-                  </>
-                )}
               </p>
+              <Button onClick={() => navigate('/create')}>
+                <Plus className="size-4 mr-2" />
+                Create Your First Portfolio
+              </Button>
             </div>
           )}
         </div>
       </div>
+
+      {/* Confirm Delete Dialog */}
+      <ConfirmDialog
+        isOpen={showConfirmDialog}
+        onClose={cancelDelete}
+        onConfirm={confirmDelete}
+        title="Delete Portfolio"
+        message="Are you sure you want to delete this portfolio? This action cannot be undone."
+      />
     </div>
   );
 };
 
-export default Profile; 
+export default Profile;

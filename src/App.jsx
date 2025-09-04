@@ -67,6 +67,7 @@ import Features from "./pages/Features";
 import CookiesPage from "./pages/Cookies";
 import PortfolioDetail from "./pages/PortfolioDetail";
 import CreatePortfolio from "./pages/CreatePortfolio";
+import EditPortfolio from "./pages/EditPortfolio";
 import AdminPanel from "./components/admin/AdminPanel";
 // import Chat from "./pages/chat/Chat";
 // import ChatTest from "./pages/chat/ChatTest";
@@ -136,6 +137,7 @@ const App = () => {
             <Route path="/settings/change-password" element={<ChangePassword />} />
             <Route path="/portfolio/:id" element={<PortfolioDetail />} />
             <Route path="/create" element={<CreatePortfolio />} />
+            <Route path="/edit/:id" element={<EditPortfolio />} />
             <Route path="/category/:slug" element={<CategoryPage />} />
             <Route path="/chat" element={<SimpleChat />} />
             {/* <Route path="/chat-old" element={<Chat />} /> */}

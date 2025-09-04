@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { getAllPortfolioThunk } from "./thunk/getAllPortfolioThunk";
 import { getPortfolioByIdThunk } from "./thunk/getPortfolioByIdThunk";
+import { getPortfolioForEditThunk } from "./thunk/getPortfolioForEditThunk";
 
 const initialState={
     loadingAllPortfolio:false,
@@ -34,6 +35,17 @@ const getAllPortfolio = createSlice({
             state.portfolioById =action.payload
         })
         builder.addCase(getPortfolioByIdThunk.rejected, (state, action) => {
+            state.loadingOnePortfolio = false;
+            state.error = action.payload;
+        })
+        builder.addCase(getPortfolioForEditThunk.pending, (state) => {
+            state.loadingOnePortfolio = true;
+        })  
+        builder.addCase(getPortfolioForEditThunk.fulfilled, (state, action) => {
+            state.loadingOnePortfolio = false;
+            state.portfolioById = action.payload
+        })
+        builder.addCase(getPortfolioForEditThunk.rejected, (state, action) => {
             state.loadingOnePortfolio = false;
             state.error = action.payload;
         })

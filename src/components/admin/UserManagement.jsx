@@ -6,72 +6,27 @@ import { cn } from '@/lib/utils';
 import { toast } from 'react-toastify';
 import StatCard from './StatCard';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { useDispatch, useSelector } from 'react-redux';
+import { getAllUsers } from '@/store/users/thunk/getAllUsers';
 
 const UserManagement = () => {
-  const [users, setUsers] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedUser, setSelectedUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  
+  const dispatch = useDispatch();
+  const { users, loading, error } = useSelector(state => state.users);
 
-  // Mock data - replace with actual API calls
   useEffect(() => {
-    const mockUsers = [
-      {
-        id: 1,
-        name: 'John Doe',
-        email: 'john.doe@example.com',
-        avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face',
-        registrationDate: '2024-01-15',
-        postsCount: 24,
-        followersCount: 156,
-        followingCount: 89,
-        status: 'active',
-        lastLogin: '2024-08-06',
-        totalLikes: 1240,
-        totalComments: 89
-      },
-      {
-        id: 2,
-        name: 'Jane Smith',
-        email: 'jane.smith@example.com',
-        avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=32&h=32&fit=crop&crop=face',
-        registrationDate: '2024-02-20',
-        postsCount: 18,
-        followersCount: 203,
-        followingCount: 145,
-        status: 'active',
-        lastLogin: '2024-08-07',
-        totalLikes: 890,
-        totalComments: 156
-      },
-      {
-        id: 3,
-        name: 'Mike Johnson',
-        email: 'mike.johnson@example.com',
-        avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=32&h=32&fit=crop&crop=face',
-        registrationDate: '2024-03-10',
-        postsCount: 7,
-        followersCount: 45,
-        followingCount: 67,
-        status: 'banned',
-        lastLogin: '2024-07-28',
-        totalLikes: 234,
-        totalComments: 45
-      }
-    ];
-    
-    setTimeout(() => {
-      setUsers(mockUsers);
-      setLoading(false);
-    }, 1000);
-  }, []);
+    dispatch(getAllUsers());
+  }, [dispatch]);
 
   const filteredUsers = users.filter(user =>
-    user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    user.email.toLowerCase().includes(searchTerm.toLowerCase())
+    user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    user.email?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const formatDate = (dateString) => {
+    if (!dateString) return 'N/A';
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'short',
@@ -86,12 +41,13 @@ const UserManagement = () => {
       suspended: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400'
     };
 
+    const userStatus = status || 'active';
     return (
       <span className={cn(
         'px-2 py-1 rounded-full text-xs font-medium',
-        statusStyles[status] || statusStyles.active
+        statusStyles[userStatus] || statusStyles.active
       )}>
-        {status.charAt(0).toUpperCase() + status.slice(1)}
+        {userStatus.charAt(0).toUpperCase() + userStatus.slice(1)}
       </span>
     );
   };
@@ -105,6 +61,22 @@ const UserManagement = () => {
           {[...Array(5)].map((_, i) => (
             <div key={i} className="h-16 bg-muted rounded"></div>
           ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-6">
+        <div className="text-center text-red-500">
+          <p>Error loading users: {error}</p>
+          <button 
+            onClick={() => dispatch(getAllUsers())}
+            className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          >
+            Retry
+          </button>
         </div>
       </div>
     );
@@ -131,7 +103,7 @@ const UserManagement = () => {
           />
           <StatCard
             title="Active Users"
-            value={users.filter(user => user.status === 'active').length}
+            value={users.filter(user => (user.status || 'active') === 'active').length}
             icon={UserCheck}
             color="green"
           />
@@ -169,7 +141,7 @@ const UserManagement = () => {
                 <th className="text-left py-3 px-2 sm:px-4 font-medium text-muted-foreground text-xs sm:text-sm hidden lg:table-cell">Portfolios</th>
                 <th className="text-left py-3 px-2 sm:px-4 font-medium text-muted-foreground text-xs sm:text-sm hidden lg:table-cell">Followers</th>
                 <th className="text-left py-3 px-2 sm:px-4 font-medium text-muted-foreground text-xs sm:text-sm">Status</th>
-
+                <th className="text-left py-3 px-2 sm:px-4 font-medium text-muted-foreground text-xs sm:text-sm">Role</th>
                 <th className="text-left py-3 px-2 sm:px-4 font-medium text-muted-foreground text-xs sm:text-sm">Actions</th>
               </tr>
             </thead>
@@ -179,28 +151,30 @@ const UserManagement = () => {
                   <td className="py-3 sm:py-4 px-2 sm:px-4">
                     <div className="flex items-center gap-2 sm:gap-3">
                       <Avatar className="size-8 sm:size-10 flex-shrink-0">
-                        <AvatarImage src={user.avatar} alt={user.name} />
-                        <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                        <AvatarImage src={user.profile_picture || user.avatar} alt={user.name} />
+                        <AvatarFallback>{user.name?.charAt(0) || 'U'}</AvatarFallback>
                       </Avatar>
                       <div className="min-w-0 flex-1">
-                        <div className="font-medium text-foreground text-sm sm:text-base truncate">{user.name}</div>
-                        <div className="text-xs sm:text-sm text-muted-foreground truncate">{user.email}</div>
+                        <div className="font-medium text-foreground text-sm sm:text-base truncate">{user.name || 'Unknown'}</div>
+                        <div className="text-xs sm:text-sm text-muted-foreground truncate">{user.email || 'No email'}</div>
                       </div>
                     </div>
                   </td>
                   <td className="py-3 sm:py-4 px-2 sm:px-4 text-xs sm:text-sm text-muted-foreground hidden md:table-cell">
-                    {formatDate(user.registrationDate)}
+                    {formatDate(user.created_at || user.registrationDate)}
                   </td>
                   <td className="py-3 sm:py-4 px-2 sm:px-4 text-xs sm:text-sm text-foreground font-medium hidden lg:table-cell">
-                    {user.postsCount}
+                    {user.portfolios_count || user.postsCount || 0}
                   </td>
                   <td className="py-3 sm:py-4 px-2 sm:px-4 text-xs sm:text-sm text-foreground font-medium hidden lg:table-cell">
-                    {user.followersCount}
+                    {user.followers_count || user.followersCount || 0}
                   </td>
                   <td className="py-3 sm:py-4 px-2 sm:px-4">
                     {getStatusBadge(user.status)}
                   </td>
-                 
+                  <td className="py-3 sm:py-4 px-2 text-blue-600 sm:px-4">
+                    {user.role}
+                  </td>
                   <td className="py-3 sm:py-4 px-2 sm:px-4">
                     <button
                       onClick={() => setSelectedUser(user)}
@@ -237,12 +211,12 @@ const UserManagement = () => {
                 {/* User Info */}
                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
                   <Avatar className="size-12 sm:size-16 flex-shrink-0">
-                    <AvatarImage src={selectedUser.avatar} alt={selectedUser.name} />
-                    <AvatarFallback>{selectedUser.name.charAt(0)}</AvatarFallback>
+                    <AvatarImage src={selectedUser.profile_picture || selectedUser.avatar} alt={selectedUser.name} />
+                    <AvatarFallback>{selectedUser.name?.charAt(0) || 'U'}</AvatarFallback>
                   </Avatar>
                   <div className="min-w-0 flex-1">
-                    <h4 className="text-base sm:text-lg font-semibold text-foreground truncate">{selectedUser.name}</h4>
-                    <p className="text-sm sm:text-base text-muted-foreground truncate">{selectedUser.email}</p>
+                    <h4 className="text-base sm:text-lg font-semibold text-foreground truncate">{selectedUser.name || 'Unknown'}</h4>
+                    <p className="text-sm sm:text-base text-muted-foreground truncate">{selectedUser.email || 'No email'}</p>
                     <div className="mt-2">{getStatusBadge(selectedUser.status)}</div>
                   </div>
                 </div>
@@ -251,22 +225,22 @@ const UserManagement = () => {
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
                   <div className="bg-muted/50 rounded-lg p-3 sm:p-4 text-center">
                     <FileText className="size-5 sm:size-6 text-purple-600 mx-auto mb-1 sm:mb-2" />
-                    <div className="text-lg sm:text-2xl font-bold text-foreground">{selectedUser.postsCount}</div>
+                    <div className="text-lg sm:text-2xl font-bold text-foreground">{selectedUser.portfolios_count || selectedUser.postsCount || 0}</div>
                     <div className="text-xs sm:text-sm text-muted-foreground">Portfolios</div>
                   </div>
                   <div className="bg-muted/50 rounded-lg p-3 sm:p-4 text-center">
                     <UserCheck className="size-5 sm:size-6 text-blue-600 mx-auto mb-1 sm:mb-2" />
-                    <div className="text-lg sm:text-2xl font-bold text-foreground">{selectedUser.followersCount}</div>
+                    <div className="text-lg sm:text-2xl font-bold text-foreground">{selectedUser.followers_count || selectedUser.followersCount || 0}</div>
                     <div className="text-xs sm:text-sm text-muted-foreground">Followers</div>
                   </div>
                   <div className="bg-muted/50 rounded-lg p-3 sm:p-4 text-center">
                     <UserCheck className="size-5 sm:size-6 text-green-600 mx-auto mb-1 sm:mb-2" />
-                    <div className="text-lg sm:text-2xl font-bold text-foreground">{selectedUser.followingCount}</div>
+                    <div className="text-lg sm:text-2xl font-bold text-foreground">{selectedUser.following_count || selectedUser.followingCount || 0}</div>
                     <div className="text-xs sm:text-sm text-muted-foreground">Following</div>
                   </div>
                   <div className="bg-muted/50 rounded-lg p-3 sm:p-4 text-center">
                   <Heart className="size-5 sm:size-6 text-red-600 mx-auto mb-1 sm:mb-2" />
-                    <div className="text-lg sm:text-2xl font-bold text-foreground">{selectedUser.totalLikes}</div>
+                    <div className="text-lg sm:text-2xl font-bold text-foreground">{selectedUser.total_likes || selectedUser.totalLikes || 0}</div>
                     <div className="text-xs sm:text-sm text-muted-foreground">Total Likes</div>
                   </div>
                 </div>
@@ -278,15 +252,8 @@ const UserManagement = () => {
                       <Calendar className="size-4 text-muted-foreground flex-shrink-0" />
                       <span className="text-muted-foreground">Registered:</span>
                     </div>
-                    <span className="text-foreground sm:ml-auto">{formatDate(selectedUser.registrationDate)}</span>
+                    <span className="text-foreground sm:ml-auto">{formatDate(selectedUser.created_at || selectedUser.registrationDate)}</span>
                   </div>
-                  {/* <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 text-xs sm:text-sm">
-                    <div className="flex items-center gap-2">
-                      <Calendar className="size-4 text-muted-foreground flex-shrink-0" />
-                      <span className="text-muted-foreground">Last Login:</span>
-                    </div>
-                    <span className="text-foreground sm:ml-auto">{formatDate(selectedUser.lastLogin)}</span>
-                  </div> */}
                 </div>
               </div>
             </div>

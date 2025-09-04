@@ -128,9 +128,9 @@ useEffect(()=>{
           } else {
             // Try to create new tag using Redux thunk
             try {
-              const tagResponse = await dispatch(createTagThunk({ name: tagName }));
-              if (tagResponse.payload && tagResponse.payload.tag) {
-                tagIds.push(tagResponse.payload.tag.id);
+              const tagResult = await dispatch(createTagThunk({ name: tagName }));
+              if (createTagThunk.fulfilled.match(tagResult) && tagResult.payload.tag) {
+                tagIds.push(tagResult.payload.tag.id);
               }
             } catch (error) {
               // Silently skip this tag if creation fails
@@ -169,14 +169,14 @@ useEffect(()=>{
 
 
       // Step 3: Submit the portfolio
-      const res = await dispatch(createPortfolioThunk(formData));
+      const result = await dispatch(createPortfolioThunk(formData));
       
-      if (res.payload && res.payload.message === 'Project created successfully!') {
+      if (createPortfolioThunk.fulfilled.match(result)) {
         toast.success("Portfolio created successfully!");
         navigate("/");
       } else {
-        toast.error("Failed to create portfolio. Please try again.");
-        console.error("Portfolio creation failed:", res);
+        const errorMessage = result.payload || "Failed to create portfolio. Please try again.";
+        toast.error(errorMessage);
       }
     } catch (error) {
       console.error("Create portfolio error:", error);

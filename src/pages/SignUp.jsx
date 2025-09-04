@@ -75,36 +75,26 @@ const SignUp = () => {
     }
 
     try {
-      const res = await dispatch(registerThunk({
+      const result = await dispatch(registerThunk({
         name,
         email,
         password,
         password_confirmation: confirmPassword
       }));
       
-      if (res.payload && res.payload.message === 'Registration successful!') {
+      if (registerThunk.fulfilled.match(result)) {
         toast.success("Registration successful!");
         setTimeout(() => {
           navigate("/signin");
         }, 500);
       } else {
-        toast.error("Registration failed. Please try again.");
+        // Handle error from thunk
+        const errorMessage = result.payload || "Registration failed. Please try again.";
+        toast.error(errorMessage);
       }
-    } catch (error) {
-      console.error("Registration error:", error);
-      let message = "An error occurred. Please try again.";
-      
-      if (error.response && error.response.data && error.response.data.message) {
-        message = error.response.data.message;
-      } else if (error.response && error.response.data && error.response.data.errors) {
-        // Laravel validation errors
-        const errors = error.response.data.errors;
-        message = Object.values(errors).flat().join(" ");
-      } else if (error.message) {
-        message = error.message;
-      }
-      
-      toast.error(message);
+    } catch (err) {
+      console.error("Registration error:", err);
+      toast.error("An unexpected error occurred");
     }
   };
 
