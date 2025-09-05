@@ -221,6 +221,46 @@ export const projectAPI = {
 
 // User API calls
 export const userAPI = {
+  // Get all users (using search endpoint without keyword for all users)
+  getAll: async (params = {}) => {
+    // Use search endpoint without keyword to get all users
+    const response = await api.get('/search/users', { params });
+    return response.data;
+  },
+
+  // Get user by ID (using search with specific user_id if available, or fetch from user list)
+  getById: async (id) => {
+    try {
+      // Try to get user from authenticated profile endpoint if it's the current user
+      const response = await api.get('/user/profile', { skipAuthRedirect: true });
+      if (response.data && response.data.id == id) {
+        return response.data;
+      }
+    } catch (error) {
+      // Not the current user, continue
+    }
+    
+    // Fallback: search for users and find the one with matching ID
+    // This is not ideal but works with the available endpoints
+    const searchResponse = await api.get('/search/users', { params: { per_page: 100 } });
+    if (searchResponse.data && searchResponse.data.data) {
+      const user = searchResponse.data.data.find(u => u.id == id);
+      if (user) {
+        return { data: user };
+      }
+    }
+    
+    // If user not found, return a basic user object
+    return {
+      data: {
+        id: id,
+        name: `User ${id}`,
+        profile_picture: null,
+        bio: null
+      }
+    };
+  },
+
   // Search users
   search: async (params = {}) => {
     const response = await api.get('/search/users', { params });

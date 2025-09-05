@@ -155,78 +155,80 @@ const SimpleChat = () => {
                             selectedConversation?.id === conversation.id ? 'bg-accent' : ''
                           }`}
                         >
-                          <button
-                            onClick={() => handleConversationSelect(conversation)}
-                            className="w-full p-4 text-left flex-1"
-                          >
-                          <div className="flex items-start space-x-3">
-                            {/* Avatar */}
-                            <div className="flex-shrink-0 relative">
-                              <div className={`h-10 w-10 rounded-full flex items-center justify-center ${
-                                conversation.unreadCount > 0 
-                                  ? 'bg-primary/20 ring-2 ring-primary/30' 
-                                  : 'bg-primary/10'
-                              }`}>
-                                {conversation.user.avatar ? (
-                                  <img
-                                    src={conversation.user.avatar}
-                                    alt={conversation.user.name}
-                                    className="h-10 w-10 rounded-full object-cover"
-                                  />
-                                ) : (
-                                  <span className={`font-semibold ${
-                                    conversation.unreadCount > 0 ? 'text-primary' : 'text-primary'
-                                  }`}>
-                                    {conversation.user.name?.charAt(0)?.toUpperCase() || 'U'}
-                                  </span>
-                                )}
-                              </div>
-                              {conversation.user.isOnline && (
-                                <div className="absolute bottom-0 right-0 h-3 w-3 bg-green-500 rounded-full border-2 border-background" />
-                              )}
-                              {/* Unread indicator */}
-                              {conversation.unreadCount > 0 && (
-                                <div className="absolute -top-1 -right-1 h-5 w-5 bg-red-500 rounded-full border-2 border-white shadow-lg">
-                                  <div className="absolute inset-0 bg-red-500 rounded-full animate-pulse opacity-75"></div>
-                                </div>
-                              )}
-                            </div>
-
-                            {/* Conversation Info */}
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center justify-between mb-1">
-                                <p className={`font-medium truncate ${
-                                  conversation.unreadCount > 0 ? 'text-foreground font-bold' : 'text-foreground'
+                          <div className="flex items-start space-x-3 p-4">
+                            {/* Clickable area for conversation */}
+                            <div 
+                              onClick={() => handleConversationSelect(conversation)}
+                              className="flex-1 flex items-start space-x-3 cursor-pointer"
+                            >
+                              {/* Avatar */}
+                              <div className="flex-shrink-0 relative">
+                                <div className={`h-10 w-10 rounded-full flex items-center justify-center ${
+                                  conversation.unreadCount > 0 
+                                    ? 'bg-primary/20 ring-2 ring-primary/30' 
+                                    : 'bg-primary/10'
                                 }`}>
-                                  {conversation.user.name}
-                                  {conversation.unreadCount > 0 && (
-                                    <span className="ml-2 text-xs text-red-500 font-bold bg-red-50 px-2 py-1 rounded-full">
-                                      NEW
+                                  {conversation.user.avatar ? (
+                                    <img
+                                      src={conversation.user.avatar}
+                                      alt={conversation.user.name}
+                                      className="h-10 w-10 rounded-full object-cover"
+                                    />
+                                  ) : (
+                                    <span className={`font-semibold ${
+                                      conversation.unreadCount > 0 ? 'text-primary' : 'text-primary'
+                                    }`}>
+                                      {conversation.user.name?.charAt(0)?.toUpperCase() || 'U'}
                                     </span>
                                   )}
-                                </p>
-                                {conversation.lastMessage?.timestamp && (
-                                  <span className={`text-xs flex items-center gap-1 ${
-                                    conversation.unreadCount > 0 ? 'text-primary font-medium' : 'text-muted-foreground'
-                                  }`}>
-                                    <Clock className="h-3 w-3" />
-                                    {formatDistanceToNow(conversation.lastMessage.timestamp, { addSuffix: true })}
-                                  </span>
+                                </div>
+                                {conversation.user.isOnline && (
+                                  <div className="absolute bottom-0 right-0 h-3 w-3 bg-green-500 rounded-full border-2 border-background" />
+                                )}
+                                {/* Unread indicator */}
+                                {conversation.unreadCount > 0 && (
+                                  <div className="absolute -top-1 -right-1 h-5 w-5 bg-red-500 rounded-full border-2 border-white shadow-lg">
+                                    <div className="absolute inset-0 bg-red-500 rounded-full animate-pulse opacity-75"></div>
+                                  </div>
                                 )}
                               </div>
-                              {conversation.lastMessage && (
-                                <p className={`text-sm truncate ${
-                                  conversation.unreadCount > 0 ? 'text-foreground font-medium' : 'text-muted-foreground'
-                                }`}>
-                                  {conversation.lastMessage.senderId === String(currentUser?.id) && (
-                                    <span className="font-medium">You: </span>
+
+                              {/* Conversation Info */}
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center justify-between mb-1">
+                                  <p className={`font-medium truncate ${
+                                    conversation.unreadCount > 0 ? 'text-foreground font-bold' : 'text-foreground'
+                                  }`}>
+                                    {conversation.user.name}
+                                    {conversation.unreadCount > 0 && (
+                                      <span className="ml-2 text-xs text-red-500 font-bold bg-red-50 px-2 py-1 rounded-full">
+                                        NEW
+                                      </span>
+                                    )}
+                                  </p>
+                                  {conversation.lastMessage?.timestamp && (
+                                    <span className={`text-xs flex items-center gap-1 ${
+                                      conversation.unreadCount > 0 ? 'text-primary font-medium' : 'text-muted-foreground'
+                                    }`}>
+                                      <Clock className="h-3 w-3" />
+                                      {formatDistanceToNow(conversation.lastMessage.timestamp, { addSuffix: true })}
+                                    </span>
                                   )}
-                                  {conversation.lastMessage.text}
-                                </p>
-                              )}
+                                </div>
+                                {conversation.lastMessage && (
+                                  <p className={`text-sm truncate ${
+                                    conversation.unreadCount > 0 ? 'text-foreground font-medium' : 'text-muted-foreground'
+                                  }`}>
+                                    {conversation.lastMessage.senderId === String(currentUser?.id) && (
+                                      <span className="font-medium">You: </span>
+                                    )}
+                                    {conversation.lastMessage.text}
+                                  </p>
+                                )}
+                              </div>
                             </div>
 
-                            {/* Unread Badge & Actions */}
+                            {/* Unread Badge & Actions - Outside clickable area */}
                             <div className="flex items-center gap-2">
                               {conversation.unreadCount > 0 && (
                                 <div className="h-6 w-6 bg-red-500 rounded-full flex items-center justify-center shadow-lg">
@@ -244,7 +246,6 @@ const SimpleChat = () => {
                                       variant="ghost"
                                       size="sm"
                                       className="opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8 p-0"
-                                      onClick={(e) => e.stopPropagation()}
                                     >
                                       <MoreVertical className="h-4 w-4" />
                                     </Button>
@@ -280,7 +281,6 @@ const SimpleChat = () => {
                               </AlertDialog>
                             </div>
                           </div>
-                          </button>
                         </div>
                       ))}
                     </div>

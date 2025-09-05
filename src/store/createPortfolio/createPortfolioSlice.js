@@ -12,17 +12,20 @@ const createPortfolio = createSlice({
     initialState,
     reducers:{},
     extraReducers: (builder) => {
-        builder.addCase(createPortfolioThunk.pending, (state) => {
-            state.loading = true;
-        })  
-        builder.addCase(createPortfolioThunk.fulfilled, (state, action) => {
-            state.loading = false;
-            state.portfolio=action.payload
-        })
-        builder.addCase(createPortfolioThunk.rejected, (state, action) => {
-            state.loading = false;
-            state.error = action.payload;
-        })
+        builder
+            .addCase(createPortfolioThunk.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(createPortfolioThunk.fulfilled, (state, action) => {
+                state.loading = false;
+                state.portfolio = action.payload;
+                state.error = null;
+            })
+            .addCase(createPortfolioThunk.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            });
     }
 })
 export default createPortfolio.reducer;

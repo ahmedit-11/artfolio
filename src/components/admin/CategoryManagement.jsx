@@ -6,96 +6,56 @@ import { cn } from '@/lib/utils';
 import { toast } from 'react-toastify';
 import StatCard from './StatCard';
 import ConfirmDialog from '@/components/ConfirmDialog';
+import { useDispatch, useSelector } from 'react-redux';
+import { getAllCatThunk } from '@/store/Categories/thunk/getAllCatThunk';
+import { createCategoryThunk } from '@/store/Categories/thunk/createCategoryThunk';
+import { updateCategoryThunk } from '@/store/Categories/thunk/updateCategoryThunk';
+import { deleteCategoryThunk } from '@/store/Categories/thunk/deleteCategoryThunk';
+import { getDashboardStatsThunk } from '@/store/dashboard/thunk/getDashboardStatsThunk';
 
 const CategoryManagement = () => {
-  const [categories, setCategories] = useState([]);
+  const dispatch = useDispatch();
+  const { 
+    categories, 
+    loading, 
+    error, 
+    createLoading, 
+    updateLoading, 
+    deleteLoading 
+  } = useSelector(state => state.categories);
+  
+  const { stats: dashboardStats, loading: dashboardLoading } = useSelector(state => state.dashboard);
+  
   const [searchTerm, setSearchTerm] = useState('');
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
     name: '',
-    description: '',
-    color: '#8B5CF6'
+    description: ''
   });
 
-  // Mock data - replace with actual API calls
+  // Fetch categories and dashboard stats from API
   useEffect(() => {
-    const mockCategories = [
-      {
-        id: 1,
-        name: 'Web Design',
-        slug: 'web-design',
-        description: 'Modern web design and user interface projects',
-        color: '#8B5CF6',
-        projects_count: 45,
-        created_at: '2024-01-15',
-        updated_at: '2024-08-01'
-      },
-      {
-        id: 2,
-        name: 'Mobile Apps',
-        slug: 'mobile-apps',
-        description: 'iOS and Android mobile application designs',
-        color: '#06B6D4',
-        projects_count: 32,
-        created_at: '2024-01-20',
-        updated_at: '2024-07-28'
-      },
-      {
-        id: 3,
-        name: 'Branding',
-        slug: 'branding',
-        description: 'Logo design, brand identity, and visual branding',
-        color: '#F59E0B',
-        projects_count: 28,
-        created_at: '2024-02-01',
-        updated_at: '2024-08-05'
-      },
-      {
-        id: 4,
-        name: 'Photography',
-        slug: 'photography',
-        description: 'Portrait, landscape, and commercial photography',
-        color: '#EF4444',
-        projects_count: 67,
-        created_at: '2024-01-10',
-        updated_at: '2024-08-03'
-      },
-      {
-        id: 5,
-        name: 'Illustration',
-        slug: 'illustration',
-        description: 'Digital illustrations, artwork, and creative designs',
-        color: '#10B981',
-        projects_count: 39,
-        created_at: '2024-02-15',
-        updated_at: '2024-07-30'
-      }
-    ];
-
-    setTimeout(() => {
-      setCategories(mockCategories);
-      setLoading(false);
-    }, 1000);
-  }, []);
+    dispatch(getAllCatThunk());
+    dispatch(getDashboardStatsThunk());
+  }, [dispatch]);
 
   // Filter categories based on search term
-  const filteredCategories = categories.filter(category =>
-    category.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    category.description.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredCategories = categories?.filter(category =>
+    category.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    category.description?.toLowerCase().includes(searchTerm.toLowerCase())
+  ) || [];
 
   // Statistics
-  const totalCategories = categories.length;
-  const totalProjects = categories.reduce((sum, cat) => sum + cat.projects_count, 0);
+  const totalCategories = categories?.length || 0;
+  const totalProjects = dashboardStats?.totalProjects || 0;
   const avgProjectsPerCategory = totalCategories > 0 ? Math.round(totalProjects / totalCategories) : 0;
 
   // Handle create category
   const handleCreateCategory = () => {
-    setFormData({ name: '', description: '', color: '#8B5CF6' });
+    setFormData({ name: '', description: '' });
     setShowCreateModal(true);
   };
 
@@ -103,9 +63,8 @@ const CategoryManagement = () => {
   const handleEditCategory = (category) => {
     setSelectedCategory(category);
     setFormData({
-      name: category.name,
-      description: category.description,
-      color: category.color
+      name: category.name || '',
+      description: category.description || ''
     });
     setShowEditModal(true);
   };
@@ -117,16 +76,26 @@ const CategoryManagement = () => {
   };
 
   // Confirm delete
-  const confirmDelete = () => {
-    // TODO: Implement actual delete API call
-    setCategories(categories.filter(cat => cat.id !== selectedCategory.id));
-    toast.success(`Category "${selectedCategory.name}" deleted successfully!`);
-    setShowDeleteDialog(false);
-    setSelectedCategory(null);
+  const confirmDelete = async () => {
+    try {
+      const result = await dispatch(deleteCategoryThunk(selectedCategory.id));
+      if (result.payload) {
+        toast.success(`Category "${selectedCategory.name}" deleted successfully!`);
+        setShowDeleteDialog(false);
+        setSelectedCategory(null);
+        // Refresh categories list to remove deleted category
+        dispatch(getAllCatThunk());
+      } else {
+        toast.error("Failed to delete category. Please try again.");
+      }
+    } catch (error) {
+      console.error("Delete category error:", error);
+      toast.error("Failed to delete category. Please try again.");
+    }
   };
 
   // Handle form submission
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (!formData.name.trim()) {
@@ -134,34 +103,38 @@ const CategoryManagement = () => {
       return;
     }
 
-    if (showCreateModal) {
-      // TODO: Implement actual create API call
-      const newCategory = {
-        id: Date.now(),
-        name: formData.name,
-        slug: formData.name.toLowerCase().replace(/\s+/g, '-'),
-        description: formData.description,
-        color: formData.color,
-        projects_count: 0,
-        created_at: new Date().toISOString().split('T')[0],
-        updated_at: new Date().toISOString().split('T')[0]
-      };
-      setCategories([...categories, newCategory]);
-      toast.success('Category created successfully!');
-      setShowCreateModal(false);
-    } else if (showEditModal) {
-      // TODO: Implement actual update API call
-      setCategories(categories.map(cat => 
-        cat.id === selectedCategory.id 
-          ? { ...cat, name: formData.name, description: formData.description, color: formData.color }
-          : cat
-      ));
-      toast.success('Category updated successfully!');
-      setShowEditModal(false);
-    }
+    try {
+      if (showCreateModal) {
+        const result = await dispatch(createCategoryThunk(formData));
+        if (result.payload) {
+          toast.success('Category created successfully!');
+          setShowCreateModal(false);
+          // Refresh categories list to show the new category
+          dispatch(getAllCatThunk());
+        } else {
+          toast.error("Failed to create category. Please try again.");
+        }
+      } else if (showEditModal) {
+        const result = await dispatch(updateCategoryThunk({ 
+          id: selectedCategory.id, 
+          categoryData: formData 
+        }));
+        if (result.payload) {
+          toast.success('Category updated successfully!');
+          setShowEditModal(false);
+          // Refresh categories list to show updated category
+          dispatch(getAllCatThunk());
+        } else {
+          toast.error("Failed to update category. Please try again.");
+        }
+      }
 
-    setFormData({ name: '', description: '', color: '#8B5CF6' });
-    setSelectedCategory(null);
+      setFormData({ name: '', description: '' });
+      setSelectedCategory(null);
+    } catch (error) {
+      console.error("Form submission error:", error);
+      toast.error("An error occurred. Please try again.");
+    }
   };
 
   // Close modals
@@ -169,7 +142,7 @@ const CategoryManagement = () => {
     setShowCreateModal(false);
     setShowEditModal(false);
     setSelectedCategory(null);
-    setFormData({ name: '', description: '', color: '#8B5CF6' });
+    setFormData({ name: '', description: '' });
   };
 
   return (
@@ -234,7 +207,7 @@ const CategoryManagement = () => {
                 <th className="text-left p-4 font-medium text-muted-foreground">Category</th>
                 <th className="text-left p-4 font-medium text-muted-foreground">Description</th>
                 <th className="text-left p-4 font-medium text-muted-foreground">Projects</th>
-                <th className="text-left p-4 font-medium text-muted-foreground">Created</th>
+                
                 <th className="text-right p-4 font-medium text-muted-foreground">Actions</th>
               </tr>
             </thead>
@@ -285,14 +258,7 @@ const CategoryManagement = () => {
                         <span className="text-sm font-medium">{category.projects_count}</span>
                       </div>
                     </td>
-                    <td className="p-4">
-                      <div className="flex items-center gap-2">
-                        <Calendar className="size-4 text-muted-foreground" />
-                        <span className="text-sm text-muted-foreground">
-                          {new Date(category.created_at).toLocaleDateString()}
-                        </span>
-                      </div>
-                    </td>
+                   
                     <td className="p-4">
                       <div className="flex items-center justify-end gap-2">
                         <button
@@ -331,11 +297,11 @@ const CategoryManagement = () => {
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-2">
-                    Category Name
+                    Category Name *
                   </label>
                   <input
                     type="text"
-                    value={formData.name}
+                    value={formData.name || ''}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     placeholder="Enter category name"
                     className="w-full px-3 py-2 border border-border rounded-lg bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
@@ -348,7 +314,7 @@ const CategoryManagement = () => {
                     Description
                   </label>
                   <textarea
-                    value={formData.description}
+                    value={formData.description || ''}
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     placeholder="Enter category description"
                     rows={3}
@@ -356,26 +322,6 @@ const CategoryManagement = () => {
                   />
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-foreground mb-2">
-                    Color
-                  </label>
-                  <div className="flex items-center gap-3">
-                    <input
-                      type="color"
-                      value={formData.color}
-                      onChange={(e) => setFormData({ ...formData, color: e.target.value })}
-                      className="w-12 h-10 border border-border rounded-lg cursor-pointer"
-                    />
-                    <input
-                      type="text"
-                      value={formData.color}
-                      onChange={(e) => setFormData({ ...formData, color: e.target.value })}
-                      placeholder="#8B5CF6"
-                      className="flex-1 px-3 py-2 border border-border rounded-lg bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                    />
-                  </div>
-                </div>
 
                 <div className="flex gap-3 pt-4">
                   <button
@@ -387,9 +333,17 @@ const CategoryManagement = () => {
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+                    disabled={createLoading || updateLoading}
+                    className="flex-1 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {showCreateModal ? 'Create' : 'Update'}
+                    {(showCreateModal && createLoading) || (showEditModal && updateLoading) ? (
+                      <div className="flex items-center justify-center">
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-foreground mr-2"></div>
+                        {showCreateModal ? 'Creating...' : 'Updating...'}
+                      </div>
+                    ) : (
+                      showCreateModal ? 'Create' : 'Update'
+                    )}
                   </button>
                 </div>
               </form>

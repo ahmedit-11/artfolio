@@ -12,7 +12,7 @@ import { deletePortfolioThunk } from "@/store/deletePortfolio/thunk/deletePortfo
 import { useEffect, useState } from "react";
 import { toast } from 'react-toastify';
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { getProfileImageUrl, getPortfolioImageUrl } from "@/utils/imageUtils";
+import { getProfileImageUrl, getPortfolioImageUrl } from "@/utils/mediaUtils";
 import PortfolioCard from "@/components/PortfolioCard";
 import ConfirmDialog from "@/components/ConfirmDialog"
 
@@ -171,11 +171,11 @@ const Profile = () => {
               <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
                 {currentUser ? (
                   <>
-                    <Button variant="outline" className="space-x-2" onClick={() => navigate('/settings/profile')}>
+                    <Button variant="outline" className="space-x-2 " onClick={() => navigate('/settings/profile')}>
                       <Edit className="size-4" />
                       <span>Edit Profile</span>
                     </Button>
-                    <Button variant="default" className="space-x-2" onClick={() => navigate('/create')}>
+                    <Button variant="default" className="space-x-2 bg-purple-600 hover:bg-purple-700 hover:text-white" onClick={() => navigate('/create')}>
                       <Plus className="size-4" />
                       <span>New Portfolio</span>
                     </Button>
@@ -227,6 +227,8 @@ const Profile = () => {
                 .map((portfolio) => (
                 <div key={portfolio.id} className="relative group">
                   <PortfolioCard
+                    id={portfolio.id}
+                    slug={portfolio.slug}
                     image={getPortfolioImageUrl(portfolio.media?.[0]?.file_path) || '/placeholder.svg'}
                     title={portfolio.title}
                     creator={name}

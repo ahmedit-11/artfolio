@@ -12,17 +12,20 @@ const updatePortfolio = createSlice({
     initialState,
     reducers:{},
     extraReducers: (builder) => {
-        builder.addCase(updatePortfolioThunk.pending, (state) => {
-            state.loading = true;
-        })  
-        builder.addCase(updatePortfolioThunk.fulfilled, (state, action) => {
-            state.loading = false;
-            state.portfolio=action.payload
-        })
-        builder.addCase(updatePortfolioThunk.rejected, (state, action) => {
-            state.loading = false;
-            state.error = action.payload;
-        })
+        builder
+            .addCase(updatePortfolioThunk.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(updatePortfolioThunk.fulfilled, (state, action) => {
+                state.loading = false;
+                state.portfolio = action.payload;
+                state.error = null;
+            })
+            .addCase(updatePortfolioThunk.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            });
     }
 })
 export default updatePortfolio.reducer;

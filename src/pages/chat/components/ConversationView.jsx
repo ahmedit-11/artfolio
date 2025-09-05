@@ -14,8 +14,8 @@ const ConversationView = ({ selectedUserId, selectedUserName }) => {
   const { currentUser, selectedConversation, messages, sendMessage, markMessagesAsRead, userProfiles, typingUsers, setTypingStatus } = useChat();
   const [chatId, setChatId] = useState(null);
 
-  // Get messages from context
-  const currentMessages = selectedConversation ? messages : [];
+  // Get messages from context - messages is already filtered for selectedConversation in ChatContext
+  const currentMessages = messages || [];
 
   // Scroll to bottom when messages change
   const scrollToBottom = () => {
@@ -181,7 +181,7 @@ const ConversationView = ({ selectedUserId, selectedUserName }) => {
                 >
                   {!isOwn && (
                     <p className="text-xs font-medium mb-1 text-muted-foreground">
-                      {selectedUserName || userProfiles[message.senderId]?.name || `User ${message.senderId?.slice(0, 6)}`}
+                      {selectedUserName || userProfiles[String(message.senderId)]?.name || `User ${message.senderId?.slice(0, 6)}`}
                     </p>
                   )}
                   <p className="break-words">{message.text}</p>
@@ -204,7 +204,7 @@ const ConversationView = ({ selectedUserId, selectedUserName }) => {
                 // Don't show typing indicator for current user
                 if (userId === String(currentUser?.id)) return null;
                 
-                const userName = userProfiles[userId]?.name || selectedUserName || `User ${userId?.slice(0, 6)}`;
+                const userName = userProfiles[String(userId)]?.name || selectedUserName || `User ${userId?.slice(0, 6)}`;
                 return (
                   <TypingIndicator 
                     key={userId}

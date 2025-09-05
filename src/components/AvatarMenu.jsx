@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { User, Settings } from "lucide-react";
-import { getProfileImageUrl } from "@/utils/imageUtils";
+import { getProfileImageUrl } from "@/utils/mediaUtils";
 
 const AvatarMenu = () => {
   const navigate = useNavigate();

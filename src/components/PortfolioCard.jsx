@@ -1,16 +1,22 @@
 // PortfolioCard.jsx
 // Displays a single portfolio item card with an image, title, creator information, likes, comments, and tags.
 import React from "react";
-import { Heart, MessageCircle, Share2 } from "lucide-react";
+import { Heart, MessageCircle, Share2, Star } from "lucide-react";
 import { FaStar, } from 'react-icons/fa';
-import { useNavigate } from "react-router-dom";
-import { cn } from "@/lib/utils";
-import Cookies from "js-cookie";
-import Tag from "./ui/tag";
-import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
+import { useNavigate } from 'react-router-dom';
+import { cn } from '@/lib/utils';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import  Tag  from '@/components/ui/tag';
+import Cookies from 'js-cookie';
+import { getPortfolioMediaUrl, getProfileImageUrl } from '@/utils/mediaUtils';
+
 // PortfolioCard component renders a card for a single portfolio item with interactive features
 const PortfolioCard = ({
+  portfolio,
   id,
+  slug,
   title,
   creator,
   creatorImage,
@@ -26,6 +32,43 @@ const PortfolioCard = ({
   onShareClick,
   rating = 0,
 }) => {
+  // If portfolio object is passed, extract properties from it
+  const portfolioData = portfolio || {
+    id,
+    slug,
+    title,
+    creator,
+    creatorImage,
+    image,
+    likes,
+    comments,
+    tags,
+    rating
+  };
+  
+  const {
+    id: portfolioId = id,
+    slug: portfolioSlug = slug,
+    title: portfolioTitle = title,
+    user,
+    creator: portfolioCreator = creator,
+    creator_image: portfolioCreatorImage = creatorImage,
+    image: portfolioImage = image,
+    media,
+    likes_count: portfolioLikes = likes,
+    comments_count: portfolioComments = comments,
+    tags: portfolioTags = tags,
+    rating: portfolioRating = rating
+  } = portfolioData;
+
+  // Handle image from media array or direct image field
+  const rawImagePath = portfolioImage || (media && media.length > 0 ? media[0].file_path : null);
+  const displayImage = getPortfolioMediaUrl(rawImagePath);
+  
+  // Handle creator name from user object or direct creator prop
+  const creatorName = user?.name || portfolioCreator || 'Unknown';
+  const rawCreatorImg = user?.profile_picture || portfolioCreatorImage;
+  const creatorImg = getProfileImageUrl(rawCreatorImg);
   const navigate = useNavigate();
 
   const handleCardClick = (e) => {
@@ -33,7 +76,7 @@ const PortfolioCard = ({
     if (onCardClick) {
       onCardClick();
     } else {
-      navigate(`/portfolio/${id}`);
+      navigate(`/projects/${portfolioSlug || portfolioId}`);
     }
   };
   const token = Cookies.get('token')
@@ -48,8 +91,8 @@ const PortfolioCard = ({
       {/* Image Container */}
       <div className="aspect-[4/3] relative overflow-hidden">
         <img
-          src={image}
-          alt={title}
+          src={displayImage}
+          alt={portfolioTitle}
           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0  transition-all duration-200 ease-in-out" />
@@ -59,7 +102,7 @@ const PortfolioCard = ({
       <div className="p-4">
         {/* Title and Creator */}
         <div className="mb-3">
-          <h3 className="font-semibold text-lg mb-2 line-clamp-1">{title}</h3>
+          <h3 className="font-semibold text-lg mb-2 line-clamp-1">{portfolioTitle}</h3>
           <div 
             className="flex items-center gap-2 text-sm text-muted-foreground cursor-pointer hover:text-purple-600 dark:hover:text-purple-400"
             onClick={(e) => {
@@ -68,16 +111,16 @@ const PortfolioCard = ({
             }}
           >
             <Avatar className="size-6">
-              <AvatarImage src={creatorImage} alt={creator} />
-              <AvatarFallback>{creator.charAt(0)}</AvatarFallback>
+              <AvatarImage src={creatorImg} alt={creatorName} />
+              <AvatarFallback>{creatorName?.charAt(0) || 'U'}</AvatarFallback>
             </Avatar>
-            <span>{creator}</span>
+            <span>{creatorName}</span>
           </div>
         </div>
 
         {/* Tags */}
         <div className="flex flex-wrap gap-2 mb-3">
-          {tags.map((tag, index) => (
+          {portfolioTags && portfolioTags.map((tag, index) => (
             <Tag
               key={index}
               size="sm"

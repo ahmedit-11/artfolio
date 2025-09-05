@@ -76,13 +76,32 @@ const EditPortfolio = () => {
         setSelectedTags(currentPortfolio.tags.map(tag => tag.name || tag));
       }
       
-      // Set media
+      // Set media - transform existing media to match new media item structure
       if (currentPortfolio.media && currentPortfolio.media.length > 0) {
-        setMediaItems(currentPortfolio.media);
+        const transformedMedia = currentPortfolio.media.map((media, index) => {
+          const fileType = media.file_type?.startsWith('image/') ? 'image' : 
+                          media.file_type?.startsWith('video/') ? 'video' :
+                          media.file_type?.startsWith('audio/') ? 'audio' : 'file';
+          
+          // Create user-friendly display name
+          const displayName = `${fileType.charAt(0).toUpperCase() + fileType.slice(1)} ${index + 1}`;
+          
+          return {
+            id: media.id,
+            type: fileType,
+            value: {
+              name: displayName,
+              isExisting: true,
+              originalMedia: media
+            }
+          };
+        });
+        setMediaItems(transformedMedia);
+        
         // Set cover image if exists
-        const coverMedia = currentPortfolio.media.find(media => media.type === 'image');
+        const coverMedia = currentPortfolio.media.find(media => media.file_type?.startsWith('image/'));
         if (coverMedia) {
-          setCoverPreview(coverMedia.url);
+          setCoverPreview(`${import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000'}/storage/${coverMedia.file_path}`);
         }
       }
     }
@@ -161,7 +180,7 @@ const EditPortfolio = () => {
                 tagIds.push(tagResult.payload.tag.id);
               }
             } catch (error) {
-              console.warn(`Could not create tag: ${tagName}`, error);
+             
             }
           }
         }
@@ -208,8 +227,8 @@ const EditPortfolio = () => {
         formData.append('new_media[]', coverImage);
       }
       
-      // Add new media files
-      const fileItems = mediaItems.filter(item => item.value && item.value instanceof File);
+      // Add new media files (only actual File objects, not existing media)
+      const fileItems = mediaItems.filter(item => item.value && item.value instanceof File && !item.value.isExisting);
       fileItems.forEach((item) => {
         formData.append('new_media[]', item.value);
       });
@@ -503,22 +522,43 @@ const EditPortfolio = () => {
                         onChange={(e) => handleMediaChange(item.id, e.target.value)}
                       />
                     ) : (
-                      <input
-                        type="file"
-                        accept={
-                          item.type === "image"
-                            ? "image/*"
-                            : item.type === "video"
-                            ? "video/*"
-                            : item.type === "audio"
-                            ? "audio/*"
-                            : item.type === "model"
-                            ? ".glb,.gltf,.obj,.fbx"
-                            : "*/*"
-                        }
-                        onChange={(e) => handleMediaChange(item.id, e.target.files?.[0] || null)}
-                        className="block w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100"
-                      />
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => document.getElementById(`file-input-${item.id}`).click()}
+                            className="bg-purple-50 text-purple-700 hover:bg-purple-100"
+                          >
+                            Choose File
+                          </Button>
+                          <span className="text-sm text-muted-foreground">
+                            {item.value?.name ? item.value.name : "No file chosen"}
+                          </span>
+                        </div>
+                        <input
+                          id={`file-input-${item.id}`}
+                          type="file"
+                          accept={
+                            item.type === "image"
+                              ? "image/*"
+                              : item.type === "video"
+                              ? "video/*"
+                              : item.type === "audio"
+                              ? "audio/*"
+                              : item.type === "model"
+                              ? ".glb,.gltf,.obj,.fbx"
+                              : "*/*"
+                          }
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            
+                            handleMediaChange(item.id, file || null);
+                          }}
+                          className="hidden"
+                        />
+                      </div>
                     )}
                   </Card>
                 ))}

@@ -75,7 +75,7 @@ import AdminPanel from "./components/admin/AdminPanel";
 // import TestUsers from "./pages/chat/TestUsers";
 // import SimpleChatTest from "./pages/chat/SimpleChatTest";
 import SimpleChat from "./pages/chat/SimpleChat";
-import CategoryPage from "./pages/CategoryPage";
+import CategoryPage from "./pages/category/CategoryPage";
 import { ToastContainer } from "react-toastify";
 
 // const SignUp = lazy(() => import("./pages/SignUp"));
@@ -135,10 +135,9 @@ const App = () => {
             <Route path="/settings" element={<Settings />} />
             <Route path="/settings/profile" element={<ProfileSettings />} />
             <Route path="/settings/change-password" element={<ChangePassword />} />
-            <Route path="/portfolio/:id" element={<PortfolioDetail />} />
             <Route path="/create" element={<CreatePortfolio />} />
             <Route path="/edit/:id" element={<EditPortfolio />} />
-            <Route path="/category/:slug" element={<CategoryPage />} />
+            <Route path="/categories/:categorySlug/projects" element={<CategoryPage />} />
             <Route path="/chat" element={<SimpleChat />} />
             {/* <Route path="/chat-old" element={<Chat />} /> */}
             {/* <Route path="/chat-test" element={<ChatTest />} />
@@ -146,6 +145,7 @@ const App = () => {
             <Route path="/test-users" element={<TestUsers />} />
             <Route path="/simple-chat" element={<SimpleChatTest />} /> */}
           </Route>
+          <Route path="/projects/:slug" element={<PortfolioDetail />} />
           <Route path="/signin" element={<SignIn />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />

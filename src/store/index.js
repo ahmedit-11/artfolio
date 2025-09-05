@@ -11,6 +11,10 @@ import currentUser from "./currentUser/currentUserSlice"
 import updateProfile from "./updateProfile/updateProfileSlice"
 import userPortfolios from "./userPortfolios/userPortfoliosSlice"
 import deletePortfolio from "./deletePortfolio/deletPortfolioSlice"
+import portfolioDetails from "./portfolioDetails/portfolioDetailsSlice"
+import comments from "./comments/commentsSlice"
+import dashboard from "./dashboard/dashboardSlice"
+import categoryPortfolios from "./categoryPortfolios/categoryPortfoliosSlice"
 import {
   FLUSH,
   PAUSE,
@@ -65,6 +69,25 @@ const persistDeletePortfolio = {
   key: "deletePortfolio",
   storage
 }
+const persistPortfolioDetails = {
+  key: "portfolioDetails",
+  storage
+}
+
+const persistComments = {
+  key: "comments",
+  storage
+}
+
+const persistDashboard = {
+  key: "dashboard",
+  storage
+}
+
+const persistCategoryPortfolios = {
+  key: "categoryPortfolios",
+  storage
+}
 
 const rootReducer = combineReducers({
       allPortfolio: persistReducer(persistAllPortfolio, allPortfolio),
@@ -77,7 +100,11 @@ const rootReducer = combineReducers({
       updatePortfolio: persistReducer(persistUpdatePortfolio, updatePortfolio),
       updateProfile: persistReducer(persistUpdateProfile, updateProfile),
       userPortfolios: persistReducer(persistUserPortfolios, userPortfolios),
-      deletePortfolio: persistReducer(persistDeletePortfolio,deletePortfolio)
+      deletePortfolio: persistReducer(persistDeletePortfolio,deletePortfolio),
+      portfolioDetails: persistReducer(persistPortfolioDetails, portfolioDetails),
+      comments: persistReducer(persistComments, comments),
+      dashboard: persistReducer(persistDashboard, dashboard),
+      categoryPortfolios: persistReducer(persistCategoryPortfolios, categoryPortfolios)
     });
 export const store = configureStore({
   reducer: rootReducer,

@@ -6,6 +6,7 @@ import { createOrUpdateUserProfile, updateUserOnlineStatus } from '../services/u
 import { decodeToken, getStoredUser } from '../utils/tokenUtils';
 import { useNotifications } from './NotificationContext';
 import { useLocation } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 const ChatContext = createContext();
 
@@ -18,6 +19,8 @@ export const useChat = () => {
 };
 
 export const ChatProvider = ({ children }) => {
+  // Get currentUser from Redux store
+  const reduxCurrentUser = useSelector(state => state.currentUser?.currentUser);
   const [currentUser, setCurrentUser] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [conversations, setConversations] = useState([]);
@@ -50,64 +53,34 @@ export const ChatProvider = ({ children }) => {
   const truncateText = (t, n = 60) =>
     typeof t === 'string' && t.length > n ? `${t.slice(0, n - 1)}…` : (t || '');
 
-  // Get current user from token or localStorage (bypass broken profile API)
+  // Use Redux currentUser instead of decoding token
   useEffect(() => {
     const initializeUser = async () => {
-      if (token) {
+      if (reduxCurrentUser && token) {
         try {
-          // First try to decode the token
-          const decodedUser = decodeToken(token);
+          const user = {
+            id: String(reduxCurrentUser.id),
+            name: reduxCurrentUser.name || 'User',
+            email: reduxCurrentUser.email || '',
+            avatar: reduxCurrentUser.profile_picture || reduxCurrentUser.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(reduxCurrentUser.name || 'User')}&background=random`,
+            isOnline: true
+          };
           
-          // If token doesn't have user info, check localStorage
-          const storedUser = getStoredUser();
+          // Store user in localStorage for future use
+          localStorage.setItem('user', JSON.stringify(user));
           
-          // Use whichever has the data
-          const userData = decodedUser?.id ? decodedUser : storedUser;
-          
-          if (userData) {
-            const user = {
-              id: String(userData.id),
-              name: userData.name || 'User',
-              email: userData.email || '',
-              avatar: userData.profile_picture || userData.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(userData.name || 'User')}&background=random`,
-              isOnline: true
-            };
-            
-            // Store user in localStorage for future use
-            localStorage.setItem('user', JSON.stringify(user));
-            
-            // Sync user to Firebase
-            await createOrUpdateUserProfile(user.id, user);
-            setCurrentUser(user);
-          } else {
-            // Fallback: create a simple user from token
-            // This ensures chat works even without full user data
-            const fallbackUser = {
-              id: '1', // Default ID, will be overridden when actual data is available
-              name: 'User',
-              email: 'user@example.com',
-              avatar: `https://ui-avatars.com/api/?name=User&background=random`,
-              isOnline: true
-            };
-            setCurrentUser(fallbackUser);
-          }
+          // Sync user to Firebase
+          await createOrUpdateUserProfile(user.id, user);
+          setCurrentUser(user);
         } catch (error) {
           console.error('Error initializing user:', error);
-          // Set a basic user to allow chat to work
-          setCurrentUser({
-            id: '1',
-            name: 'User',
-            email: '',
-            avatar: `https://ui-avatars.com/api/?name=User&background=random`,
-            isOnline: true
-          });
         }
       }
       setAuthLoading(false);
     };
 
     initializeUser();
-  }, [token]);
+  }, [reduxCurrentUser, token]);
 
   // Update loading state based on auth
   useEffect(() => {
@@ -141,14 +114,14 @@ export const ChatProvider = ({ children }) => {
             const response = await userAPI.getById(userId);
             const userData = response.data || response;
             return {
-              id: userId,
+              id: String(userId),
               name: userData.name || `User ${userId}`,
               avatar: userData.profile_picture || userData.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(userData.name || 'User')}&background=random`
             };
           } catch (error) {
             console.warn(`Failed to fetch user ${userId}:`, error);
             return {
-              id: userId,
+              id: String(userId),
               name: `User ${userId}`,
               avatar: `https://ui-avatars.com/api/?name=User${userId}&background=random`
             };
@@ -157,14 +130,14 @@ export const ChatProvider = ({ children }) => {
         
         const userProfilesArray = await Promise.all(userProfilePromises);
         userProfilesArray.forEach(profile => {
-          profiles[profile.id] = profile;
+          profiles[String(profile.id)] = profile;
         });
       } catch (error) {
         console.warn('Failed to fetch user profiles, using fallback:', error);
         // Fallback to generic profiles
         userIds.forEach(userId => {
-          profiles[userId] = {
-            id: userId,
+          profiles[String(userId)] = {
+            id: String(userId),
             name: `User ${userId}`,
             avatar: `https://ui-avatars.com/api/?name=User${userId}&background=random`
           };
@@ -174,7 +147,7 @@ export const ChatProvider = ({ children }) => {
 
       const formattedConversations = chats.map(chat => {
         const otherUserId = chat.users.find(userId => userId !== String(currentUser.id));
-        const userProfile = profiles[otherUserId] || {};
+        const userProfile = profiles[String(otherUserId)] || {};
         
         // Calculate unread count
         const unreadCount = chat.unreadCount?.[String(currentUser.id)] || 0;
@@ -198,7 +171,7 @@ export const ChatProvider = ({ children }) => {
           id: chat.id,
           chatId: chat.id,
           user: {
-            id: otherUserId,
+            id: String(otherUserId),
             name: userProfile.name || `User ${otherUserId?.slice(0, 6)}`,
             avatar: userProfile.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(userProfile.name || 'User')}&background=7c3aed&color=fff`,
             isOnline: userProfile.isOnline || false
@@ -227,7 +200,8 @@ export const ChatProvider = ({ children }) => {
           const prevKey = prevLastMsgKeyRef.current[conv.id] || '';
           const lastMsgChanged = !!currKey && currKey !== prevKey;
 
-          if ((increased || lastMsgChanged) && incoming && !isOpenConv) {
+          // Only notify if there's actually a message (not just a new empty conversation)
+          if ((increased || lastMsgChanged) && incoming && !isOpenConv && conv.lastMessage?.text) {
             addNotification({
               type: 'message',
               actorName: conv.user?.name || 'User',
@@ -302,7 +276,7 @@ export const ChatProvider = ({ children }) => {
 
       setMessages(prev => ({
         ...prev,
-        [selectedConversation.id]: formattedMessages
+        [selectedConversation.chatId]: formattedMessages
       }));
     });
 
@@ -387,17 +361,17 @@ export const ChatProvider = ({ children }) => {
           const response = await userAPI.getById(otherUserIdStr);
           const userData = response.data || response;
           userProfile = {
-            id: otherUserIdStr,
+            id: String(otherUserIdStr),
             name: userData.name || `User ${otherUserIdStr?.slice(0, 6)}`,
             avatar: userData.profile_picture || userData.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(userData.name || 'User')}&background=7c3aed&color=fff`,
             isOnline: false
           };
-          // Cache the profile
-          setUserProfiles(prev => ({ ...prev, [otherUserIdStr]: userProfile }));
+          // Cache the profile with string key
+          setUserProfiles(prev => ({ ...prev, [String(otherUserIdStr)]: userProfile }));
         } catch (error) {
           console.warn(`Failed to fetch user ${otherUserIdStr} for new chat:`, error);
           userProfile = {
-            id: otherUserIdStr,
+            id: String(otherUserIdStr),
             name: `User ${otherUserIdStr?.slice(0, 6)}`,
             avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(`User ${otherUserIdStr}`)}&background=7c3aed&color=fff`,
             isOnline: false
@@ -484,7 +458,7 @@ export const ChatProvider = ({ children }) => {
     conversations,
     selectedConversation,
     setSelectedConversation: handleConversationSelect,
-    messages: selectedConversation ? messages[selectedConversation.id] || [] : [],
+    messages: selectedConversation ? messages[selectedConversation.chatId] || [] : [],
     loading: loading || authLoading,
     currentUser,
     sendMessage: handleSendMessage,

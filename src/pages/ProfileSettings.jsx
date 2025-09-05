@@ -13,7 +13,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { updateProfileThunk } from "@/store/updateProfile/thunk/updateProfilethunk";
 import { getCurrentUserThunk } from "@/store/currentUser/thunk/getCurrentUserThunk";
 import { toast } from "react-toastify";
-import { getProfileImageUrl } from "@/utils/imageUtils";
+import { getProfileImageUrl } from "@/utils/mediaUtils";
 const initialProfile = {
   bio: "Digital artist and UI designer passionate about creating immersive experiences.",
   avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=creative_artist",
