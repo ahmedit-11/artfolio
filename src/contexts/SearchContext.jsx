@@ -40,6 +40,6 @@ export const localSearch = (items = [], query = "") => {
   return items.filter(
     (item) =>
       item.title?.toLowerCase().includes(lower) ||
-      item.tags?.some((t) => t.toLowerCase().includes(lower))
+      item.tags?.some((t) => typeof t === 'string' ? t.toLowerCase().includes(lower) : t.name?.toLowerCase().includes(lower))
   );
 };

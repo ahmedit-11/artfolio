@@ -11,16 +11,16 @@ import { reportAPI } from "@/lib/api";
 import { useDispatch, useSelector } from "react-redux";
 import { addCommentThunk } from "@/store/comments/thunk/addCommentThunk";
 import { deleteCommentThunk } from "@/store/comments/thunk/deleteCommentThunk";
+import { getCommentsThunk } from "@/store/comments/thunk/getCommentsThunk";
 import { getProfileImageUrl } from "@/utils/mediaUtils";
 import { toast } from 'react-toastify';
 
 
-const CommentsModal = ({ isOpen, onClose, portfolioId, portfolioTitle }) => {
+const CommentsModal = ({ isOpen, onClose, portfolioSlug, portfolioTitle }) => {
   const dispatch = useDispatch();
-  const { loading: addingComment, deleteLoading } = useSelector(state => state.comments);
+  const { loading: addingComment, deleteLoading, comments, currentProjectId } = useSelector(state => state.comments);
   const { currentUser } = useSelector(state => state.currentUser);
   
-  const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
   const [showReportModal, setShowReportModal] = useState(false);
   const [reportingComment, setReportingComment] = useState(null);
@@ -28,12 +28,12 @@ const CommentsModal = ({ isOpen, onClose, portfolioId, portfolioTitle }) => {
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [commentToDelete, setCommentToDelete] = useState(null);
 
-  // Initialize empty comments (no GET API available yet)
+  // Fetch comments when modal opens
   useEffect(() => {
-    if (isOpen) {
-      setComments([]);
+    if (isOpen && portfolioSlug) {
+      dispatch(getCommentsThunk(portfolioSlug));
     }
-  }, [isOpen]);
+  }, [isOpen, portfolioSlug, dispatch]);
 
   const handleAddComment = async (e) => {
     e.preventDefault();
@@ -41,19 +41,11 @@ const CommentsModal = ({ isOpen, onClose, portfolioId, portfolioTitle }) => {
 
     try {
       const result = await dispatch(addCommentThunk({ 
-        projectId: portfolioId, 
+        projectSlug: portfolioSlug, 
         content: newComment 
       }));
       
       if (addCommentThunk.fulfilled.match(result)) {
-        // Add the new comment to local state
-        const newCommentData = {
-          id: result.payload.comment.id,
-          user: result.payload.comment.user,
-          content: result.payload.comment.content,
-          created_at: result.payload.comment.created_at
-        };
-        setComments([newCommentData, ...comments]);
         setNewComment("");
         toast.success("Comment added successfully!");
       } else {
@@ -82,8 +74,6 @@ const CommentsModal = ({ isOpen, onClose, portfolioId, portfolioTitle }) => {
       const result = await dispatch(deleteCommentThunk({ commentId }));
       
       if (deleteCommentThunk.fulfilled.match(result)) {
-        // Remove comment from local state
-        setComments(comments.filter(comment => comment.id !== commentId));
         toast.success("Comment deleted successfully!");
       } else {
         const errorMessage = result.payload || "Failed to delete comment. Please try again.";

@@ -14,20 +14,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { getAllCatThunk } from "../store/Categories/thunk/getAllCatThunk";
 import { updatePortfolioThunk } from "../store/updatePortfolio/thunk/updatePortfolioThunk";
 import { getAllTagsThunk } from "../store/tags/thunk/getAllTagsThunk";
-import { createTagThunk } from "../store/tags/thunk/createTagThunk";
 import { getUserPortfoliosThunk } from "../store/userPortfolios/thunk/getUserPortfoliosThunk";
+import { createTagThunk } from "../store/tags/thunk/createTagThunk";
 import { toast } from 'react-toastify';
 
-const commonTags = [
-  "UI/UX",
-  "Illustration",
-  "3D",
-  "Animation",
-  "Photography",
-  "Branding",
-  "Web Design",
-  "Mobile Design",
-];
 
 const EditPortfolio = () => {
   useScrollToTop();
@@ -141,6 +131,7 @@ const EditPortfolio = () => {
     setCustomTag("");
   };
 
+
   // Media helpers
   const addMediaItem = (type) => {
     setMediaItems((prev) => [
@@ -185,7 +176,7 @@ const EditPortfolio = () => {
                 tagIds.push(tagResult.payload.tag.id);
               }
             } catch (error) {
-             
+              console.warn(`Could not create tag: ${tagName}`, error);
             }
           }
         }
@@ -284,6 +275,17 @@ const EditPortfolio = () => {
       </div>
     );
   }
+
+  const commonTags = [
+    "UI/UX",
+    "Illustration",
+    "3D",
+    "Animation",
+    "Photography",
+    "Branding",
+    "Web Design",
+    "Mobile Design",
+  ];
 
   return (
     <section className="py-12 bg-background animate-fade-in">

@@ -121,3 +121,6 @@ import {
     }
   }
 
+  // Alias for deleteChat to match the expected function name in components
+  export const deleteConversation = deleteChat;
+

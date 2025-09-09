@@ -13,11 +13,13 @@ import { formatDistanceToNow } from 'date-fns';
 import * as chatService from '../../services/chatService';
 import { toast } from 'react-toastify';
 import PageTitle from '@/components/PageTitle'
+import { useLocation } from 'react-router-dom';
 const SimpleChat = () => {
   const { currentUser, loading, conversations, selectedConversation, setSelectedConversation } = useChat();
   const [selectedUser, setSelectedUser] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState('conversations');
+  const location = useLocation();
 
   // Update selected user when conversation changes
   useEffect(() => {
@@ -29,6 +31,38 @@ const SimpleChat = () => {
       });
     }
   }, [selectedConversation]);
+
+  // Handle URL parameters for direct user chat
+  useEffect(() => {
+    const urlParams = new URLSearchParams(location.search);
+    const userId = urlParams.get('userId');
+    const userName = urlParams.get('userName');
+    
+    if (userId && userName && currentUser) {
+      // Check if there's an existing conversation with this user
+      const existingConversation = conversations.find(conv => 
+        conv.user.id === userId || conv.user.id === String(userId)
+      );
+      
+      if (existingConversation) {
+        // Select the existing conversation
+        setSelectedConversation(existingConversation);
+        setSelectedUser({
+          id: existingConversation.user.id,
+          name: existingConversation.user.name,
+          chatId: existingConversation.chatId
+        });
+      } else {
+        // Auto-select the user from URL parameters for new conversation
+        setSelectedUser({
+          id: userId,
+          name: decodeURIComponent(userName),
+          chatId: null // Will be created when first message is sent
+        });
+      }
+      setActiveTab('conversations');
+    }
+  }, [location.search, currentUser, conversations]);
 
   const handleUserSelect = (user, chatId) => {
     setSelectedUser({

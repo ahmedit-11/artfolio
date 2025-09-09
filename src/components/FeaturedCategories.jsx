@@ -9,17 +9,24 @@ import { getAllCatThunk } from "../store/Categories/thunk/getAllCatThunk";
 
 const categories = [
   {
-    image: "https://images.unsplash.com/photo-1561070791-2526d30994b5",
+    image: "https://imgs.search.brave.com/FewSCST-gyG0s8fIz-lpl7lxyXrrUdv3ai-2n-WKAVk/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9pbWcu/ZnJlZXBpay5jb20v/cHJlbWl1bS1waG90/by9zdHVubmluZy13/b3JsZC1ncmFwaHkt/ZGF5LWltYWdlcy1j/ZWxlYnJhdGluZy1h/cnQtZ3JhcGh5Xzc2/Mjc4NS0yMDMxNDMu/anBnP3NlbXQ9YWlz/X2h5YnJpZCZ3PTc0/MCZxPTgw",
   },
   {
-    image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085",
+    image: "https://imgs.search.brave.com/2OU-OH4mU2CUpGnv2Z8KfCkAKpkPNM-2-nGnL1ZIlp8/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly90My5m/dGNkbi5uZXQvanBn/LzAwLzYxLzE4LzQy/LzM2MF9GXzYxMTg0/MjA3X1lPZjZXd0tW/MUc1SHNVaVhLYUZx/T01vY1ltR2NIbmpn/LmpwZw",
   },
   {
-    image: "https://images.unsplash.com/photo-1542038784456-1ea8e935640e",
+    image: "https://imgs.search.brave.com/XOMu8bn-fZK7yre6b5EZ54DZFQKFGuKozz0joYmTKHA/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9tZWRp/YS5pc3RvY2twaG90/by5jb20vaWQvMTQ3/Njk3MzAyMC9waG90/by92aWRlby1tYXJr/ZXRpbmctY29uY2Vw/dC13b21hbi1wbGF5/aW5nLXZpZGVvLWNv/bnRlbnQtb25saW5l/LXN0cmVhbWluZy1y/dW5uaW5nLXNob3J0/LWNsaXAtb24uanBn/P3M9NjEyeDYxMiZ3/PTAmaz0yMCZjPW5T/TDFjSjh6Q1NSMWJD/cHgtZHBPZ0p1Q1pV/UHZ2U1FNWTA3dGdz/UnRyc1E9",
   },
   {
-    image: "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5",
+    image: "https://imgs.search.brave.com/tsiNq-ZSxMw0PRn0aStVqIKgdBgThiwkVloxPgjytx0/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9tZWRp/YS5nZXR0eWltYWdl/cy5jb20vaWQvMTI3/MDIxODIxMC9waG90/by9jbG9zZS11cC1j/b21wdXRlci1jb2Rl/LW9uLXNjcmVlbi5q/cGc_cz02MTJ4NjEy/Jnc9MCZrPTIwJmM9/QUl2bklmWG9Eangt/ZW11OG9rRWtpMTNa/MVpBZ1B1WnFBOFhU/al9hTC1tST0",
   },
+  {
+    image: "https://imgs.search.brave.com/skaEVQ4L92MTUvDg9waBuZL0CErjayuuidNQDtjgwws/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9idXJz/dC5zaG9waWZ5Y2Ru/LmNvbS9waG90b3Mv/Y3JlYXRpdmUtZGVz/aWduZXJzLWRlc2su/anBnP3dpZHRoPTEw/MDAmZm9ybWF0PXBq/cGcmZXhpZj0wJmlw/dGM9MA"
+  },
+  {
+    image: "https://imgs.search.brave.com/qpZos8r9hOs4iELw0WEoV5CSGMHGFJrNGPiCD7RA39k/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9tZWRp/YS5pc3RvY2twaG90/by5jb20vaWQvMTE0/OTU5NzA3NS9waG90/by9ncmFwaGljLWRl/c2lnbmVyLWRldmVs/b3BtZW50LXByb2Nl/c3MtZHJhd2luZy1z/a2V0Y2gtZGVzaWdu/LWNyZWF0aXZlLWlk/ZWFzLWRyYWZ0LWxv/Z28tcHJvZHVjdC5q/cGc_cz02MTJ4NjEy/Jnc9MCZrPTIwJmM9/LWRxUUV1LTlockVL/ekEzYi1xbHdvdlpK/OU5qZlJ3M2cxUnIz/Y2U0LTBLVT0"
+  }
+
 ];
 
 

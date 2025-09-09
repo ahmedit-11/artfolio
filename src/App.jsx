@@ -53,7 +53,7 @@ import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import ChangePassword from "./pages/ChangePassword";
 import Settings from "./pages/Settings";
-import Profile from "./pages/Profile";
+import Profile from "./pages/profile/Profile";
 import ProfileSettings from "./pages/ProfileSettings";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";

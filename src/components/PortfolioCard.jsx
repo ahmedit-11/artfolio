@@ -69,7 +69,7 @@ const PortfolioCard = ({
   
   // Handle creator name from user object or direct creator prop
   const creatorName = user?.name || portfolioCreator || 'Unknown';
-  const rawCreatorImg = user?.profile_picture || portfolioCreatorImage;
+  const rawCreatorImg = user?.profile_picture;
   const creatorImg = getProfileImageUrl(rawCreatorImg);
   
   const navigate = useNavigate();
@@ -122,27 +122,35 @@ const PortfolioCard = ({
         </div>
 
         {/* Tags */}
-        <div className="flex flex-wrap gap-2 mb-3">
-          {portfolioTags && portfolioTags.map((tag, index) => (
-            <Tag
-              key={index}
-              size="sm"
-              onClick={onTagClick}
-            >
-              {tag}
-            </Tag>
-          ))}
-        </div>
+        {portfolioTags && portfolioTags.length > 0 && (
+          <div className="flex flex-wrap gap-2 mb-3">
+            {portfolioTags.slice(0, 3).map((tag, index) => (
+              <Tag
+                key={tag.id || index}
+                size="sm"
+                onClick={() => onTagClick?.(tag)}
+                className="text-xs"
+              >
+                {tag.name || tag}
+              </Tag>
+            ))}
+            {portfolioTags.length > 3 && (
+              <span className="text-xs text-muted-foreground self-center">
+                +{portfolioTags.length - 3} more
+              </span>
+            )}
+          </div>
+        )}
 
         {/* Stats */}
         <div className="flex justify-between items-center gap-4 text-sm text-muted-foreground">
             <div className="flex items-center gap-1">
               <Heart className="size-4" />
-              <span>{likes}</span>
+              <span>{portfolioLikes || 0}</span>
             </div>
             <div className="flex   items-center gap-2">
               <MessageCircle className="size-4" />
-              <span>{comments}</span>
+              <span>{portfolioComments || 0}</span>
             </div>
               <div className="flex items-center gap-1" aria-label={`Rating: ${rating} out of 5`}>
                 {[...Array(5)].map((_, index) => {

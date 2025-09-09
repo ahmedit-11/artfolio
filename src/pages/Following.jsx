@@ -1,58 +1,102 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useScrollToTop } from "../utils/scrollToTop";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PortfolioCard from "@/components/PortfolioCard";
 import { useSearch, localSearch } from "@/contexts/SearchContext";
 import PageTitle from "@/components/PageTitle";
-
-const portfolios = [
-  {
-    id: 1,
-    image: "https://images.unsplash.com/photo-1558655146-9f40138edfeb?auto=format&fit=crop&w=800&q=80",
-    title: "Minimalist UI Design Collection",
-    creator: "Alex Johnson",
-    creatorImage: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80",
-    likes: 248,
-    comments: 36,
-    tags: ["UI/UX", "Minimalism"],
-  },
-  {
-    id: 2,
-    image: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80",
-    title: "Abstract Digital Art Series",
-    creator: "Maya Patel",
-    creatorImage: "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=100&q=80",
-    likes: 192,
-    comments: 24,
-    tags: ["Digital Art", "Abstract"],
-  },
-  {
-    id: 3,
-    image: "https://images.unsplash.com/photo-1618556450991-2f1af64e8191?auto=format&fit=crop&w=800&q=80",
-    title: "Brand Identity for Tech Startup",
-    creator: "Daniel Lee",
-    creatorImage: "https://images.unsplash.com/photo-1599566150163-29194dcaad36?auto=format&fit=crop&w=100&q=80",
-    likes: 324,
-    comments: 41,
-    tags: ["Branding", "Logo Design"],
-  },
-  {
-    id: 4,
-    image: "https://images.unsplash.com/photo-1626544827763-d516dce335e2?auto=format&fit=crop&w=800&q=80",
-    title: "3D Character Animation Reel",
-    creator: "Sophie Garcia",
-    creatorImage: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=100&q=80",
-    likes: 176,
-    comments: 19,
-    tags: ["3D", "Animation"],
-  },
-];
+import { getCurrentUserThunk } from "@/store/currentUser/thunk/getCurrentUserThunk";
+import { Button } from "@/components/ui/button";
+import { Users, Heart } from "lucide-react";
+import axios from "axios";
 
 const FollowingPage = () => {
   useScrollToTop();
+  const dispatch = useDispatch();
   const { query } = useSearch();
-  const filtered = localSearch(portfolios, query);
+  
+  const { currentUser } = useSelector(state => state.currentUser);
+  const [followingPortfolios, setFollowingPortfolios] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    dispatch(getCurrentUserThunk());
+  }, [dispatch]);
+
+  // Fetch portfolios from followed users
+  useEffect(() => {
+    const fetchFollowingPortfolios = async () => {
+      if (!currentUser?.following || !Array.isArray(currentUser.following) || currentUser.following.length === 0) {
+        setFollowingPortfolios([]);
+        setLoading(false);
+        return;
+      }
+
+      setLoading(true);
+      try {
+        const portfolioPromises = currentUser.following.map(user => 
+          axios.get(`/users/${user.id}/projects`).catch(err => {
+            console.warn(`Failed to fetch projects for user ${user.id}:`, err);
+            return { data: { projects: [] } };
+          })
+        );
+        
+        const responses = await Promise.all(portfolioPromises);
+        const allPortfolios = responses.flatMap(response => 
+          response.data.projects || []
+        );
+        
+        setFollowingPortfolios(allPortfolios);
+      } catch (error) {
+        console.error('Error fetching following portfolios:', error);
+        setFollowingPortfolios([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    // Add a small delay to ensure currentUser is fully updated after follow/unfollow
+    const timeoutId = setTimeout(fetchFollowingPortfolios, 100);
+    return () => clearTimeout(timeoutId);
+  }, [currentUser?.following]);
+
+  const filtered = followingPortfolios.length > 0 ? localSearch(followingPortfolios, query) : [];
+
+  // Loading skeleton
+  const LoadingSkeleton = () => (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      {[...Array(8)].map((_, index) => (
+        <div key={index} className="animate-pulse">
+          <div className="bg-muted rounded-lg h-48 mb-4"></div>
+          <div className="space-y-2">
+            <div className="h-4 bg-muted rounded w-3/4"></div>
+            <div className="h-3 bg-muted rounded w-1/2"></div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+
+  // Empty state
+  const EmptyState = () => (
+    <div className="text-center py-16">
+      <div className="mx-auto w-24 h-24 bg-muted rounded-full flex items-center justify-center mb-6">
+        <Users className="w-12 h-12 text-muted-foreground" />
+      </div>
+      <h3 className="text-xl font-semibold mb-2">No portfolios from followed users</h3>
+      <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+        Start following creators to see their amazing work here!
+      </p>
+      <Button 
+        onClick={() => window.location.href = '/explore'} 
+        className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+      >
+        <Heart className="w-4 h-4 mr-2" />
+        Discover Creators
+      </Button>
+    </div>
+  );
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <Header />
@@ -62,22 +106,36 @@ const FollowingPage = () => {
             <PageTitle subtitle="Stay updated with your favorite creators and their latest portfolio updates.">
               Following
             </PageTitle>
-            <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 animate-fade-in animation-delay-300">
-              {filtered.map((portfolio, index) => (
-                <PortfolioCard
-                  key={portfolio.id}
-                  className="transition-all duration-500 hover:shadow-lg hover:-translate-y-3 hover:scale-105 hover:shadow-purple-200/40 dark:hover:shadow-purple-900/20 animate-fade-in"
-                  style={{ animationDelay: `${600 + (index * 200)}ms` }}
-                  image={portfolio.image}
-                  title={portfolio.title}
-                  creator={portfolio.creator}
-                  creatorImage={portfolio.creatorImage}
-                  likes={portfolio.likes}
-                  comments={portfolio.comments}
-                  tags={portfolio.tags}
-                />
-              ))}
+            <div className="mt-8">
+              {loading ? (
+                <LoadingSkeleton />
+              ) : followingPortfolios.length === 0 ? (
+                <EmptyState />
+              ) : filtered.length === 0 && query ? (
+                <div className="text-center py-16">
+                  <p className="text-muted-foreground">
+                    No portfolios found matching "{query}"
+                  </p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 animate-fade-in animation-delay-300">
+                  {filtered.map((portfolio, index) => (
+                    <PortfolioCard
+                      key={portfolio.id}
+                      portfolio={portfolio}
+                      className="transition-all duration-500 hover:shadow-lg hover:-translate-y-3 hover:scale-105 hover:shadow-purple-200/40 dark:hover:shadow-purple-900/20 animate-fade-in"
+                      style={{ animationDelay: `${600 + (index * 200)}ms` }}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
+            
+            {!loading && followingPortfolios.length > 0 && (
+              <div className="mt-8 text-center text-sm text-muted-foreground">
+                Showing {filtered.length} of {followingPortfolios.length} portfolios
+              </div>
+            )}
           </div>
         </section>
       </main>

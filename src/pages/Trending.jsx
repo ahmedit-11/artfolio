@@ -1,55 +1,25 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useScrollToTop } from "../utils/scrollToTop";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PortfolioCard from "@/components/PortfolioCard";
 import PageTitle from "@/components/PageTitle";
-
-const portfolios = [
-  {
-    id: 1,
-    image: "https://images.unsplash.com/photo-1558655146-9f40138edfeb?auto=format&fit=crop&w=800&q=80",
-    title: "Minimalist UI Design Collection",
-    creator: "Alex Johnson",
-    creatorImage: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80",
-    likes: 248,
-    comments: 36,
-    tags: ["UI/UX", "Minimalism"],
-  },
-  {
-    id: 2,
-    image: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80",
-    title: "Abstract Digital Art Series",
-    creator: "Maya Patel",
-    creatorImage: "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=100&q=80",
-    likes: 192,
-    comments: 24,
-    tags: ["Digital Art", "Abstract"],
-  },
-  {
-    id: 3,
-    image: "https://images.unsplash.com/photo-1618556450991-2f1af64e8191?auto=format&fit=crop&w=800&q=80",
-    title: "Brand Identity for Tech Startup",
-    creator: "Daniel Lee",
-    creatorImage: "https://images.unsplash.com/photo-1599566150163-29194dcaad36?auto=format&fit=crop&w=100&q=80",
-    likes: 324,
-    comments: 41,
-    tags: ["Branding", "Logo Design"],
-  },
-  {
-    id: 4,
-    image: "https://images.unsplash.com/photo-1626544827763-d516dce335e2?auto=format&fit=crop&w=800&q=80",
-    title: "3D Character Animation Reel",
-    creator: "Sophie Garcia",
-    creatorImage: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=100&q=80",
-    likes: 176,
-    comments: 19,
-    tags: ["3D", "Animation"],
-  },
-];
+import { getTrendingProjectsThunk } from "@/store/trending/thunk/getTrendingProjectsThunk";
+import { TrendingUp } from "lucide-react";
 
 const TrendingPage = () => {
   useScrollToTop();
+  const dispatch = useDispatch();
+  const { projects, loading, error } = useSelector(state => state.trending);
+
+  useEffect(() => {
+    // Fetch trending projects if not already loaded
+    if (!projects.length) {
+      dispatch(getTrendingProjectsThunk());
+    }
+  }, [dispatch, projects.length]);
+
   return (
     <div className="flex flex-col min-h-screen bg-background bg-background">
       <Header />
@@ -59,22 +29,55 @@ const TrendingPage = () => {
             <PageTitle subtitle="Explore the most popular and trending portfolios that are making waves in the creative community.">
               Trending Now
             </PageTitle>
-            <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 animate-fade-in animation-delay-300">
-              {portfolios.map((portfolio, index) => (
-                <PortfolioCard
-                  key={portfolio.id}
-                  className="transition-all duration-500 hover:shadow-lg hover:-translate-y-3 hover:scale-105 hover:shadow-purple-200/40 dark:hover:shadow-purple-900/20 animate-fade-in"
-                  style={{ animationDelay: `${600 + (index * 200)}ms` }}
-                  image={portfolio.image}
-                  title={portfolio.title}
-                  creator={portfolio.creator}
-                  creatorImage={portfolio.creatorImage}
-                  likes={portfolio.likes}
-                  comments={portfolio.comments}
-                  tags={portfolio.tags}
-                />
-              ))}
-            </div>
+            
+            {/* Loading State */}
+            {loading && !projects.length && (
+              <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                {[...Array(8)].map((_, index) => (
+                  <div key={index} className="animate-pulse">
+                    <div className="aspect-[4/3] bg-gray-200 rounded-xl mb-4"></div>
+                    <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                    <div className="h-3 bg-gray-200 rounded w-3/4"></div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Error State */}
+            {error && (
+              <div className="mt-8 text-center py-12">
+                <TrendingUp className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                <p className="text-red-500 mb-4">Failed to load trending projects: {error}</p>
+                <button 
+                  onClick={() => dispatch(getTrendingProjectsThunk())}
+                  className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+                >
+                  Try Again
+                </button>
+              </div>
+            )}
+
+            {/* Projects Grid */}
+            {!loading && !error && projects.length > 0 && (
+              <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 animate-fade-in animation-delay-300">
+                {projects.map((project, index) => (
+                  <PortfolioCard
+                    key={project.id}
+                    portfolio={project}
+                   
+                    style={{ animationDelay: `${600 + (index * 200)}ms` }}
+                  />
+                ))}
+              </div>
+            )}
+
+            {/* Empty State */}
+            {!loading && !error && projects.length === 0 && (
+              <div className="mt-8 text-center py-12">
+                <TrendingUp className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-500">No trending projects found</p>
+              </div>
+            )}
           </div>
         </section>
       </main>

@@ -142,13 +142,14 @@ const SearchResults = ({
         {sortedResults.map((item) => (
           <PortfolioCard
             key={item.id}
-            image={item.image}
-            title={item.title}
-            creator={item.creator}
-            creatorImage={item.creatorImage}
-            likes={item.likes}
-            comments={item.comments}
-            tags={item.tags}
+            portfolioData={{
+              cover_image: item.image,
+              title: item.title,
+              user: { name: item.creator, profile_picture: item.creatorImage },
+              likes_count: item.likes,
+              comments_count: item.comments,
+              tags: item.tags
+            }}
             className="transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:shadow-purple-200/40 dark:hover:shadow-purple-900/20"
             onCardClick={() => onItemClick(item)}
             onCreatorClick={() => onCreatorClick(item.creator)}

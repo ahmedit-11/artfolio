@@ -1,53 +1,25 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Button } from "@/components/ui/button";
 import { ChevronRight } from "lucide-react";
 import PortfolioCard from "./PortfolioCard";
 import { Link } from "react-router-dom";
-
-const portfolios = [
-  {
-    id: 1,
-    image: "https://images.unsplash.com/photo-1558655146-9f40138edfeb?auto=format&fit=crop&w=800&q=80",
-    title: "Minimalist UI Design Collection",
-    creator: "Alex Johnson",
-    creatorImage: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80",
-    likes: 248,
-    comments: 36,
-    tags: ["UI/UX", "Minimalism"],
-  },
-  {
-    id: 2,
-    image: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80",
-    title: "Abstract Digital Art Series",
-    creator: "Maya Patel",
-    creatorImage: "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=100&q=80",
-    likes: 192,
-    comments: 24,
-    tags: ["Digital Art", "Abstract"],
-  },
-  {
-    id: 3,
-    image: "https://images.unsplash.com/photo-1618556450991-2f1af64e8191?auto=format&fit=crop&w=800&q=80",
-    title: "Brand Identity for Tech Startup",
-    creator: "Daniel Lee",
-    creatorImage: "https://images.unsplash.com/photo-1599566150163-29194dcaad36?auto=format&fit=crop&w=100&q=80",
-    likes: 324,
-    comments: 41,
-    tags: ["Branding", "Logo Design"],
-  },
-  {
-    id: 4,
-    image: "https://images.unsplash.com/photo-1626544827763-d516dce335e2?auto=format&fit=crop&w=800&q=80",
-    title: "3D Character Animation Reel",
-    creator: "Sophie Garcia",
-    creatorImage: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=100&q=80",
-    likes: 176,
-    comments: 19,
-    tags: ["3D", "Animation"],
-  },
-];
+import { getTrendingProjectsThunk } from "@/store/trending/thunk/getTrendingProjectsThunk";
 
 const TrendingPortfolios = () => {
+  const dispatch = useDispatch();
+  const { projects, loading, error } = useSelector(state => state.trending);
+
+  useEffect(() => {
+    // Fetch trending projects if not already loaded
+    if (!projects.length) {
+      dispatch(getTrendingProjectsThunk());
+    }
+  }, [dispatch, projects.length]);
+
+  // Display only top 4 trending projects
+  const topFourProjects = projects.slice(0, 4);
+
   return (
     <section className="py-16 bg-gradient-to-br from-slate-200/50  to-purple-200/50 dark:bg-gradient-to-br dark:from-purple-900/15 dark:via-indigo-900/20 dark:to-background">
       <div className="container px-4 mx-auto">
@@ -61,22 +33,52 @@ const TrendingPortfolios = () => {
             </Button>
           </Link>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {portfolios.map((portfolio) => (
-            <PortfolioCard
-              key={portfolio.id}
-              id={portfolio.id}
-              image={portfolio.image}
-              title={portfolio.title}
-              creator={portfolio.creator}
-              creatorImage={portfolio.creatorImage}
-              likes={portfolio.likes}
-              comments={portfolio.comments}
-              tags={portfolio.tags}
-              className="transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:shadow-purple-200/40 dark:hover:shadow-purple-900/20"
-            />
-          ))}
-        </div>
+
+        {/* Loading State */}
+        {loading && !projects.length && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[...Array(4)].map((_, index) => (
+              <div key={index} className="animate-pulse">
+                <div className="aspect-[4/3] bg-gray-200 rounded-xl mb-4"></div>
+                <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                <div className="h-3 bg-gray-200 rounded w-3/4"></div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Error State */}
+        {error && (
+          <div className="text-center py-8">
+            <p className="text-red-500 mb-4">Failed to load trending projects</p>
+            <button 
+              onClick={() => dispatch(getTrendingProjectsThunk())}
+              className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition-colors"
+            >
+              Try Again
+            </button>
+          </div>
+        )}
+
+        {/* Projects Grid - Top 4 */}
+        {!loading && !error && topFourProjects.length > 0 && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {topFourProjects.map((project) => (
+              <PortfolioCard
+                key={project.id}
+                portfolio={project}
+                className="transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:shadow-purple-200/40 dark:hover:shadow-purple-900/20"
+              />
+            ))}
+          </div>
+        )}
+
+        {/* Empty State */}
+        {!loading && !error && projects.length === 0 && (
+          <div className="text-center py-8">
+            <p className="text-gray-500">No trending projects available</p>
+          </div>
+        )}
       </div>
     </section>
   );

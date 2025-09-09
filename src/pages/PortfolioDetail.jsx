@@ -35,7 +35,9 @@ import { Card } from "@/components/ui/card";
 import { FaStar } from 'react-icons/fa';
 import { useScrollToTop } from '../utils/scrollToTop';
 import { useDispatch, useSelector } from 'react-redux';
-import { getPortfolioDetailsThunk } from '@/store/portfolioDetails/thunk/getPortfolioDetailsThunk';
+import { getPortfolioDetailsThunk } from "@/store/portfolioDetails/thunk/getPortfolioDetailsThunk";
+import { getLikeStatusThunk } from "@/store/social/thunk/getLikeStatusThunk";
+import { getRatingsThunk } from "@/store/ratings/thunk/getRatingsThunk";
 import { getPortfolioMediaUrl, getProfileImageUrl } from '../utils/mediaUtils';
 import { cn } from "@/lib/utils";
 import { reportAPI } from "@/lib/api";
@@ -50,6 +52,8 @@ import AudioPlayer from "@/components/AudioPlayer";
 import PageTitle from "@/components/PageTitle";
 import CommentsModal from "@/components/CommentsModal";
 import ReportModal from "@/components/ReportModal";
+import LikeButton from "@/components/LikeButton";
+import CommentButton from "@/components/CommentButton";
 
 const PortfolioDetail = () => {
   useScrollToTop();
@@ -59,16 +63,15 @@ const PortfolioDetail = () => {
   
   // All state hooks must be declared at the top level
   const [isClosing, setIsClosing] = useState(false);
-  const [isLiked, setIsLiked] = useState(false);
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [showComments, setShowComments] = useState(false);
-  const [likes, setLikes] = useState(0);
   const [showReportModal, setShowReportModal] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   
   const { data: portfolio, loading, error } = useSelector(state => state.portfolioDetails);
+  const { averageRating, ratingsCount } = useSelector(state => state.ratings);
 
   // Fetch portfolio data on component mount
   useEffect(() => {
@@ -77,14 +80,15 @@ const PortfolioDetail = () => {
     }
   }, [slug, dispatch]);
 
-  // Debug: Log portfolio data when it changes
- 
-  // Initialize likes from portfolio data
+  // Fetch like status and ratings when portfolio loads
   useEffect(() => {
-    if (portfolio) {
-      setLikes(portfolio.likes_count || 0);
+    if (portfolio?.slug) {
+      dispatch(getLikeStatusThunk(portfolio.slug));
+      dispatch(getRatingsThunk(portfolio.slug));
     }
-  }, [portfolio]);
+  }, [portfolio?.slug, dispatch]);
+
+  // Debug: Log portfolio data when it changes
 
   // Reset image index when portfolio changes
   useEffect(() => {
@@ -141,14 +145,6 @@ const PortfolioDetail = () => {
 
   // Image navigation is now handled by ImageGallery component
 
-  const handleLike = () => {
-    if (isLiked) {
-      setLikes(prev => prev - 1);
-    } else {
-      setLikes(prev => prev + 1);
-    }
-    setIsLiked(!isLiked);
-  };
 
   const handleShare = () => {
     navigator.clipboard.writeText(window.location.href);
@@ -374,29 +370,15 @@ const PortfolioDetail = () => {
                 <div className="flex flex-col gap-4  items-center justify-between">
                 <div className="grid grid-cols-2 justify-center gap-4">
 
-                  <Button
-                    variant="ghost"
-                    onClick={handleLike}
-                    className={cn(
-                      "text-center p-3 bg-purple-50 dark:bg-purple-900/10 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-900/20 h-auto flex flex-col transition-all duration-200",
-                      isLiked && "text-purple-600"
-                    )}
-                  >
-                    <Heart className={cn("size-5 mx-auto mb-2 transition-all text-purple-600 duration-200", isLiked && "fill-current")} />
-                    <div className="font-semibold">{likes}</div>
-                    <div className="text-sm text-muted-foreground">Likes</div>
-                  </Button>
-                  <Button
-                    variant="ghost"
+                  <LikeButton 
+                    projectId={portfolio.slug}
+                    likesCount={portfolio.likes_count || 0}
+                  />
+                  <CommentButton 
+                    projectSlug={portfolio.slug}
+                    commentsCount={portfolio.comments_count || 0}
                     onClick={() => setShowComments(true)}
-                    className="text-center p-3 bg-purple-50 dark:bg-purple-900/10 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-900/20 h-auto flex flex-col transition-all duration-200"
-                  >
-                    <MessageCircle className="size-5 mx-auto mb-2 text-purple-600" />
-                    <div className="font-semibold">
-                      {portfolio.comments_count || 0}
-                    </div>
-                    <div className="text-sm text-muted-foreground">Comments</div>
-                  </Button>
+                  />
                   <div className="text-center p-3 bg-purple-50 dark:bg-purple-900/10 rounded-lg">
                                 <Calendar className="ssize-5 mx-auto mb-2 text-purple-600" />
     
@@ -405,7 +387,7 @@ const PortfolioDetail = () => {
                   </div>
                   <div className="text-center items-center  align-center  p-3 bg-purple-50 dark:bg-purple-900/10 rounded-lg">
                     <Star className="size-5 mx-auto mb-2  text-purple-600" />
-                    <div className="font-semibold">{portfolio.average_rating || '0.0'}</div>
+                    <div className="font-semibold">{averageRating || portfolio.average_rating || '0.0'}</div>
                     <div className="text-sm text-muted-foreground">Avg Rating</div>
                   </div>
                 </div>
@@ -413,8 +395,14 @@ const PortfolioDetail = () => {
               </div>
             </Card>
 
-            {/* Tags */}
+            {/* Rating */}
             <Card className="p-6 animate-fade-in animation-delay-1350">
+              <h3 className="font-semibold mb-4">Rate this Project</h3>
+              <StarRating projectSlug={portfolio.slug} />
+            </Card>
+
+            {/* Tags */}
+            <Card className="p-6 animate-fade-in animation-delay-1400">
               <h3 className="font-semibold mb-4">Tags</h3>
               <div className="flex flex-wrap gap-2">
                 {portfolio.tags?.map((tag) => (
@@ -424,12 +412,7 @@ const PortfolioDetail = () => {
                 ))}
               </div>
             </Card>
-            {/* Ratings */}
-                        <Card className="p-6 animate-fade-in animation-delay-1500">
-                          <h3 className="font-semibold mb-3">Rate this portfolio</h3>
-                          <StarRating 
-                          />
-                        </Card>
+          
 
            
           </div>
@@ -440,7 +423,7 @@ const PortfolioDetail = () => {
       <CommentsModal
         isOpen={showComments}
         onClose={() => setShowComments(false)}
-        portfolioId={portfolio.id}
+        portfolioSlug={portfolio.slug}
         portfolioTitle={portfolio.title}
       />
 

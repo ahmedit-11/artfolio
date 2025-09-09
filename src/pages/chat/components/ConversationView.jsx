@@ -14,8 +14,9 @@ const ConversationView = ({ selectedUserId, selectedUserName }) => {
   const { currentUser, selectedConversation, messages, sendMessage, markMessagesAsRead, userProfiles, typingUsers, setTypingStatus } = useChat();
   const [chatId, setChatId] = useState(null);
 
-  // Get messages from context - messages is already filtered for selectedConversation in ChatContext
-  const currentMessages = messages || [];
+  // Get messages from context for the selected conversation
+  const currentMessages = selectedConversation?.chatId ? (messages[selectedConversation.chatId] || []) : [];
+  
 
   // Scroll to bottom when messages change
   const scrollToBottom = () => {
@@ -49,28 +50,24 @@ const ConversationView = ({ selectedUserId, selectedUserName }) => {
       const newChatId = chatService.makeChatId(String(currentUser.id), String(selectedUserId));
       setChatId(newChatId);
       
-      // Mark messages as read when opening conversation
-      markMessagesAsRead(selectedConversation.chatId);
+      // Mark messages as read when opening conversation (only if conversation exists)
+      if (selectedConversation?.chatId) {
+        markMessagesAsRead(selectedConversation.chatId);
+      }
     }
   }, [selectedUserId, currentUser?.id, selectedConversation]);
 
   const handleSendMessage = async () => {
-    if (!messageText.trim() || !chatId) return;
+    if (!messageText.trim()) return;
 
     const tempMessage = messageText.trim();
     setMessageText('');
     setLoading(true);
 
     try {
-      // Create or get chat first
-      await chatService.createOrGetChat(String(currentUser.id), String(selectedUserId));
-      
-      // Send the message
-      await chatService.sendMessage(
-        chatId,
-        String(currentUser.id),
-        tempMessage
-      );
+      // Use the sendMessage from ChatContext which handles the conversation creation and message sending
+      // Pass selectedUserId for new conversations
+      await sendMessage(tempMessage, selectedUserId);
     } catch (error) {
       console.error('Error sending message:', error);
       setMessageText(tempMessage); // Restore message on error

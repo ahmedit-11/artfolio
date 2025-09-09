@@ -1,8 +1,9 @@
 import React from "react";
 import { Card } from "@/components/ui/card";
 import { Eye, Heart, MessageCircle, Calendar } from "lucide-react";
+import LikeButton from "@/components/LikeButton";
 
-const PortfolioStats = ({ likes, comments, views, createdAt }) => {
+const PortfolioStats = ({ projectId, likes, comments, views, createdAt }) => {
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -17,10 +18,14 @@ const PortfolioStats = ({ likes, comments, views, createdAt }) => {
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <Heart className="size-4 text-red-500" />
             <span className="text-sm">Likes</span>
           </div>
-          <span className="font-medium">{likes.toLocaleString()}</span>
+          <LikeButton 
+            projectId={projectId}
+            likesCount={likes || 0}
+            variant="ghost"
+            size="sm"
+          />
         </div>
         
         <div className="flex items-center justify-between">

@@ -1,9 +1,12 @@
 // Following.jsx
 // Displays a section of portfolio items that the user is following, with a title, view all button, and a grid of portfolio cards.
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Button } from "@/components/ui/button";
 import { ChevronRight } from "lucide-react";
 import PortfolioCard from "./PortfolioCard";
+import { getCurrentUserThunk } from "@/store/currentUser/thunk/getCurrentUserThunk";
+import axios from "axios";
 
 // Following component renders a section of portfolio items with interactive features
 const Following = ({ 
@@ -15,50 +18,57 @@ const Following = ({
   onCreatorClick = () => {},
   onLikeClick = () => {},
   onCommentClick = () => {},
-  onTagClick = () => {},
-  items = [
-    {
-      id: 1,
-      title: "Minimalist UI Design Collection",
-      creator: "Alex Johnson",
-      creatorImage: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80",
-      image: "https://images.unsplash.com/photo-1558655146-9f40138edfeb?auto=format&fit=crop&w=800&q=80",
-      likes: 248,
-      comments: 36,
-      tags: ["UI/UX", "Minimalism"],
-    },
-    {
-      id: 2,
-      title: "Abstract Digital Art Series",
-      creator: "Maya Patel",
-      creatorImage: "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=100&q=80",
-      image: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80",
-      likes: 192,
-      comments: 24,
-      tags: ["Digital Art", "Abstract"],
-    },
-    {
-      id: 3,
-      title: "Brand Identity for Tech Startup",
-      creator: "Daniel Lee",
-      creatorImage: "https://images.unsplash.com/photo-1599566150163-29194dcaad36?auto=format&fit=crop&w=100&q=80",
-      image: "https://images.unsplash.com/photo-1618556450991-2f1af64e8191?auto=format&fit=crop&w=800&q=80",
-      likes: 324,
-      comments: 41,
-      tags: ["Branding", "Logo Design"],
-    },
-    {
-      id: 4,
-      title: "3D Character Animation Reel",
-      creator: "Sophie Garcia",
-      creatorImage: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=100&q=80",
-      image: "https://images.unsplash.com/photo-1626544827763-d516dce335e2?auto=format&fit=crop&w=800&q=80",
-      likes: 176,
-      comments: 19,
-      tags: ["3D", "Animation"],
-    },
-  ]
+  onTagClick = () => {}
 }) => {
+  const dispatch = useDispatch();
+  const { currentUser } = useSelector(state => state.currentUser);
+  const [followingPortfolios, setFollowingPortfolios] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    dispatch(getCurrentUserThunk());
+  }, [dispatch]);
+
+  // Fetch portfolios from followed users
+  useEffect(() => {
+    const fetchFollowingPortfolios = async () => {
+      if (!currentUser?.following || !Array.isArray(currentUser.following) || currentUser.following.length === 0) {
+        setFollowingPortfolios([]);
+        setLoading(false);
+        return;
+      }
+
+      setLoading(true);
+      try {
+        const portfolioPromises = currentUser.following.map(user => 
+          axios.get(`/users/${user.id}/projects`).catch(err => {
+            console.warn(`Failed to fetch projects for user ${user.id}:`, err);
+            return { data: { projects: [] } };
+          })
+        );
+        
+        const responses = await Promise.all(portfolioPromises);
+        const allPortfolios = responses.flatMap(response => 
+          response.data.projects || []
+        );
+        
+        // Sort by creation date and take first 4
+        const sortedPortfolios = allPortfolios.sort((a, b) => 
+          new Date(b.created_at) - new Date(a.created_at)
+        );
+        
+        setFollowingPortfolios(sortedPortfolios.slice(0, 4));
+      } catch (error) {
+        console.error('Error fetching following portfolios:', error);
+        setFollowingPortfolios([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const timeoutId = setTimeout(fetchFollowingPortfolios, 100);
+    return () => clearTimeout(timeoutId);
+  }, [currentUser?.following]);
   return (
     <section className={`py-16 bg-gradient-to-br from-slate-200/50  to-purple-200/50 dark:bg-gradient-to-br dark:from-purple-900/15 dark:via-indigo-900/20 dark:to-background ${className || ''}`}>
       <div className="container mx-auto px-4">
@@ -76,25 +86,39 @@ const Following = ({
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 bg-secondary\/50">
-          {items.map((item) => (
-            <PortfolioCard
-              key={item.id}
-              id={item.id}
-              image={item.image}
-              title={item.title}
-              creator={item.creator}
-              creatorImage={item.creatorImage}
-              likes={item.likes}
-              comments={item.comments}
-              tags={item.tags}
-              className="transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:shadow-purple-200/40 dark:hover:shadow-purple-900/20"
-              onCardClick={() => onItemClick(item)}
-              onCreatorClick={() => onCreatorClick(item.creator)}
-              onLikeClick={() => onLikeClick(item)}
-              onCommentClick={() => onCommentClick(item)}
-              onTagClick={(tag) => onTagClick(tag, item)}
-            />
-          ))}
+          {loading ? (
+            // Loading skeleton
+            [...Array(4)].map((_, index) => (
+              <div key={index} className="animate-pulse">
+                <div className="bg-muted rounded-lg h-48 mb-4"></div>
+                <div className="space-y-2">
+                  <div className="h-4 bg-muted rounded w-3/4"></div>
+                  <div className="h-3 bg-muted rounded w-1/2"></div>
+                </div>
+              </div>
+            ))
+          ) : followingPortfolios.length === 0 ? (
+            // Empty state
+            <div className="col-span-full text-center py-12">
+              <p className="text-muted-foreground">
+                Follow some creators to see their latest portfolios here
+              </p>
+            </div>
+          ) : (
+            // Real portfolio data
+            followingPortfolios.map((portfolio) => (
+              <PortfolioCard
+                key={portfolio.id}
+                portfolio={portfolio}
+                className="transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:shadow-purple-200/40 dark:hover:shadow-purple-900/20"
+                onCardClick={() => onItemClick(portfolio)}
+                onCreatorClick={() => onCreatorClick(portfolio.user?.name)}
+                onLikeClick={() => onLikeClick(portfolio)}
+                onCommentClick={() => onCommentClick(portfolio)}
+                onTagClick={(tag) => onTagClick(tag, portfolio)}
+              />
+            ))
+          )}
         </div>
       </div>
     </section>

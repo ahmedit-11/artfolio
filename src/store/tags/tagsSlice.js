@@ -1,6 +1,9 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { getAllTagsThunk } from "./thunk/getAllTagsThunk";
 import { createTagThunk } from "./thunk/createTagThunk";
+import { addTagToProjectThunk } from "./thunk/addTagToProjectThunk";
+import { updateProjectTagsThunk } from "./thunk/updateProjectTagsThunk";
+import { removeTagFromProjectThunk } from "./thunk/removeTagFromProjectThunk";
 
 const initialState = {
   tags: [],
@@ -8,6 +11,8 @@ const initialState = {
   error: null,
   createLoading: false,
   createError: null,
+  projectTagLoading: false,
+  projectTagError: null,
 };
 
 const tagsSlice = createSlice({
@@ -46,6 +51,55 @@ const tagsSlice = createSlice({
       .addCase(createTagThunk.rejected, (state, action) => {
         state.createLoading = false;
         state.createError = action.payload;
+      })
+
+    // Add Tag to Project
+    builder
+      .addCase(addTagToProjectThunk.pending, (state) => {
+        state.projectTagLoading = true;
+        state.projectTagError = null;
+      })
+      .addCase(addTagToProjectThunk.fulfilled, (state, action) => {
+        state.projectTagLoading = false;
+        // Add the new tag to tags array if it doesn't exist
+        if (action.payload && action.payload.tag) {
+          const existingTag = state.tags.find(tag => tag.id === action.payload.tag.id);
+          if (!existingTag) {
+            state.tags.push(action.payload.tag);
+          }
+        }
+      })
+      .addCase(addTagToProjectThunk.rejected, (state, action) => {
+        state.projectTagLoading = false;
+        state.projectTagError = action.payload;
+      })
+
+    // Update Project Tags
+    builder
+      .addCase(updateProjectTagsThunk.pending, (state) => {
+        state.projectTagLoading = true;
+        state.projectTagError = null;
+      })
+      .addCase(updateProjectTagsThunk.fulfilled, (state) => {
+        state.projectTagLoading = false;
+      })
+      .addCase(updateProjectTagsThunk.rejected, (state, action) => {
+        state.projectTagLoading = false;
+        state.projectTagError = action.payload;
+      })
+
+    // Remove Tag from Project
+    builder
+      .addCase(removeTagFromProjectThunk.pending, (state) => {
+        state.projectTagLoading = true;
+        state.projectTagError = null;
+      })
+      .addCase(removeTagFromProjectThunk.fulfilled, (state) => {
+        state.projectTagLoading = false;
+      })
+      .addCase(removeTagFromProjectThunk.rejected, (state, action) => {
+        state.projectTagLoading = false;
+        state.projectTagError = action.payload;
       });
   },
 });

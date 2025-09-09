@@ -15,6 +15,9 @@ import portfolioDetails from "./portfolioDetails/portfolioDetailsSlice"
 import comments from "./comments/commentsSlice"
 import dashboard from "./dashboard/dashboardSlice"
 import categoryPortfolios from "./categoryPortfolios/categoryPortfoliosSlice"
+import social from "./social/socialSlice"
+import ratings from "./ratings/ratingsSlice"
+import trending from "./trending/trendingSlice"
 import {
   FLUSH,
   PAUSE,
@@ -89,6 +92,20 @@ const persistCategoryPortfolios = {
   storage
 }
 
+const persistSocial = {
+  key: "social",
+  storage
+}
+
+const persistRatings = {
+  key: "ratings",
+  storage
+}
+
+const persistTrending = {
+  key: "trending",
+  storage
+}
 
 const rootReducer = combineReducers({
       allPortfolio: persistReducer(persistAllPortfolio, allPortfolio),
@@ -106,6 +123,9 @@ const rootReducer = combineReducers({
       comments: persistReducer(persistComments, comments),
       dashboard: persistReducer(persistDashboard, dashboard),
       categoryPortfolios: persistReducer(persistCategoryPortfolios, categoryPortfolios),
+      social: persistReducer(persistSocial, social),
+      ratings: persistReducer(persistRatings, ratings),
+      trending: persistReducer(persistTrending, trending),
     });
 export const store = configureStore({
   reducer: rootReducer,
@@ -114,6 +134,7 @@ export const store = configureStore({
       serializableCheck: {
         ignoreActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
       },
+      immutableCheck: false, // Disable in development to improve performance
     }),
 });
 export const persistor = persistStore(store);

@@ -167,7 +167,6 @@ useEffect(()=>{
         formData.append('media[]', item.value);
       });
 
-
       // Step 3: Submit the portfolio
       const result = await dispatch(createPortfolioThunk(formData));
       

@@ -306,11 +306,30 @@ export const ChatProvider = ({ children }) => {
     
   };
 
-  const handleSendMessage = async (messageText) => {
-    if (!selectedConversation?.chatId || !messageText.trim() || !currentUser?.id) return;
+  const handleSendMessage = async (messageText, otherUserId = null) => {
+    if (!messageText.trim() || !currentUser?.id) {
+      return;
+    }
 
     try {
-      await chatService.sendMessage(selectedConversation.chatId, String(currentUser.id), messageText.trim());
+      let chatId = selectedConversation?.chatId;
+      
+      // If no chatId but we have otherUserId, create or get the chat
+      if (!chatId && otherUserId) {
+        chatId = await chatService.createOrGetChat(String(currentUser.id), String(otherUserId));
+        
+        // Start new chat to set up the conversation
+        const newConversation = await startNewChat(otherUserId);
+        if (newConversation) {
+          chatId = newConversation.chatId;
+        }
+      }
+      
+      if (!chatId) {
+        return;
+      }
+
+      await chatService.sendMessage(chatId, String(currentUser.id), messageText.trim());
       
       // Update last message in conversation list
       setConversations(prev =>
@@ -455,7 +474,7 @@ export const ChatProvider = ({ children }) => {
     conversations,
     selectedConversation,
     setSelectedConversation: handleConversationSelect,
-    messages: selectedConversation ? messages[selectedConversation.chatId] || [] : [],
+    messages,
     loading: loading || authLoading,
     currentUser,
     sendMessage: handleSendMessage,
