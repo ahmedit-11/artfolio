@@ -89,6 +89,7 @@ const persistCategoryPortfolios = {
   storage
 }
 
+
 const rootReducer = combineReducers({
       allPortfolio: persistReducer(persistAllPortfolio, allPortfolio),
       categories: persistReducer(persistCategories, categories),
@@ -104,7 +105,7 @@ const rootReducer = combineReducers({
       portfolioDetails: persistReducer(persistPortfolioDetails, portfolioDetails),
       comments: persistReducer(persistComments, comments),
       dashboard: persistReducer(persistDashboard, dashboard),
-      categoryPortfolios: persistReducer(persistCategoryPortfolios, categoryPortfolios)
+      categoryPortfolios: persistReducer(persistCategoryPortfolios, categoryPortfolios),
     });
 export const store = configureStore({
   reducer: rootReducer,

@@ -4,9 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Calendar, LinkIcon, MapPin, ExternalLink, Edit, MessageCircle, UserPlus, UserMinus, Settings, Share2, MoreHorizontal, Users, Heart, Eye, Clock,Twitter,Facebook,Linkedin,Github,Instagram,Globe,Plus,Trash2,Loader2,Edit3 } from 'lucide-react';
 import BioWithLinks from '../components/BioWithLinks';
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getCurrentUserThunk } from "@/store/currentUser/thunk/getCurrentUserThunk";
+import { getUserByIdThunk } from "@/store/users/thunk/getUserByIdThunk";
 import { getUserPortfoliosThunk } from "@/store/userPortfolios/thunk/getUserPortfoliosThunk";
 import { deletePortfolioThunk } from "@/store/deletePortfolio/thunk/deletePortfolioThunk";
 import { useEffect, useState } from "react";
@@ -30,8 +31,10 @@ const Profile = () => {
   useScrollToTop();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { userId } = useParams(); // Get userId from URL params
   
-  const { currentUser, error, loading } = useSelector(state => state.currentUser);
+  const { currentUser, error: currentUserError, loading: currentUserLoading } = useSelector(state => state.currentUser);
+  const { userById, userByIdLoading, userByIdError } = useSelector(state => state.users);
   const { data: userPortfolios, loading: portfoliosLoading, error: portfoliosError } = useSelector(state => state.userPortfolios);
   const { loading: deleteLoading } = useSelector(state => state.deletePortfolio);
   
@@ -39,15 +42,32 @@ const Profile = () => {
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [portfolioToDelete, setPortfolioToDelete] = useState(null);
 
-  useEffect(() => {
-    dispatch(getCurrentUserThunk());
-  }, [dispatch])
+  // Determine if we're viewing current user's profile or another user's profile
+  const isOwnProfile = !userId;
+  const profileUserId = userId || currentUser?.id;
+  
+  // Get the appropriate user data
+  const profileUser = isOwnProfile ? currentUser : userById[userId];
+  const profileLoading = isOwnProfile ? currentUserLoading : userByIdLoading[userId];
+  const profileError = isOwnProfile ? currentUserError : userByIdError[userId];
 
   useEffect(() => {
-    if (currentUser?.id) {
-      dispatch(getUserPortfoliosThunk(currentUser.id));
+    // Always fetch current user data for authentication and comparison
+    dispatch(getCurrentUserThunk());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (userId && userId !== currentUser?.id) {
+      // Fetch other user's data if viewing someone else's profile
+      dispatch(getUserByIdThunk(userId));
     }
-  }, [dispatch, currentUser?.id])
+  }, [dispatch, userId, currentUser?.id]);
+
+  useEffect(() => {
+    if (profileUserId) {
+      dispatch(getUserPortfoliosThunk(profileUserId));
+    }
+  }, [dispatch, profileUserId])
 
   // Handle portfolio deletion
   const handleDeletePortfolio = (portfolioId) => {
@@ -61,7 +81,7 @@ const Profile = () => {
         await dispatch(deletePortfolioThunk(portfolioToDelete));
         toast.success('Portfolio deleted successfully!');
         // Refresh portfolios after deletion
-        dispatch(getUserPortfoliosThunk(currentUser.id));
+        dispatch(getUserPortfoliosThunk(profileUserId));
       } catch (error) {
         console.error('Failed to delete portfolio:', error);
         toast.error('Failed to delete portfolio. Please try again.');
@@ -78,7 +98,7 @@ const Profile = () => {
   };
   
   // Show loading state
-  if (loading) {
+  if (profileLoading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="flex items-center gap-3">
@@ -90,12 +110,18 @@ const Profile = () => {
   }
   
   // Show error state
-  if (error) {
+  if (profileError) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <p className="text-lg text-red-500 mb-4">Error loading profile: {typeof error === 'string' ? error : 'Something went wrong'}</p>
-          <Button onClick={() => dispatch(getCurrentUserThunk())}>
+          <p className="text-lg text-red-500 mb-4">Error loading profile: {typeof profileError === 'string' ? profileError : 'Something went wrong'}</p>
+          <Button onClick={() => {
+            if (isOwnProfile) {
+              dispatch(getCurrentUserThunk());
+            } else {
+              dispatch(getUserByIdThunk(userId));
+            }
+          }}>
             Try Again
           </Button>
         </div>
@@ -104,7 +130,7 @@ const Profile = () => {
   }
   
   // Show no data state
-  if (!currentUser) {
+  if (!profileUser) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
@@ -114,8 +140,8 @@ const Profile = () => {
     );
   }
 
-  // Safely destructure currentUser data
-  const { name, email, profile_picture, created_at, bio } = currentUser || {};
+  // Safely destructure profile user data
+  const { name, email, profile_picture, created_at, bio } = profileUser || {};
   
   // Convert relative URL to full URL
   const fullProfileImageUrl = getProfileImageUrl(profile_picture);
@@ -169,7 +195,7 @@ const Profile = () => {
 
               {/* Action Buttons */}
               <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
-                {currentUser ? (
+                {isOwnProfile ? (
                   <>
                     <Button variant="outline" className="space-x-2 " onClick={() => navigate('/settings/profile')}>
                       <Edit className="size-4" />
@@ -181,9 +207,16 @@ const Profile = () => {
                     </Button>
                   </>
                 ) : (
-                  <Button variant="default">
-                    Follow
-                  </Button>
+                  <>
+                    <Button variant="default" className="space-x-2 bg-purple-600 hover:bg-purple-700">
+                      <UserPlus className="size-4" />
+                      <span>Follow</span>
+                    </Button>
+                    <Button variant="outline" className="space-x-2" onClick={() => navigate('/chat')}>
+                      <MessageCircle className="size-4" />
+                      <span>Message</span>
+                    </Button>
+                  </>
                 )}
               </div>
             </div>
@@ -204,7 +237,7 @@ const Profile = () => {
         {/* Portfolios Section */}
         <div className="mt-12 animate-fade-in animation-delay-1050">
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold">My Portfolios</h2>
+            <h2 className="text-2xl font-bold">{isOwnProfile ? 'My Portfolios' : `${name}'s Portfolios`}</h2>
           
           </div>
           
@@ -216,62 +249,55 @@ const Profile = () => {
           ) : portfoliosError ? (
             <div className="text-center py-12 bg-card rounded-lg">
               <p className="text-lg text-red-500 mb-4">Error loading portfolios: {portfoliosError}</p>
-              <Button onClick={() => dispatch(getUserPortfoliosThunk(currentUser?.id))}>
+              <Button onClick={() => dispatch(getUserPortfoliosThunk(profileUserId))}>
                 Try Again
               </Button>
             </div>
           ) : userPortfolios && Array.isArray(userPortfolios) && userPortfolios.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in animation-delay-1200">
-              {userPortfolios
-                .filter(portfolio => portfolio.user_id === currentUser?.id || portfolio.user?.id === currentUser?.id)
-                .map((portfolio) => (
+              {userPortfolios.map((portfolio) => (
                 <div key={portfolio.id} className="relative group">
                   <PortfolioCard
-                    id={portfolio.id}
-                    slug={portfolio.slug}
-                    image={getPortfolioImageUrl(portfolio.media?.[0]?.file_path) || '/placeholder.svg'}
-                    title={portfolio.title}
-                    creator={name}
-                    creatorImage={fullProfileImageUrl}
-                    likes={portfolio.likes_count || 0}
-                    comments={portfolio.comments_count || 0}
-                    tags={portfolio.tags?.map(tag => tag.name) || []}
-                    initialLikes={portfolio.likes_count || 0}
+                    portfolio={portfolio}
                   />
-                  <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      onClick={() => navigate(`/edit/${portfolio.id}`)}
-                      className="bg-blue-500 hover:bg-blue-600 text-white"
-                    >
-                      <Edit3 className="size-4" />
-                    </Button>
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => handleDeletePortfolio(portfolio.id)}
-                      disabled={deleteLoading}
-                    >
-                      {deleteLoading ? (
-                        <Loader2 className="size-4 animate-spin" />
-                      ) : (
-                        <Trash2 className="size-4" />
-                      )}
-                    </Button>
-                  </div>
+                  {isOwnProfile && (
+                    <div className="absolute top-2 right-2 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                      <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => navigate(`/edit-portfolio/${portfolio.id}`)}
+                        className="bg-blue-500 hover:bg-blue-600 text-white"
+                      >
+                        <Edit3 className="size-4" />
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => handleDeletePortfolio(portfolio.id)}
+                        disabled={deleteLoading}
+                      >
+                        {deleteLoading ? (
+                          <Loader2 className="size-4 animate-spin" />
+                        ) : (
+                          <Trash2 className="size-4" />
+                        )}
+                      </Button>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
           ) : (
             <div className="text-center py-12 bg-card rounded-lg animate-fade-in animation-delay-1350">
               <p className="text-lg text-muted-foreground mb-4">
-                No portfolios created yet.
+                {isOwnProfile ? 'No portfolios created yet.' : `${name} hasn't created any portfolios yet.`}
               </p>
-              <Button onClick={() => navigate('/create')}>
-                <Plus className="size-4 mr-2" />
-                Create Your First Portfolio
-              </Button>
+              {isOwnProfile && (
+                <Button onClick={() => navigate('/create')}>
+                  <Plus className="size-4 mr-2" />
+                  Create Your First Portfolio
+                </Button>
+              )}
             </div>
           )}
         </div>

@@ -73,7 +73,6 @@ const PortfolioDetail = () => {
   // Fetch portfolio data on component mount
   useEffect(() => {
     if (slug) {
-      
       dispatch(getPortfolioDetailsThunk(slug));
     }
   }, [slug, dispatch]);

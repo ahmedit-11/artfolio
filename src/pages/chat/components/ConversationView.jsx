@@ -50,9 +50,7 @@ const ConversationView = ({ selectedUserId, selectedUserName }) => {
       setChatId(newChatId);
       
       // Mark messages as read when opening conversation
-      if (selectedConversation?.unreadCount > 0) {
-        markMessagesAsRead(selectedConversation.chatId);
-      }
+      markMessagesAsRead(selectedConversation.chatId);
     }
   }, [selectedUserId, currentUser?.id, selectedConversation]);
 

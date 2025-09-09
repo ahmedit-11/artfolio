@@ -2,7 +2,7 @@
 import {
     doc, setDoc, collection, addDoc,
     query, orderBy, onSnapshot, serverTimestamp,
-    where, deleteDoc, getDocs, updateDoc, increment
+    where, deleteDoc, getDocs, updateDoc
   } from "firebase/firestore";
   import { db } from "../utils/firebase";
   
@@ -12,8 +12,10 @@ import {
   // ينشئ المحادثة لو مش موجودة ويرجع chatId
   export async function createOrGetChat(userA, userB) {
     const chatId = makeChatId(userA, userB);
+    const userAStr = String(userA);
+    const userBStr = String(userB);
     await setDoc(doc(db, "chats", chatId), {
-      users: [userA, userB],
+      users: [userAStr, userBStr],
       updatedAt: serverTimestamp()
     }, { merge: true });
     return chatId;
@@ -25,30 +27,20 @@ import {
     await addDoc(messagesCol, {
       senderId,
       text,
-      createdAt: serverTimestamp(),
-      isRead: false
+      createdAt: serverTimestamp()
     });
 
-    // استنتاج المستلم مباشرةً من chatId لتجنّب استعلام إضافي
-    // chatId مُكوَّن من userA__userB (مرتّبين)
-    const parts = String(chatId).split("__");
-    let otherUserId = null;
-    if (parts.length === 2) {
-      const [a, b] = parts;
-      otherUserId = String(a) === String(senderId) ? String(b) : String(a);
-    }
-
-    // تحديث المحادثة بآخر رسالة وزيادة عدد غير المقروء للمستلم
+    // تحديث المحادثة بآخر رسالة
     const updateData = {
-      lastMessage: { text, senderId, createdAt: serverTimestamp(), isRead: false },
-      updatedAt: serverTimestamp(),
+      lastMessage: { 
+        text,
+        senderId,
+        createdAt: serverTimestamp()
+      },
+      updatedAt: serverTimestamp()
     };
 
-    if (otherUserId) {
-      updateData[`unreadCount.${otherUserId}`] = increment(1);
-    }
-
-    await setDoc(doc(db, "chats", chatId), updateData, { merge: true });
+    await updateDoc(doc(db, "chats", chatId), updateData);
   }
   
   // اشتراك realtime على رسائل محادثة
@@ -63,7 +55,7 @@ import {
   // اشتراك realtime لقائمة محادثات لمستخدم (يعتمد users array)
   export function listenForUserChats(userId, onUpdate) {
     // قد تحتاج إنشاء index إذا استخدمت orderBy مع where
-    const q = query(collection(db, "chats"), where("users", "array-contains", userId));
+    const q = query(collection(db, "chats"), where("users", "array-contains", String(userId)));
     return onSnapshot(q, snap => {
       const chats = snap.docs.map(d => ({ id: d.id, ...d.data() }));
       onUpdate(chats);
@@ -97,34 +89,6 @@ import {
     });
   }
 
-  // Mark messages as read
-  export async function markMessagesAsRead(chatId, userId) {
-    try {
-      // Update unread count for this user
-      await updateDoc(doc(db, "chats", chatId), {
-        [`unreadCount.${userId}`]: 0,
-        "lastMessage.isRead": true
-      });
-      
-      // Mark all messages as read
-      const messagesQuery = query(
-        collection(db, "chats", chatId, "messages"),
-        where("isRead", "==", false)
-      );
-      const snapshot = await getDocs(messagesQuery);
-      
-      const batch = [];
-      snapshot.forEach(doc => {
-        if (doc.data().senderId !== userId) {
-          batch.push(updateDoc(doc.ref, { isRead: true }));
-        }
-      });
-      
-      await Promise.all(batch);
-    } catch (error) {
-      console.error("Error marking messages as read:", error);
-    }
-  }
 
   // Delete a chat conversation
   export async function deleteChat(chatId, userId) {
@@ -157,5 +121,3 @@ import {
     }
   }
 
-  // Delete entire conversation (alias for deleteChat)
-  export const deleteConversation = deleteChat;

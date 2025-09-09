@@ -3,8 +3,14 @@ import axios from "axios";
 
 export const getUserPortfoliosThunk = createAsyncThunk("getUserPortfoliosThunk", async (userId) => {
     try {
-        const response = await axios.get("/projects");
-        // Handle Laravel API response structure - return data array if it exists, otherwise return response.data
+        const response = await axios.get(`/users/${userId}/projects`);
+        
+        // Handle the new API response structure
+        if (response.data && response.data.success) {
+            return response.data.projects;
+        }
+        
+        // Fallback for other response formats
         return response.data.data || response.data;
     } catch (error) {
         console.error("Get user portfolios error:", error);

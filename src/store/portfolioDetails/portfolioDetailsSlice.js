@@ -19,7 +19,7 @@ const portfolioDetailsSlice = createSlice({
             })
             .addCase(getPortfolioDetailsThunk.fulfilled, (state, action) => {
                 state.loading = false;
-                state.data = action.payload;
+                state.data = action.payload.project;
                 state.error = null;
             })
             .addCase(getPortfolioDetailsThunk.rejected, (state, action) => {

@@ -163,11 +163,7 @@ const SimpleChat = () => {
                             >
                               {/* Avatar */}
                               <div className="flex-shrink-0 relative">
-                                <div className={`h-10 w-10 rounded-full flex items-center justify-center ${
-                                  conversation.unreadCount > 0 
-                                    ? 'bg-primary/20 ring-2 ring-primary/30' 
-                                    : 'bg-primary/10'
-                                }`}>
+                                <div className="h-10 w-10 rounded-full flex items-center justify-center bg-primary/10">
                                   {conversation.user.avatar ? (
                                     <img
                                       src={conversation.user.avatar}
@@ -175,50 +171,28 @@ const SimpleChat = () => {
                                       className="h-10 w-10 rounded-full object-cover"
                                     />
                                   ) : (
-                                    <span className={`font-semibold ${
-                                      conversation.unreadCount > 0 ? 'text-primary' : 'text-primary'
-                                    }`}>
+                                    <span className="font-semibold text-primary">
                                       {conversation.user.name?.charAt(0)?.toUpperCase() || 'U'}
                                     </span>
                                   )}
                                 </div>
-                                {conversation.user.isOnline && (
-                                  <div className="absolute bottom-0 right-0 h-3 w-3 bg-green-500 rounded-full border-2 border-background" />
-                                )}
-                                {/* Unread indicator */}
-                                {conversation.unreadCount > 0 && (
-                                  <div className="absolute -top-1 -right-1 h-5 w-5 bg-red-500 rounded-full border-2 border-white shadow-lg">
-                                    <div className="absolute inset-0 bg-red-500 rounded-full animate-pulse opacity-75"></div>
-                                  </div>
-                                )}
                               </div>
 
                               {/* Conversation Info */}
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center justify-between mb-1">
-                                  <p className={`font-medium truncate ${
-                                    conversation.unreadCount > 0 ? 'text-foreground font-bold' : 'text-foreground'
-                                  }`}>
+                                  <p className="font-medium truncate text-foreground">
                                     {conversation.user.name}
-                                    {conversation.unreadCount > 0 && (
-                                      <span className="ml-2 text-xs text-red-500 font-bold bg-red-50 px-2 py-1 rounded-full">
-                                        NEW
-                                      </span>
-                                    )}
                                   </p>
                                   {conversation.lastMessage?.timestamp && (
-                                    <span className={`text-xs flex items-center gap-1 ${
-                                      conversation.unreadCount > 0 ? 'text-primary font-medium' : 'text-muted-foreground'
-                                    }`}>
+                                    <span className="text-xs flex items-center gap-1 text-muted-foreground">
                                       <Clock className="h-3 w-3" />
                                       {formatDistanceToNow(conversation.lastMessage.timestamp, { addSuffix: true })}
                                     </span>
                                   )}
                                 </div>
                                 {conversation.lastMessage && (
-                                  <p className={`text-sm truncate ${
-                                    conversation.unreadCount > 0 ? 'text-foreground font-medium' : 'text-muted-foreground'
-                                  }`}>
+                                  <p className="text-sm truncate text-muted-foreground">
                                     {conversation.lastMessage.senderId === String(currentUser?.id) && (
                                       <span className="font-medium">You: </span>
                                     )}
@@ -228,15 +202,8 @@ const SimpleChat = () => {
                               </div>
                             </div>
 
-                            {/* Unread Badge & Actions - Outside clickable area */}
+                            {/* Actions - Outside clickable area */}
                             <div className="flex items-center gap-2">
-                              {conversation.unreadCount > 0 && (
-                                <div className="h-6 w-6 bg-red-500 rounded-full flex items-center justify-center shadow-lg">
-                                  <span className="text-xs text-white font-bold">
-                                    {conversation.unreadCount > 9 ? '9+' : conversation.unreadCount}
-                                  </span>
-                                </div>
-                              )}
                               
                               {/* Delete Button */}
                               <AlertDialog>

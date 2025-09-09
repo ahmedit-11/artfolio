@@ -27,8 +27,6 @@ export async function createOrUpdateUserProfile(userId, userData) {
       ...userData,
       // normalized fields for case-insensitive search
       nameLower: (userData?.name || "").toLowerCase(),
-      lastSeen: serverTimestamp(),
-      isOnline: true,
       updatedAt: serverTimestamp()
     }, { merge: true });
   } catch (error) {
@@ -36,17 +34,6 @@ export async function createOrUpdateUserProfile(userId, userData) {
   }
 }
 
-// Update user online status
-export async function updateUserOnlineStatus(userId, isOnline) {
-  try {
-    await updateDoc(doc(db, "users", userId), {
-      isOnline,
-      lastSeen: serverTimestamp()
-    });
-  } catch (error) {
-    console.error("Error updating online status:", error);
-  }
-}
 
 // Search users for starting new chats
 export async function searchUsers(searchTerm) {

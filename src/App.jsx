@@ -44,7 +44,7 @@ import { NotificationProvider } from './contexts/NotificationContext';
 
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "@/components/Layout";
-import SearchPage from "@/pages/Search";
+import SearchPage from "@/pages/SearchSimple";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import SignIn from "./pages/SignIn";
@@ -132,11 +132,12 @@ const App = () => {
           <Route element={<Layout />}>
             <Route index element={<Index />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/profile/:userId" element={<Profile />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="/settings/profile" element={<ProfileSettings />} />
             <Route path="/settings/change-password" element={<ChangePassword />} />
             <Route path="/create" element={<CreatePortfolio />} />
-            <Route path="/edit/:id" element={<EditPortfolio />} />
+            <Route path="/edit-portfolio/:id" element={<EditPortfolio />} />
             <Route path="/categories/:categorySlug/projects" element={<CategoryPage />} />
             <Route path="/chat" element={<SimpleChat />} />
             {/* <Route path="/chat-old" element={<Chat />} /> */}

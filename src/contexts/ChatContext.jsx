@@ -1,12 +1,13 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import * as chatService from '../services/chatService';
-import { authAPI, userAPI } from '../lib/api';
+import { authAPI } from '../lib/api';
 import Cookies from 'js-cookie';
-import { createOrUpdateUserProfile, updateUserOnlineStatus } from '../services/userService';
+import { createOrUpdateUserProfile } from '../services/userService';
 import { decodeToken, getStoredUser } from '../utils/tokenUtils';
 import { useNotifications } from './NotificationContext';
 import { useLocation } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { getUserByIdThunk } from '../store/users/thunk/getUserByIdThunk';
 
 const ChatContext = createContext();
 
@@ -21,6 +22,8 @@ export const useChat = () => {
 export const ChatProvider = ({ children }) => {
   // Get currentUser from Redux store
   const reduxCurrentUser = useSelector(state => state.currentUser?.currentUser);
+  const { userById } = useSelector(state => state.users);
+  const dispatch = useDispatch();
   const [currentUser, setCurrentUser] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [conversations, setConversations] = useState([]);
@@ -53,7 +56,7 @@ export const ChatProvider = ({ children }) => {
   const truncateText = (t, n = 60) =>
     typeof t === 'string' && t.length > n ? `${t.slice(0, n - 1)}…` : (t || '');
 
-  // Use Redux currentUser instead of decoding token
+  // Use Redux currentUser only
   useEffect(() => {
     const initializeUser = async () => {
       if (reduxCurrentUser && token) {
@@ -62,12 +65,8 @@ export const ChatProvider = ({ children }) => {
             id: String(reduxCurrentUser.id),
             name: reduxCurrentUser.name || 'User',
             email: reduxCurrentUser.email || '',
-            avatar: reduxCurrentUser.profile_picture || reduxCurrentUser.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(reduxCurrentUser.name || 'User')}&background=random`,
-            isOnline: true
+            avatar: reduxCurrentUser.profile_picture || reduxCurrentUser.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(reduxCurrentUser.name || 'User')}&background=random`
           };
-          
-          // Store user in localStorage for future use
-          localStorage.setItem('user', JSON.stringify(user));
           
           // Sync user to Firebase
           await createOrUpdateUserProfile(user.id, user);
@@ -75,6 +74,8 @@ export const ChatProvider = ({ children }) => {
         } catch (error) {
           console.error('Error initializing user:', error);
         }
+      } else {
+        setCurrentUser(null);
       }
       setAuthLoading(false);
     };
@@ -88,6 +89,28 @@ export const ChatProvider = ({ children }) => {
       setLoading(false);
     }
   }, [authLoading]);
+
+  // Helper function that mimics userAPI.getById but uses Redux
+  const getReduxUserById = async (userId) => {
+    try {
+      // Dispatch the thunk and wait for it to complete
+      const result = await dispatch(getUserByIdThunk(userId));
+      
+      // Check if the thunk was fulfilled
+      if (result.type === 'users/getUserById/fulfilled') {
+        const userData = result.payload;
+        // Extract user from the nested structure
+        const user = userData.user || userData;
+        return {
+          data: user
+        };
+      } else {
+        throw new Error('Failed to fetch user from Redux');
+      }
+    } catch (error) {
+      throw error;
+    }
+  };
 
   // Listen for user's conversations
   useEffect(() => {
@@ -104,14 +127,14 @@ export const ChatProvider = ({ children }) => {
         });
       });
 
-      // Fetch real user profiles from API
+      // Fetch real user profiles using Redux thunks
       const profiles = {};
       
-      // Try to fetch user profiles from API
+      // Try to fetch user profiles using Redux (same pattern as original)
       try {
         const userProfilePromises = Array.from(userIds).map(async (userId) => {
           try {
-            const response = await userAPI.getById(userId);
+            const response = await getReduxUserById(userId);
             const userData = response.data || response;
             return {
               id: String(userId),
@@ -149,8 +172,6 @@ export const ChatProvider = ({ children }) => {
         const otherUserId = chat.users.find(userId => userId !== String(currentUser.id));
         const userProfile = profiles[String(otherUserId)] || {};
         
-        // Calculate unread count
-        const unreadCount = chat.unreadCount?.[String(currentUser.id)] || 0;
         
         // Robust timestamp handling for lastMessage.createdAt
         let lmTimestamp = null;
@@ -173,53 +194,40 @@ export const ChatProvider = ({ children }) => {
           user: {
             id: String(otherUserId),
             name: userProfile.name || `User ${otherUserId?.slice(0, 6)}`,
-            avatar: userProfile.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(userProfile.name || 'User')}&background=7c3aed&color=fff`,
-            isOnline: userProfile.isOnline || false
+            avatar: userProfile.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(userProfile.name || 'User')}&background=7c3aed&color=fff`
           },
           lastMessage: chat.lastMessage ? {
             text: chat.lastMessage.text,
             timestamp: lmTimestamp,
-            senderId: chat.lastMessage.senderId,
-            isRead: chat.lastMessage.isRead || false
-          } : null,
-          unreadCount: unreadCount
+            senderId: chat.lastMessage.senderId
+          } : null
         };
       });
       
       // Detect new incoming messages and create notifications (skip initial load)
       if (hasInitializedRef.current) {
         formattedConversations.forEach((conv) => {
-          const prev = prevUnreadCountsRef.current[conv.id] ?? 0;
-          const increased = (conv.unreadCount || 0) > prev;
           const incoming = conv.lastMessage && String(conv.lastMessage.senderId) !== String(currentUser.id);
           const isOpenConv = location.pathname === '/chat' && selectedConvRef.current?.id === conv.id;
-          // Robust: also detect lastMessage change (in case unreadCount isn't available yet)
+          // Detect lastMessage change
           const currKey = conv.lastMessage
             ? `${conv.lastMessage.senderId}|${conv.lastMessage.text}|${conv.lastMessage.timestamp ? new Date(conv.lastMessage.timestamp).getTime() : ''}`
             : '';
           const prevKey = prevLastMsgKeyRef.current[conv.id] || '';
-          const lastMsgChanged = !!currKey && currKey !== prevKey;
+          const messageChanged = currKey !== prevKey;
 
-          // Only notify if there's actually a message (not just a new empty conversation)
-          if ((increased || lastMsgChanged) && incoming && !isOpenConv && conv.lastMessage?.text) {
+          if (messageChanged && incoming && !isOpenConv && conv.lastMessage?.text?.trim()) {
             addNotification({
+              id: `msg-${conv.id}-${Date.now()}`,
               type: 'message',
-              actorName: conv.user?.name || 'User',
-              avatar: conv.user?.avatar || '',
-              action: 'sent you a new message',
-              time: 'now',
-              chatId: conv.chatId || conv.id,
-              userId: conv.user?.id,
+              title: 'New Message',
+              message: truncateText(`${conv.user.name}: ${conv.lastMessage.text}`, 60),
+              isNew: true,
+              timestamp: new Date()
             });
           }
         });
       }
-      // Update previous counts snapshot
-      const nextCounts = {};
-      formattedConversations.forEach((conv) => {
-        nextCounts[conv.id] = conv.unreadCount || 0;
-      });
-      prevUnreadCountsRef.current = nextCounts;
       // Update previous last message keys
       const nextKeys = {};
       formattedConversations.forEach((conv) => {
@@ -269,8 +277,7 @@ export const ChatProvider = ({ children }) => {
           text: msg.text,
           timestamp: ts,
           senderId: msg.senderId,
-          isCurrentUser: msg.senderId === String(currentUser?.id),
-          isRead: msg.isRead || false
+          isCurrentUser: msg.senderId === String(currentUser?.id)
         };
       });
 
@@ -284,29 +291,19 @@ export const ChatProvider = ({ children }) => {
   }, [selectedConversation?.chatId, currentUser?.id]);
 
   // Mark messages as read when conversation is selected
-  useEffect(() => {
-    if (!selectedConversation?.chatId || !currentUser?.id) return;
+  // useEffect(() => {
+  //   if (!selectedConversation?.chatId || !currentUser?.id) return;
     
-    const markAsRead = async () => {
-      await chatService.markMessagesAsRead(selectedConversation.chatId, String(currentUser.id));
-    };
+  //   const markAsRead = async () => {
+  //     await chatService.markMessagesAsRead(selectedConversation.chatId, String(currentUser.id));
+  //   };
     
-    markAsRead();
-  }, [selectedConversation?.chatId, currentUser?.id]);
+  //   markAsRead();
+  // }, [selectedConversation?.chatId, currentUser?.id]);
 
   const handleConversationSelect = (conversation) => {
     setSelectedConversation(conversation);
     
-    // Mark as read (implement unread logic) - add null check
-    if (conversation && conversation.unreadCount > 0) {
-      setConversations(prev => 
-        prev.map(conv => 
-          conv.id === conversation.id 
-            ? { ...conv, unreadCount: 0 }
-            : conv
-        )
-      );
-    }
   };
 
   const handleSendMessage = async (messageText) => {
@@ -324,8 +321,7 @@ export const ChatProvider = ({ children }) => {
                 lastMessage: {
                   text: messageText.trim(),
                   timestamp: new Date(),
-                  senderId: String(currentUser.id),
-                  isRead: false
+                  senderId: String(currentUser.id)
                 }
               }
             : conv
@@ -353,18 +349,17 @@ export const ChatProvider = ({ children }) => {
         return existingConv;
       }
 
-      // Fetch user profile from API or use cached profile
+      // Fetch user profile using Redux (same pattern as original)
       let userProfile = userProfiles[otherUserIdStr];
       
       if (!userProfile) {
         try {
-          const response = await userAPI.getById(otherUserIdStr);
+          const response = await getReduxUserById(otherUserIdStr);
           const userData = response.data || response;
           userProfile = {
             id: String(otherUserIdStr),
             name: userData.name || `User ${otherUserIdStr?.slice(0, 6)}`,
-            avatar: userData.profile_picture || userData.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(userData.name || 'User')}&background=7c3aed&color=fff`,
-            isOnline: false
+            avatar: userData.profile_picture || userData.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(userData.name || 'User')}&background=7c3aed&color=fff`
           };
           // Cache the profile with string key
           setUserProfiles(prev => ({ ...prev, [String(otherUserIdStr)]: userProfile }));
@@ -373,8 +368,7 @@ export const ChatProvider = ({ children }) => {
           userProfile = {
             id: String(otherUserIdStr),
             name: `User ${otherUserIdStr?.slice(0, 6)}`,
-            avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(`User ${otherUserIdStr}`)}&background=7c3aed&color=fff`,
-            isOnline: false
+            avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(`User ${otherUserIdStr}`)}&background=7c3aed&color=fff`
           };
         }
       }
@@ -386,11 +380,9 @@ export const ChatProvider = ({ children }) => {
         user: {
           id: otherUserIdStr,
           name: userProfile.name || `User ${otherUserIdStr?.slice(0, 6)}`,
-          avatar: userProfile.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(userProfile.name || 'User')}&background=7c3aed&color=fff`,
-          isOnline: userProfile.isOnline || false
+          avatar: userProfile.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(userProfile.name || 'User')}&background=7c3aed&color=fff`
         },
-        lastMessage: null,
-        unreadCount: 0
+        lastMessage: null
       };
 
       // Don't add to conversations list immediately - let Firebase listener handle it
@@ -454,6 +446,11 @@ export const ChatProvider = ({ children }) => {
     return unsubscribe;
   }, [selectedConversation?.chatId]);
 
+  // Dummy function for compatibility
+  const markMessagesAsRead = () => {
+    // No longer tracks read status
+  };
+
   const value = {
     conversations,
     selectedConversation,
@@ -464,6 +461,7 @@ export const ChatProvider = ({ children }) => {
     sendMessage: handleSendMessage,
     startNewChat,
     deleteConversation,
+    markMessagesAsRead,
     typingUsers,
     setTypingStatus: handleSetTypingStatus,
     userProfiles,

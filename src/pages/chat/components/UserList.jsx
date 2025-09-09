@@ -1,49 +1,29 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Button } from '../../../components/ui/button';
 import { MessageCircle, User } from 'lucide-react';
-import { userAPI } from '../../../lib/api';
+import { useDispatch, useSelector } from 'react-redux';
+import { getChatUsersThunk } from '../../../store/users/thunk/getChatUsersThunk';
 import { useChat } from '../../../contexts/ChatContext';
 import { toast } from 'react-toastify';
+import { getProfileImageUrl } from '../../../utils/mediaUtils';
 
 const UserList = ({ onUserSelect, searchTerm = '' }) => {
-  const [users, setUsers] = useState([]);
   const [filteredUsers, setFilteredUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const dispatch = useDispatch();
+  const { chatUsers, chatUsersLoading, chatUsersError } = useSelector(state => state.users);
   const { currentUser, startNewChat } = useChat();
 
-  // Fetch all users from Laravel API
+  // Fetch all users from Redux store
   useEffect(() => {
-    fetchUsers();
-  }, []);
+    dispatch(getChatUsersThunk({ per_page: 100 }));
+  }, [dispatch]);
 
-  const fetchUsers = async () => {
-    try {
-      setLoading(true);
-      const response = await userAPI.getAll({ per_page: 100 });
-      if (response?.data) {
-        // The API returns data directly, not nested in a 'users' property
-        const allUsers = Array.isArray(response.data) ? response.data : [];
-        // Filter out current user
-        const otherUsers = allUsers.filter(
-          user => String(user.id) !== String(currentUser?.id)
-        );
-        setUsers(otherUsers);
-        setFilteredUsers(otherUsers);
-      }
-    } catch (error) {
-      console.error('Error fetching users:', error);
-      // Fallback: create some dummy users for testing
-      const dummyUsers = [
-        { id: 1, name: 'John Doe', email: 'john@example.com' },
-        { id: 2, name: 'Jane Smith', email: 'jane@example.com' },
-        { id: 3, name: 'Bob Wilson', email: 'bob@example.com' }
-      ].filter(user => String(user.id) !== String(currentUser?.id));
-      setUsers(dummyUsers);
-      setFilteredUsers(dummyUsers);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // Memoize filtered users to prevent infinite re-renders
+  const users = useMemo(() => {
+    return chatUsers.filter(
+      user => String(user.id) !== String(currentUser?.id)
+    );
+  }, [chatUsers, currentUser?.id]);
 
   // Filter users based on search
   useEffect(() => {
@@ -74,7 +54,7 @@ const UserList = ({ onUserSelect, searchTerm = '' }) => {
     }
   };
 
-  if (loading) {
+  if (chatUsersLoading) {
     return (
       <div className="p-4 text-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
@@ -107,7 +87,7 @@ const UserList = ({ onUserSelect, searchTerm = '' }) => {
                   <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
                     {user.profile_picture ? (
                       <img
-                        src={user.profile_picture}
+                        src={getProfileImageUrl(user.profile_picture)}
                         alt={user.name}
                         className="h-10 w-10 rounded-full object-cover"
                       />
@@ -142,7 +122,7 @@ const UserList = ({ onUserSelect, searchTerm = '' }) => {
         <Button
           variant="outline"
           className="w-full"
-          onClick={fetchUsers}
+          onClick={() => dispatch(getChatUsersThunk({ per_page: 100 }))}
         >
           Refresh Users
         </Button>

@@ -15,6 +15,7 @@ import { getAllCatThunk } from "../store/Categories/thunk/getAllCatThunk";
 import { updatePortfolioThunk } from "../store/updatePortfolio/thunk/updatePortfolioThunk";
 import { getAllTagsThunk } from "../store/tags/thunk/getAllTagsThunk";
 import { createTagThunk } from "../store/tags/thunk/createTagThunk";
+import { getUserPortfoliosThunk } from "../store/userPortfolios/thunk/getUserPortfoliosThunk";
 import { toast } from 'react-toastify';
 
 const commonTags = [
@@ -38,6 +39,7 @@ const EditPortfolio = () => {
   const { tags } = useSelector(state => state.tags);
   const { data: userPortfolios, loading: portfoliosLoading } = useSelector(state => state.userPortfolios);
   const { loading: updateLoading } = useSelector(state => state.updatePortfolio);
+  const { currentUser } = useSelector(state => state.currentUser);
 
   // Core form state
   const [title, setTitle] = useState("");
@@ -58,7 +60,11 @@ const EditPortfolio = () => {
   useEffect(() => {
     dispatch(getAllCatThunk());
     dispatch(getAllTagsThunk());
-  }, [dispatch]);
+    // Get current user's portfolios - no userId needed for own portfolios
+    if (currentUser?.id) {
+      dispatch(getUserPortfoliosThunk(currentUser.id));
+    }
+  }, [dispatch, currentUser?.id]);
 
   // Populate form when portfolio data loads
   useEffect(() => {
@@ -99,9 +105,8 @@ const EditPortfolio = () => {
         setMediaItems(transformedMedia);
         
         // Set cover image if exists
-        const coverMedia = currentPortfolio.media.find(media => media.file_type?.startsWith('image/'));
-        if (coverMedia) {
-          setCoverPreview(`${import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000'}/storage/${coverMedia.file_path}`);
+        if (currentPortfolio.cover_image) {
+          setCoverPreview(currentPortfolio.cover_image);
         }
       }
     }
@@ -224,7 +229,7 @@ const EditPortfolio = () => {
       
       // Add new cover image if selected
       if (coverImage) {
-        formData.append('new_media[]', coverImage);
+        formData.append('cover_image', coverImage);
       }
       
       // Add new media files (only actual File objects, not existing media)

@@ -8,6 +8,7 @@ import StatCard from './StatCard';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { useDispatch, useSelector } from 'react-redux';
 import { getAllUsers } from '@/store/users/thunk/getAllUsers';
+import { getProfileImageUrl } from '@/utils/mediaUtils';
 
 const UserManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -151,7 +152,7 @@ const UserManagement = () => {
                   <td className="py-3 sm:py-4 px-2 sm:px-4">
                     <div className="flex items-center gap-2 sm:gap-3">
                       <Avatar className="size-8 sm:size-10 flex-shrink-0">
-                        <AvatarImage src={user.profile_picture || user.avatar} alt={user.name} />
+                        <AvatarImage src={getProfileImageUrl(user.profile_picture || user.avatar)} alt={user.name} />
                         <AvatarFallback>{user.name?.charAt(0) || 'U'}</AvatarFallback>
                       </Avatar>
                       <div className="min-w-0 flex-1">
@@ -211,7 +212,7 @@ const UserManagement = () => {
                 {/* User Info */}
                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
                   <Avatar className="size-12 sm:size-16 flex-shrink-0">
-                    <AvatarImage src={selectedUser.profile_picture || selectedUser.avatar} alt={selectedUser.name} />
+                    <AvatarImage src={getProfileImageUrl(selectedUser.profile_picture || selectedUser.avatar)} alt={selectedUser.name} />
                     <AvatarFallback>{selectedUser.name?.charAt(0) || 'U'}</AvatarFallback>
                   </Avatar>
                   <div className="min-w-0 flex-1">

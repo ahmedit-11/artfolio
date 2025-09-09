@@ -54,6 +54,7 @@ const PortfolioCard = ({
     creator: portfolioCreator = creator,
     creator_image: portfolioCreatorImage = creatorImage,
     image: portfolioImage = image,
+    cover_image,
     media,
     likes_count: portfolioLikes = likes,
     comments_count: portfolioComments = comments,
@@ -61,14 +62,16 @@ const PortfolioCard = ({
     rating: portfolioRating = rating
   } = portfolioData;
 
-  // Handle image from media array or direct image field
-  const rawImagePath = portfolioImage || (media && media.length > 0 ? media[0].file_path : null);
+  // Handle cover image first, then fallback to media array or direct image field
+  const rawImagePath = cover_image || portfolioImage || (media && media.length > 0 ? media[0].file_path : null);
   const displayImage = getPortfolioMediaUrl(rawImagePath);
+  
   
   // Handle creator name from user object or direct creator prop
   const creatorName = user?.name || portfolioCreator || 'Unknown';
   const rawCreatorImg = user?.profile_picture || portfolioCreatorImage;
   const creatorImg = getProfileImageUrl(rawCreatorImg);
+  
   const navigate = useNavigate();
 
   const handleCardClick = (e) => {
