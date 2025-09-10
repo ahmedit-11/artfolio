@@ -397,8 +397,8 @@ const PortfolioDetail = () => {
               Back
             </Button>
             
-            {/* Report Button */}
-            {token && (
+            {/* Report Button - Only show if not viewing own portfolio */}
+            {token && currentUser && currentUser.id !== portfolio.user?.id && (
               <Button
                 variant="ghost"
                 onClick={() => setShowReportModal(true)}
