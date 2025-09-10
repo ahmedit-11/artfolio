@@ -75,9 +75,14 @@ useEffect(()=>{
   };
 
   const addCustomTag = () => {
+   
     const trimmed = customTag.trim();
+   
     if (trimmed && !selectedTags.includes(trimmed)) {
       setSelectedTags((prev) => [...prev, trimmed]);
+      
+    } else {
+      console.log("Tag not added - either empty or already exists");
     }
     setCustomTag("");
   };
@@ -381,29 +386,30 @@ useEffect(()=>{
                   </Button>
                   <p className="text-sm font-medium capitalize">{item.type}</p>
 
-                  {item.type === "text" ? (
-                    <Textarea
-                      placeholder="Enter text content..."
-                      value={item.value || ""}
-                      onChange={(e) => handleMediaChange(item.id, e.target.value)}
-                    />
-                  ) : (
-                    <input
-                      type="file"
-                      accept={
-                        item.type === "image"
-                          ? "image/*"
-                          : item.type === "video"
-                          ? "video/*"
-                          : item.type === "audio"
-                          ? "audio/*"
-                          : item.type === "model"
-                          ? ".glb,.gltf,.obj,.fbx"
-                          : "*/*"
-                      }
-                      onChange={(e) => handleMediaChange(item.id, e.target.files?.[0] || null)}
-                      className="block w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100"
-                    />
+                  <input
+                    type="file"
+                    accept={
+                      item.type === "image"
+                        ? "image/*"
+                        : item.type === "video"
+                        ? "video/*"
+                        : item.type === "audio"
+                        ? "audio/*"
+                        : item.type === "model"
+                        ? ".glb,.gltf,.obj,.fbx"
+                        : item.type === "text"
+                        ? ".txt,.md,.docx,.pdf"
+                        : "*/*"
+                    }
+                    onChange={(e) => handleMediaChange(item.id, e.target.files?.[0] || null)}
+                    className="block w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100"
+                  />
+                  
+                  {/* Show selected file name for text files */}
+                  {item.type === "text" && item.value && (
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Selected: {item.value.name}
+                    </p>
                   )}
                 </Card>
               ))}

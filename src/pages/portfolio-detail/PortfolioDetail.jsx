@@ -56,6 +56,7 @@ import ReportModal from "@/components/ReportModal";
 import LikeButton from "@/components/LikeButton";
 import CommentButton from "@/components/CommentButton";
 
+
 const PortfolioDetail = () => {
   useScrollToTop();
   const { slug } = useParams();
@@ -207,6 +208,16 @@ const PortfolioDetail = () => {
     const images = portfolio.media.filter(item => item.file_type?.startsWith('image/'));
     const videos = portfolio.media.filter(item => item.file_type?.startsWith('video/'));
     const audios = portfolio.media.filter(item => item.file_type?.startsWith('audio/'));
+    const textFiles = portfolio.media.filter(item => 
+      item.file_type?.startsWith('text/') || 
+      item.file_type?.includes('pdf') ||
+      item.file_type?.includes('document') ||
+      item.file_type?.includes('msword') ||
+      item.file_path?.endsWith('.txt') ||
+      item.file_path?.endsWith('.md') ||
+      item.file_path?.endsWith('.pdf') ||
+      item.file_path?.endsWith('.docx')
+    );
 
     return (
       <div className="space-y-6">
@@ -302,6 +313,64 @@ const PortfolioDetail = () => {
                 showDownload={true}
               />
             ))}
+          </div>
+        )}
+
+        {/* Text Files */}
+        {textFiles.length > 0 && (
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold">Documents</h3>
+            {textFiles.map((textFile, index) => {
+              const fileName = textFile.file_path?.split('/').pop() || `Document ${index + 1}`;
+              const fileExtension = fileName.split('.').pop()?.toLowerCase();
+              const fileUrl = getPortfolioMediaUrl(textFile.file_path);
+              
+              // All files get the same simple treatment
+              return (
+                <Card key={index} className="p-4 border border-gray-200 dark:border-gray-700">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 bg-blue-100 dark:bg-blue-900/20 rounded-lg">
+                        <svg className="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                      <div>
+                        <p className="font-medium text-sm">{fileName}</p>
+                        <p className="text-xs text-muted-foreground uppercase">
+                          {fileExtension} document
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => window.open(fileUrl, '_blank')}
+                        className="flex items-center gap-2"
+                      >
+                        <Eye className="w-4 h-4" />
+                        View
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          const link = document.createElement('a');
+                          link.href = fileUrl;
+                          link.download = fileName;
+                          link.click();
+                        }}
+                        className="flex items-center gap-2"
+                      >
+                        <Download className="w-4 h-4" />
+                        Download
+                      </Button>
+                    </div>
+                  </div>
+                </Card>
+              );
+            })}
           </div>
         )}
       </div>
