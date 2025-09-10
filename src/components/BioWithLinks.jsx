@@ -5,7 +5,7 @@ const BioWithLinks = ({ bio, className = "" }) => {
   if (!bio) return <p className={className}>No bio available</p>;
 
   // Extract URLs from bio
-  const urlRegex = /(https?:\/\/[^\s]+|www\.[^\s]+|\b[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\b)/g;
+  const urlRegex = /(https?:\/\/[^\s]+|www\.[^\s]+|\b[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(?:\/[^\s]*)?)/g;
   const extractedLinks = bio.match(urlRegex) || [];
 
   // Remove URLs from bio text for clean display

@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import Loader from "@/components/ui/loader";
-import { useScrollToTop } from "../utils/scrollToTop";
+import { useScrollToTop } from "../../utils/scrollToTop";
 import PageTitle from "@/components/PageTitle";
 import { Mail, MessageSquare, Phone, MapPin, Send, CheckCircle2 } from "lucide-react";
 

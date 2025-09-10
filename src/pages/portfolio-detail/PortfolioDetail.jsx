@@ -33,18 +33,19 @@ import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Card } from "@/components/ui/card";
 import { FaStar } from 'react-icons/fa';
-import { useScrollToTop } from '../utils/scrollToTop';
+import { useScrollToTop } from '../../utils/scrollToTop';
 import { useDispatch, useSelector } from 'react-redux';
 import { getPortfolioDetailsThunk } from "@/store/portfolioDetails/thunk/getPortfolioDetailsThunk";
 import { getLikeStatusThunk } from "@/store/social/thunk/getLikeStatusThunk";
 import { getRatingsThunk } from "@/store/ratings/thunk/getRatingsThunk";
-import { getPortfolioMediaUrl, getProfileImageUrl } from '../utils/mediaUtils';
+import { getCurrentUserThunk } from "@/store/currentUser/thunk/getCurrentUserThunk";
+import { getPortfolioMediaUrl, getProfileImageUrl } from '../../utils/mediaUtils';
 import { cn } from "@/lib/utils";
 import { reportAPI } from "@/lib/api";
 import Cookies from "js-cookie";
 import { toast } from 'react-toastify';
 import StarRating from "@/components/StarRating";
-import Tag from "../components/ui/tag";
+import Tag from "../../components/ui/tag";
 import ImageGallery from "@/components/ImageGallery";
 import VideoPlayer from "@/components/VideoPlayer";
 import TextContent from "@/components/TextContent";
@@ -72,6 +73,7 @@ const PortfolioDetail = () => {
   
   const { data: portfolio, loading, error } = useSelector(state => state.portfolioDetails);
   const { averageRating, ratingsCount } = useSelector(state => state.ratings);
+  const { currentUser } = useSelector(state => state.currentUser);
 
   // Fetch portfolio data on component mount
   useEffect(() => {
@@ -87,6 +89,14 @@ const PortfolioDetail = () => {
       dispatch(getRatingsThunk(portfolio.slug));
     }
   }, [portfolio?.slug, dispatch]);
+
+  // Fetch current user data
+  useEffect(() => {
+    const token = Cookies.get("token");
+    if (token && !currentUser) {
+      dispatch(getCurrentUserThunk());
+    }
+  }, [dispatch, currentUser]);
 
   // Debug: Log portfolio data when it changes
 
@@ -163,6 +173,22 @@ const PortfolioDetail = () => {
       console.error('Failed to report portfolio:', error);
       toast.error("Failed to report portfolio. Please try again.");
       throw error;
+    }
+  };
+
+  // Handle creator click navigation
+  const handleCreatorClick = () => {
+    if (!portfolio?.user) return;
+    
+    // Check if this is the current user's portfolio
+    const isOwnPortfolio = currentUser && currentUser.id === portfolio.user.id;
+    
+    if (isOwnPortfolio) {
+      // Navigate to own profile
+      navigate("/profile");
+    } else {
+      // Navigate to other user's profile
+      navigate(`/profile/${portfolio.user.id}`);
     }
   };
 
@@ -328,7 +354,10 @@ const PortfolioDetail = () => {
               {portfolio.title}
               </PageTitle>
              
-              <div className="flex items-center gap-4">
+              <div 
+                className="flex items-center gap-4 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 p-2 rounded-lg transition-colors"
+                onClick={handleCreatorClick}
+              >
                 <Avatar className="size-12">
                   <AvatarImage 
                     src={getProfileImageUrl(portfolio.user?.profile_picture)} 
@@ -341,9 +370,9 @@ const PortfolioDetail = () => {
                   <AvatarFallback>{portfolio.user?.name?.charAt(0)}</AvatarFallback>
                 </Avatar>
                 <div>
-                  <h3 className="font-semibold">{portfolio.user?.name}</h3>
+                  <h3 className="font-semibold hover:text-purple-600 transition-colors">{portfolio.user?.name}</h3>
                   <p className="text-sm text-muted-foreground">
-                    {'Portfolio creator'}
+                    {currentUser && currentUser.id === portfolio.user?.id ? 'Your portfolio' : 'Portfolio creator'}
                   </p>
                 </div>
               </div>

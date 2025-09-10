@@ -3,7 +3,7 @@ import axios from "axios";
 
 export const createTagThunk = createAsyncThunk("createTagThunk", async (tagData) => {
     try {
-        const response = await axios.post("/tags", tagData);
+        const response = await axios.post("/tags/get-or-create", { name: tagData.name });
         return response.data;
     } catch (error) {
         console.error("Create tag error:", error);

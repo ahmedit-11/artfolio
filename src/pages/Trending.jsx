@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 import PortfolioCard from "@/components/PortfolioCard";
 import PageTitle from "@/components/PageTitle";
 import { getTrendingProjectsThunk } from "@/store/trending/thunk/getTrendingProjectsThunk";
+import { getRatingsThunk } from "@/store/ratings/thunk/getRatingsThunk";
 import { TrendingUp } from "lucide-react";
 
 const TrendingPage = () => {
@@ -14,11 +15,20 @@ const TrendingPage = () => {
   const { projects, loading, error } = useSelector(state => state.trending);
 
   useEffect(() => {
-    // Fetch trending projects if not already loaded
-    if (!projects.length) {
-      dispatch(getTrendingProjectsThunk());
+    // Always fetch fresh trending projects
+    dispatch(getTrendingProjectsThunk());
+  }, [dispatch]);
+
+  // Fetch ratings for each project when projects are loaded
+  useEffect(() => {
+    if (projects && projects.length > 0) {
+      projects.forEach(project => {
+        if (project.slug) {
+          dispatch(getRatingsThunk(project.slug));
+        }
+      });
     }
-  }, [dispatch, projects.length]);
+  }, [projects, dispatch]);
 
   return (
     <div className="flex flex-col min-h-screen bg-background bg-background">

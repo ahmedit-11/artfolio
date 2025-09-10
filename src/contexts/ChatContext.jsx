@@ -1,13 +1,11 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import * as chatService from '../services/chatService';
-import { authAPI } from '../lib/api';
 import Cookies from 'js-cookie';
 import { createOrUpdateUserProfile } from '../services/userService';
-import { decodeToken, getStoredUser } from '../utils/tokenUtils';
-import { useNotifications } from './NotificationContext';
 import { useLocation } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { getUserByIdThunk } from '../store/users/thunk/getUserByIdThunk';
+import { getProfileImageUrl } from '../utils/mediaUtils';
 
 const ChatContext = createContext();
 
@@ -22,7 +20,6 @@ export const useChat = () => {
 export const ChatProvider = ({ children }) => {
   // Get currentUser from Redux store
   const reduxCurrentUser = useSelector(state => state.currentUser?.currentUser);
-  const { userById } = useSelector(state => state.users);
   const dispatch = useDispatch();
   const [currentUser, setCurrentUser] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
@@ -33,11 +30,9 @@ export const ChatProvider = ({ children }) => {
   const [typingUsers, setTypingUsers] = useState({});
   const [userProfiles, setUserProfiles] = useState({});
   const token = Cookies.get('token');
-  const { addNotification } = useNotifications();
   const location = useLocation();
 
-  // Track previous unread counts and last message keys per conversation to detect changes
-  const prevUnreadCountsRef = useRef({});
+  // Track previous last message keys per conversation to detect changes
   const prevLastMsgKeyRef = useRef({});
   const hasInitializedRef = useRef(false);
   const selectedConvRef = useRef(null);
@@ -53,19 +48,17 @@ export const ChatProvider = ({ children }) => {
     }
   }, [location.pathname]);
 
-  const truncateText = (t, n = 60) =>
-    typeof t === 'string' && t.length > n ? `${t.slice(0, n - 1)}…` : (t || '');
-
   // Use Redux currentUser only
   useEffect(() => {
     const initializeUser = async () => {
       if (reduxCurrentUser && token) {
         try {
+          const profileImage = getProfileImageUrl(reduxCurrentUser.profile_picture);
           const user = {
             id: String(reduxCurrentUser.id),
             name: reduxCurrentUser.name || 'User',
             email: reduxCurrentUser.email || '',
-            avatar: reduxCurrentUser.profile_picture || reduxCurrentUser.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(reduxCurrentUser.name || 'User')}&background=random`
+            avatar: profileImage || reduxCurrentUser.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(reduxCurrentUser.name || 'User')}&background=random`
           };
           
           // Sync user to Firebase
@@ -90,7 +83,7 @@ export const ChatProvider = ({ children }) => {
     }
   }, [authLoading]);
 
-  // Helper function that mimics userAPI.getById but uses Redux
+  // Helper function that   gets user by id
   const getReduxUserById = async (userId) => {
     try {
       // Dispatch the thunk and wait for it to complete
@@ -204,30 +197,6 @@ export const ChatProvider = ({ children }) => {
         };
       });
       
-      // Detect new incoming messages and create notifications (skip initial load)
-      if (hasInitializedRef.current) {
-        formattedConversations.forEach((conv) => {
-          const incoming = conv.lastMessage && String(conv.lastMessage.senderId) !== String(currentUser.id);
-          const isOpenConv = location.pathname === '/chat' && selectedConvRef.current?.id === conv.id;
-          // Detect lastMessage change
-          const currKey = conv.lastMessage
-            ? `${conv.lastMessage.senderId}|${conv.lastMessage.text}|${conv.lastMessage.timestamp ? new Date(conv.lastMessage.timestamp).getTime() : ''}`
-            : '';
-          const prevKey = prevLastMsgKeyRef.current[conv.id] || '';
-          const messageChanged = currKey !== prevKey;
-
-          if (messageChanged && incoming && !isOpenConv && conv.lastMessage?.text?.trim()) {
-            addNotification({
-              id: `msg-${conv.id}-${Date.now()}`,
-              type: 'message',
-              title: 'New Message',
-              message: truncateText(`${conv.user.name}: ${conv.lastMessage.text}`, 60),
-              isNew: true,
-              timestamp: new Date()
-            });
-          }
-        });
-      }
       // Update previous last message keys
       const nextKeys = {};
       formattedConversations.forEach((conv) => {
@@ -290,17 +259,7 @@ export const ChatProvider = ({ children }) => {
     return unsubscribe;
   }, [selectedConversation?.chatId, currentUser?.id]);
 
-  // Mark messages as read when conversation is selected
-  // useEffect(() => {
-  //   if (!selectedConversation?.chatId || !currentUser?.id) return;
-    
-  //   const markAsRead = async () => {
-  //     await chatService.markMessagesAsRead(selectedConversation.chatId, String(currentUser.id));
-  //   };
-    
-  //   markAsRead();
-  // }, [selectedConversation?.chatId, currentUser?.id]);
-
+ 
   const handleConversationSelect = (conversation) => {
     setSelectedConversation(conversation);
     
@@ -465,10 +424,6 @@ export const ChatProvider = ({ children }) => {
     return unsubscribe;
   }, [selectedConversation?.chatId]);
 
-  // Dummy function for compatibility
-  const markMessagesAsRead = () => {
-    // No longer tracks read status
-  };
 
   const value = {
     conversations,
@@ -480,7 +435,6 @@ export const ChatProvider = ({ children }) => {
     sendMessage: handleSendMessage,
     startNewChat,
     deleteConversation,
-    markMessagesAsRead,
     typingUsers,
     setTypingStatus: handleSetTypingStatus,
     userProfiles,

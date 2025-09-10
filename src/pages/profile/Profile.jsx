@@ -20,6 +20,7 @@ import PortfolioCard from "@/components/PortfolioCard";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import FollowButton from "./components/FollowButton";
 import ProfileStatsEnhanced from "./components/ProfileStatsEnhanced";
+import { getRatingsThunk } from "@/store/ratings/thunk/getRatingsThunk";
 
 
 
@@ -82,6 +83,16 @@ const Profile = () => {
       dispatch(getFollowStatusThunk(userId));
     }
   }, [dispatch, userId]);
+
+  useEffect(() => {
+    if (userPortfolios && userPortfolios.length > 0) {
+      userPortfolios.forEach(portfolio => {
+        if (portfolio.slug) {
+          dispatch(getRatingsThunk(portfolio.slug));
+        }
+      });
+    }
+  }, [userPortfolios, dispatch]);
 
   // Handle portfolio deletion
   const handleDeletePortfolio = (portfolioId) => {

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useScrollToTop } from "../utils/scrollToTop";
+import { useScrollToTop } from "../../utils/scrollToTop";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,7 +9,7 @@ import { Lock, Eye, EyeOff, ArrowLeft, CheckCircle } from "lucide-react";
 import { toast } from "react-toastify";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
 import PageTitle from "@/components/PageTitle";
-import { authAPI } from "../lib/api";
+import { authAPI } from "../../lib/api";
 
 const ChangePassword = () => {
   useScrollToTop();

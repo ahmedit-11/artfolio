@@ -14,10 +14,11 @@ import deletePortfolio from "./deletePortfolio/deletPortfolioSlice"
 import portfolioDetails from "./portfolioDetails/portfolioDetailsSlice"
 import comments from "./comments/commentsSlice"
 import dashboard from "./dashboard/dashboardSlice"
+import forYou from "./forYou/forYouSlice"
+import trending from "./trending/trendingSlice"
 import categoryPortfolios from "./categoryPortfolios/categoryPortfoliosSlice"
 import social from "./social/socialSlice"
 import ratings from "./ratings/ratingsSlice"
-import trending from "./trending/trendingSlice"
 import {
   FLUSH,
   PAUSE,
@@ -107,6 +108,12 @@ const persistTrending = {
   storage
 }
 
+const persistForYou = {
+  key: "forYou",
+  storage
+}
+
+
 const rootReducer = combineReducers({
       allPortfolio: persistReducer(persistAllPortfolio, allPortfolio),
       categories: persistReducer(persistCategories, categories),
@@ -122,10 +129,11 @@ const rootReducer = combineReducers({
       portfolioDetails: persistReducer(persistPortfolioDetails, portfolioDetails),
       comments: persistReducer(persistComments, comments),
       dashboard: persistReducer(persistDashboard, dashboard),
+      forYou: persistReducer(persistForYou, forYou),
+      trending: persistReducer(persistTrending, trending),
       categoryPortfolios: persistReducer(persistCategoryPortfolios, categoryPortfolios),
       social: persistReducer(persistSocial, social),
       ratings: persistReducer(persistRatings, ratings),
-      trending: persistReducer(persistTrending, trending),
     });
 export const store = configureStore({
   reducer: rootReducer,

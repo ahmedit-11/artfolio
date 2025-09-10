@@ -123,12 +123,12 @@ const CallToAction = () => {
               Your breakthrough moment starts here.
             </p>
 
-            {/* Interactive stats with hover effects */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 max-w-4xl mx-auto">
+            {/* Interactive stats with hover effects
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12 max-w-4xl mx-auto">
               {[
                 { number: "20K+", label: "Active Creators", icon: Users, gradient: "from-blue-500 to-purple-500" },
                 { number: "500k+", label: "Portfolio Views", icon: Eye, gradient: "from-pink-500 to-red-500" },
-                { number: "4.2k+", label: "Hires Initiated", icon: Rocket, gradient: "from-indigo-500 to-blue-600" }
+               
               ].map((stat, index) => {
                 const Icon = stat.icon;
                 return (
@@ -144,7 +144,7 @@ const CallToAction = () => {
                   </div>
                 );
               })}
-            </div>
+            </div> */}
 
             {/* Enhanced CTA buttons */}
             <div className="flex flex-col sm:flex-row gap-6 justify-center items-center">
@@ -162,7 +162,7 @@ const CallToAction = () => {
                 </Button>
               </Link>
               
-              <Link to="/explore">
+              <Link to="/trending">
                 <Button 
                   size="lg" 
                   variant="outline"

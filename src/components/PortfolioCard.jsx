@@ -59,7 +59,8 @@ const PortfolioCard = ({
     likes_count: portfolioLikes = likes,
     comments_count: portfolioComments = comments,
     tags: portfolioTags = tags,
-    rating: portfolioRating = rating
+    rating: portfolioRating = rating,
+    average_rating: portfolioAverageRating = 0
   } = portfolioData;
 
   // Handle cover image first, then fallback to media array or direct image field
@@ -72,6 +73,7 @@ const PortfolioCard = ({
   const rawCreatorImg = user?.profile_picture;
   const creatorImg = getProfileImageUrl(rawCreatorImg);
   
+  
   const navigate = useNavigate();
 
   const handleCardClick = (e) => {
@@ -83,6 +85,10 @@ const PortfolioCard = ({
     }
   };
   const token = Cookies.get('token')
+  
+  // Use average_rating from backend data, fallback to prop rating or 0
+  const displayRating = portfolioAverageRating || portfolioRating || 0;
+
   return (
     <div
       className={cn(
@@ -152,10 +158,10 @@ const PortfolioCard = ({
               <MessageCircle className="size-4" />
               <span>{portfolioComments || 0}</span>
             </div>
-              <div className="flex items-center gap-1" aria-label={`Rating: ${rating} out of 5`}>
+              <div className="flex items-center gap-1" aria-label={`Rating: ${displayRating} out of 5`}>
                 {[...Array(5)].map((_, index) => {
                   const starIndex = index; // 0-based
-                  const diff = rating - starIndex;
+                  const diff = displayRating - starIndex;
                   const fillPercent = diff >= 1 ? 100 : diff >= 0.5 ? 50 : 0;
                   return (
                     <span key={index} className="relative inline-block" style={{ width: 16, height: 16 }} aria-hidden="true">

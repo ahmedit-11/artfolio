@@ -4,7 +4,7 @@ import axios from "axios";
 export const getFollowingCountThunk = createAsyncThunk("social/getFollowingCount", async (userId) => {
     try {
         const response = await axios.get(`/users/${userId}/following-count`);
-        console.log("Get following count response:", response.data);
+       
         return response.data;
     } catch (error) {
         console.error("Get following count error:", error);

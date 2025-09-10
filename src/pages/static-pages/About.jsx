@@ -1,5 +1,5 @@
 import React from "react";
-import { useScrollToTop } from "../utils/scrollToTop";
+import { useScrollToTop } from "../../utils/scrollToTop";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PageTitle from "@/components/PageTitle";
@@ -108,7 +108,7 @@ const About = () => {
                 Start your portfolio, explore inspiring creators, and share your journey.
               </p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-                <Link to="/explore" className="inline-flex items-center justify-center rounded-md bg-purple-600 text-white px-5 py-2.5 font-medium hover:bg-purple-700 transition-colors">
+                <Link to="/trending" className="inline-flex items-center justify-center rounded-md bg-purple-600 text-white px-5 py-2.5 font-medium hover:bg-purple-700 transition-colors">
                   Explore Portfolios
                 </Link>
                 <Link to="/create" className="inline-flex items-center justify-center rounded-md border border-border px-5 py-2.5 font-medium hover:bg-accent/40">

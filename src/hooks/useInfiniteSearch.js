@@ -9,10 +9,11 @@ export const useInfiniteSearch = (searchType = 'projects') => {
   const [hasMore, setHasMore] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [query, setQuery] = useState('');
+  const [selectedTagId, setSelectedTagId] = useState(null);
 
   const endpoint = searchType === 'users' ? '/search/users' : '/search/projects';
 
-  const search = useCallback(async (searchQuery, page = 1, append = false) => {
+  const search = useCallback(async (searchQuery, tagId = null, page = 1, append = false) => {
     if (page === 1) {
       setLoading(true);
       setData([]);
@@ -23,13 +24,20 @@ export const useInfiniteSearch = (searchType = 'projects') => {
     setError(null);
 
     try {
-      const response = await axios.get(endpoint, {
-        params: {
-          keyword: searchQuery,
-          page,
-          per_page: 20
-        }
-      });
+      const params = {
+        page,
+        per_page: 20
+      };
+
+      // Add search parameters based on search type
+      if (searchType === 'projects') {
+        if (searchQuery) params.keyword = searchQuery;
+        if (tagId) params.tag_id = tagId;
+      } else {
+        if (searchQuery) params.keyword = searchQuery;
+      }
+
+      const response = await axios.get(endpoint, { params });
 
       const newData = response.data.data;
       
@@ -48,18 +56,19 @@ export const useInfiniteSearch = (searchType = 'projects') => {
       setLoading(false);
       setLoadingMore(false);
     }
-  }, [endpoint]);
+  }, [endpoint, searchType]);
 
   const loadMore = useCallback(() => {
-    if (hasMore && !loadingMore && query) {
-      search(query, currentPage + 1, true);
+    if (hasMore && !loadingMore && (query || selectedTagId)) {
+      search(query, selectedTagId, currentPage + 1, true);
     }
-  }, [hasMore, loadingMore, query, currentPage, search]);
+  }, [hasMore, loadingMore, query, selectedTagId, currentPage, search]);
 
-  const newSearch = useCallback((searchQuery) => {
+  const newSearch = useCallback((searchQuery, tagId = null) => {
     setQuery(searchQuery);
-    if (searchQuery.trim().length >= 3) {
-      search(searchQuery, 1, false);
+    setSelectedTagId(tagId);
+    if (searchQuery?.trim().length >= 3 || tagId) {
+      search(searchQuery, tagId, 1, false);
     } else {
       setData([]);
       setHasMore(false);
@@ -69,6 +78,7 @@ export const useInfiniteSearch = (searchType = 'projects') => {
   const clear = useCallback(() => {
     setData([]);
     setQuery('');
+    setSelectedTagId(null);
     setHasMore(false);
     setCurrentPage(1);
     setError(null);
@@ -80,6 +90,7 @@ export const useInfiniteSearch = (searchType = 'projects') => {
     loadingMore,
     error,
     hasMore,
+    selectedTagId,
     search: newSearch,
     loadMore,
     clear

@@ -3,7 +3,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Link } from "react-router-dom";
 import { Palette, SunMoon, Users2, Image, Smartphone, LogIn, Sparkles } from "lucide-react";
-import { useScrollToTop } from "../utils/scrollToTop";
+import { useScrollToTop } from "../../utils/scrollToTop";
 
 const Features = () => {
   useScrollToTop();

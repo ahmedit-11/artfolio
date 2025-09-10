@@ -7,6 +7,7 @@ import PortfolioCard from "@/components/PortfolioCard";
 import { useSearch, localSearch } from "@/contexts/SearchContext";
 import PageTitle from "@/components/PageTitle";
 import { getCurrentUserThunk } from "@/store/currentUser/thunk/getCurrentUserThunk";
+import { getRatingsThunk } from "@/store/ratings/thunk/getRatingsThunk";
 import { Button } from "@/components/ui/button";
 import { Users, Heart } from "lucide-react";
 import axios from "axios";
@@ -61,6 +62,16 @@ const FollowingPage = () => {
     return () => clearTimeout(timeoutId);
   }, [currentUser?.following]);
 
+  useEffect(() => {
+    if (followingPortfolios && followingPortfolios.length > 0) {
+      followingPortfolios.forEach(portfolio => {
+        if (portfolio.slug) {
+          dispatch(getRatingsThunk(portfolio.slug));
+        }
+      });
+    }
+  }, [followingPortfolios, dispatch]);
+
   const filtered = followingPortfolios.length > 0 ? localSearch(followingPortfolios, query) : [];
 
   // Loading skeleton
@@ -89,7 +100,7 @@ const FollowingPage = () => {
         Start following creators to see their amazing work here!
       </p>
       <Button 
-        onClick={() => window.location.href = '/explore'} 
+        onClick={() => window.location.href = '/trending'} 
         className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
       >
         <Heart className="w-4 h-4 mr-2" />

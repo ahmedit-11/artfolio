@@ -11,11 +11,9 @@ const TrendingPortfolios = () => {
   const { projects, loading, error } = useSelector(state => state.trending);
 
   useEffect(() => {
-    // Fetch trending projects if not already loaded
-    if (!projects.length) {
-      dispatch(getTrendingProjectsThunk());
-    }
-  }, [dispatch, projects.length]);
+    // Call API every time component mounts (home screen enter)
+    dispatch(getTrendingProjectsThunk());
+  }, [dispatch]);
 
   // Display only top 4 trending projects
   const topFourProjects = projects.slice(0, 4);

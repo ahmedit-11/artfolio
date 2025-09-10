@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { useScrollToTop } from "../utils/scrollToTop";
+import { useScrollToTop } from "../../utils/scrollToTop";
 import { Link, useNavigate } from "react-router-dom";
 import Cookies from "js-cookie"
 import { useDispatch, useSelector } from "react-redux";
-import { loginThunk } from "../store/auth/thunk/loginThunk";
+import { loginThunk } from "../../store/auth/thunk/loginThunk";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -98,7 +98,7 @@ const SignIn = () => {
                   <div className="flex items-center justify-between">
                     <Label htmlFor="password" className="font-quicksand">Password</Label>
                     <Link
-                      to="/forgot-password"
+                      to="/auth/forgot-password"
                       className="text-sm text-primary hover:underline font-quicksand transition-all"
                     >
                       Forgot password?
@@ -156,7 +156,7 @@ const SignIn = () => {
               <div className="text-center text-sm text-muted-foreground font-quicksand">
                 Don't have an account?{" "}
                 <Link
-                  to="/signup"
+                  to="/auth/signup"
                   className="text-primary hover:underline font-semibold transition-all hover:text-purple-600"
                 >
                   Sign Up

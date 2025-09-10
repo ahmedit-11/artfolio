@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import { useScrollToTop } from "../utils/scrollToTop";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -11,35 +12,58 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { getProfileImageUrl } from "@/utils/mediaUtils";
 import { useInfiniteSearch } from "@/hooks/useInfiniteSearch";
 import PortfolioCard from "@/components/PortfolioCard";
+import { getAllTagsThunk } from "@/store/tags/thunk/getAllTagsThunk";
+import { getRatingsThunk } from "@/store/ratings/thunk/getRatingsThunk";
 
 const popularTerms = ["UI/UX", "3D", "Illustration", "Photography"];
 
 const SearchSimple = () => {
   useScrollToTop();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const { query, setQuery } = useSearch();
   const [scope, setScope] = useState("portfolios");
   const [history, setHistory] = useState(() => JSON.parse(localStorage.getItem("searchHistory") || "[]"));
+  const [selectedTag, setSelectedTag] = useState(null);
   
   const userSearch = useInfiniteSearch('users');
   const projectSearch = useInfiniteSearch('projects');
   
   const currentSearch = scope === 'users' ? userSearch : projectSearch;
+  const { tags, loading: tagsLoading } = useSelector(state => state.tags);
+
+  // Fetch available tags using Redux thunk
+  useEffect(() => {
+    if (tags.length === 0) {
+      dispatch(getAllTagsThunk());
+    }
+  }, [dispatch, tags.length]);
 
   // Clear search when scope changes
   useEffect(() => {
     userSearch.clear();
     projectSearch.clear();
+    setSelectedTag(null);
   }, [scope]);
 
-  // Search when query changes
+  // Search when query or tag changes
   useEffect(() => {
     if (scope === 'users') {
       userSearch.search(query);
     } else {
-      projectSearch.search(query);
+      projectSearch.search(query, selectedTag?.id);
     }
-  }, [query, scope]);
+  }, [query, selectedTag, scope]);
+
+  useEffect(() => {
+    if (currentSearch?.data && currentSearch.data.length > 0 && scope === 'portfolios') {
+      currentSearch.data.forEach(portfolio => {
+        if (portfolio.slug) {
+          dispatch(getRatingsThunk(portfolio.slug));
+        }
+      });
+    }
+  }, [currentSearch?.data, scope, dispatch]);
 
   const handleSubmit = (val) => {
     if (!val) return;
@@ -49,6 +73,22 @@ const SearchSimple = () => {
       localStorage.setItem("searchHistory", JSON.stringify(updated));
       return updated;
     });
+  };
+
+  const handleQuickSearch = (val) => {
+    setQuery(val);
+    setHistory((prev) => {
+      const updated = [val, ...prev.filter((h) => h !== val)].slice(0, 5);
+      localStorage.setItem("searchHistory", JSON.stringify(updated));
+      return updated;
+    });
+  };
+
+  const handleTagClick = (tag) => {
+    if (scope === 'portfolios') {
+      setSelectedTag(selectedTag?.id === tag.id ? null : tag);
+      setQuery(''); // Clear text search when selecting tag
+    }
   };
 
   return (
@@ -79,13 +119,34 @@ const SearchSimple = () => {
           ))}
         </div>
 
+        {/* Tags Section - Only show for portfolios */}
+        {scope === 'portfolios' && tags.length > 0 && (
+          <section className="space-y-4">
+            <div>
+              <h2 className="font-semibold mb-2">Search by tags</h2>
+              <div className="flex flex-wrap gap-2">
+                {tags.map((tag) => (
+                  <Button 
+                    key={tag.id} 
+                    size="sm" 
+                    variant={selectedTag?.id === tag.id ? "default" : "secondary"}
+                    onClick={() => handleTagClick(tag)}
+                  >
+                    {tag.name}
+                  </Button>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
+
         {/* Popular & History */}
         <section className="space-y-4">
           <div>
             <h2 className="font-semibold mb-2">Popular searches</h2>
             <div className="flex flex-wrap gap-2">
               {popularTerms.map((term) => (
-                <Button key={term} size="sm" variant="secondary" onClick={() => setQuery(term)}>
+                <Button key={term} size="sm" variant="secondary" onClick={() => handleQuickSearch(term)}>
                   {term}
                 </Button>
               ))}
@@ -96,7 +157,7 @@ const SearchSimple = () => {
               <h2 className="font-semibold mb-2">Recent searches</h2>
               <div className="flex flex-wrap gap-2">
                 {history.map((h) => (
-                  <Button key={h} size="sm" variant="ghost" onClick={() => setQuery(h)}>
+                  <Button key={h} size="sm" variant="ghost" onClick={() => handleQuickSearch(h)}>
                     {h}
                   </Button>
                 ))}
@@ -104,6 +165,20 @@ const SearchSimple = () => {
             </div>
           )}
         </section>
+
+        {/* Active Filters */}
+        {selectedTag && (
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-muted-foreground">Active filter:</span>
+            <Button 
+              size="sm" 
+              variant="outline" 
+              onClick={() => setSelectedTag(null)}
+            >
+              {selectedTag.name} ✕
+            </Button>
+          </div>
+        )}
 
         {/* Loading */}
         {currentSearch.loading && (
@@ -120,11 +195,11 @@ const SearchSimple = () => {
         )}
 
         {/* Results */}
-        {!currentSearch.loading && query.trim().length === 0 && (
-          <p className="text-center text-muted-foreground py-10">Start typing to search...</p>
+        {!currentSearch.loading && query.trim().length === 0 && !selectedTag && (
+          <p className="text-center text-muted-foreground py-10">Start typing to search or select a tag...</p>
         )}
 
-        {!currentSearch.loading && query.trim().length >= 3 && (
+        {!currentSearch.loading && (query.trim().length >= 3 || selectedTag) && (
           <>
             {currentSearch.data.length > 0 ? (
               <div className="space-y-6">

@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import PortfolioCard from "@/components/PortfolioCard";
 import { getCategoryPortfoliosThunk } from "@/store/categoryPortfolios/thunk/getCategoryPortfoliosThunk";
 import { clearCategoryPortfolios } from "@/store/categoryPortfolios/categoryPortfoliosSlice";
+import { getRatingsThunk } from "@/store/ratings/thunk/getRatingsThunk";
 
 const CategoryPage = () => {
   const { categorySlug } = useParams();
@@ -27,6 +28,17 @@ const CategoryPage = () => {
       dispatch(clearCategoryPortfolios());
     };
   }, [dispatch, categorySlug]);
+
+  // Fetch ratings for each portfolio when portfolios are loaded
+  useEffect(() => {
+    if (portfolios && portfolios.length > 0) {
+      portfolios.forEach(portfolio => {
+        if (portfolio.slug) {
+          dispatch(getRatingsThunk(portfolio.slug));
+        }
+      });
+    }
+  }, [portfolios, dispatch]);
 
   if (loading) {
     return (

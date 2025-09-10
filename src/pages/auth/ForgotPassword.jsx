@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useScrollToTop } from "../utils/scrollToTop";
+import { useScrollToTop } from "../../utils/scrollToTop";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,7 +10,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { toast } from "react-toastify";
 import PageTitle from "@/components/PageTitle";
-import { authAPI } from "../lib/api";
+import { authAPI } from "../../lib/api";
 
 const ForgotPassword = () => {
   useScrollToTop();
@@ -85,7 +85,7 @@ const ForgotPassword = () => {
                 </Button>
                 <div className="text-center text-sm text-muted-foreground font-quicksand">
                   <Link
-                    to="/signin"
+                    to="/auth/signin"
                     className="text-primary hover:underline font-semibold transition-all hover:text-purple-600 inline-flex items-center"
                   >
                     <ArrowLeft className="w-4 h-4 mr-1" />
@@ -157,7 +157,7 @@ const ForgotPassword = () => {
               <div className="text-center text-sm text-muted-foreground font-quicksand">
                 Remember your password?{" "}
                 <Link
-                  to="/signin"
+                  to="/auth/signin"
                   className="text-primary hover:underline font-semibold transition-all hover:text-purple-600 inline-flex items-center"
                 >
                   <ArrowLeft className="w-4 h-4 mr-1" />

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useScrollToTop } from "../utils/scrollToTop";
+import { useScrollToTop } from "../../utils/scrollToTop";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,7 +11,7 @@ import Footer from "@/components/Footer";
 import { toast } from "react-toastify";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
 import PageTitle from "@/components/PageTitle";
-import { authAPI } from "../lib/api";
+import { authAPI } from "../../lib/api";
 
 const ResetPassword = () => {
   useScrollToTop();
@@ -34,7 +34,7 @@ const ResetPassword = () => {
     // Check if required parameters are present
     if (!formData.token || !formData.email) {
       toast.error("Invalid reset link. Please request a new password reset.");
-      navigate('/forgot-password');
+      navigate('/auth/forgot-password');
     }
   }, [formData.token, formData.email, navigate]);
 
@@ -123,7 +123,7 @@ const ResetPassword = () => {
               </CardHeader>
               <CardFooter className="flex flex-col space-y-4 animate-fade-in animation-delay-300">
                 <Button
-                  onClick={() => navigate('/signin')}
+                  onClick={() => navigate('/auth/signin')}
                   className="w-full bg-purple-gradient hover:opacity-90 transition-all font-quicksand"
                 >
                   Continue to Sign In
@@ -241,7 +241,7 @@ const ResetPassword = () => {
               <div className="text-center text-sm text-muted-foreground font-quicksand">
                 Remember your password?{" "}
                 <Link
-                  to="/signin"
+                  to="/auth/signin"
                   className="text-primary hover:underline font-semibold transition-all hover:text-purple-600 inline-flex items-center"
                 >
                   <ArrowLeft className="w-4 h-4 mr-1" />

@@ -115,8 +115,9 @@ useEffect(()=>{
     }
 
     try {
-      // Step 1: Create tags dynamically and get their IDs using Redux
+      // Step 1: Create or get all tags first
       const tagIds = [];
+      
       if (selectedTags.length > 0) {
         for (const tagName of selectedTags) {
           // Check if tag already exists in Redux store
@@ -126,14 +127,13 @@ useEffect(()=>{
             // Use existing tag ID
             tagIds.push(existingTag.id);
           } else {
-            // Try to create new tag using Redux thunk
+            // Create new tag using the get-or-create endpoint
             try {
               const tagResult = await dispatch(createTagThunk({ name: tagName }));
               if (createTagThunk.fulfilled.match(tagResult) && tagResult.payload.tag) {
                 tagIds.push(tagResult.payload.tag.id);
               }
             } catch (error) {
-              // Silently skip this tag if creation fails
               console.warn(`Could not create tag: ${tagName}`, error);
             }
           }
@@ -152,7 +152,7 @@ useEffect(()=>{
         formData.append('category_ids[]', selectedCategory.id);
       }
       
-      // Add the created tag IDs
+      // Add all tag IDs (existing + newly created)
       tagIds.forEach(tagId => {
         formData.append('tag_ids[]', tagId);
       });
@@ -172,7 +172,7 @@ useEffect(()=>{
       
       if (createPortfolioThunk.fulfilled.match(result)) {
         toast.success("Portfolio created successfully!");
-        navigate("/");
+        navigate("/profile");
       } else {
         const errorMessage = result.payload || "Failed to create portfolio. Please try again.";
         toast.error(errorMessage);

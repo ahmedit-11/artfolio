@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useScrollToTop } from "../utils/scrollToTop";
+import { useScrollToTop } from "../../utils/scrollToTop";
 import { Link, useNavigate } from "react-router-dom";
 import Cookies from "js-cookie"
 import { Button } from "@/components/ui/button";
@@ -15,7 +15,7 @@ import PageTitle from "@/components/PageTitle";
 
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
 import { useDispatch, useSelector } from "react-redux";
-import { registerThunk } from "../store/auth/thunk/registrerThunk";
+import { registerThunk } from "../../store/auth/thunk/registrerThunk";
 
 const SignUp = () => {
   useScrollToTop();
@@ -85,7 +85,7 @@ const SignUp = () => {
       if (registerThunk.fulfilled.match(result)) {
         toast.success("Registration successful!");
         setTimeout(() => {
-          navigate("/signin");
+          navigate("/auth/signin");
         }, 500);
       } else {
         // Handle error from thunk
@@ -300,7 +300,7 @@ const SignUp = () => {
               <div className="text-center text-sm text-muted-foreground font-quicksand">
                 Already have an account?{" "}
                 <Link
-                  to="/signin"
+                  to="/auth/signin"
                   className="text-primary hover:underline font-semibold transition-all hover:text-purple-600"
                 >
                   Sign In

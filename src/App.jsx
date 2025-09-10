@@ -3,7 +3,7 @@
 import React, { useEffect,Suspense } from "react";
 import { SearchProvider } from './contexts/SearchContext';
 import { ChatProvider } from './contexts/ChatContext';
-import { NotificationProvider } from './contexts/NotificationContext';
+import { PusherProvider } from './contexts/PusherContext';
 
 // Import routing components from react-router-dom
 // import { BrowserRouter, Routes, Route } from "react-router-dom";
@@ -46,26 +46,26 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "@/components/Layout";
 import SearchPage from "@/pages/SearchSimple";
 import Index from "./pages/Index";
-import NotFound from "./pages/NotFound";
-import SignIn from "./pages/SignIn";
-import SignUp from "./pages/SignUp";
-import ForgotPassword from "./pages/ForgotPassword";
-import ResetPassword from "./pages/ResetPassword";
-import ChangePassword from "./pages/ChangePassword";
+import NotFound from "./pages/static-pages/NotFound";
+import SignIn from "./pages/auth/SignIn";
+import SignUp from "./pages/auth/SignUp";
+import ForgotPassword from "./pages/auth/ForgotPassword";
+import ResetPassword from "./pages/auth/ResetPassword";
+import ChangePassword from "./pages/auth/ChangePassword";
 import Settings from "./pages/Settings";
 import Profile from "./pages/profile/Profile";
 import ProfileSettings from "./pages/ProfileSettings";
-import Terms from "./pages/Terms";
-import Privacy from "./pages/Privacy";
+import Terms from "./pages/static-pages/Terms";
+import Privacy from "./pages/static-pages/Privacy";
 import FollowingPage from "./pages/Following";
 import TrendingPage from "./pages/Trending";
-import ExplorePage from "./pages/Explore";
+// import ExplorePage from "./pages/Explore";
 import ForYouPage from "./pages/ForYou";
-import Contact from "./pages/Contact";
-import About from "./pages/About";
-import Features from "./pages/Features";
-import CookiesPage from "./pages/Cookies";
-import PortfolioDetail from "./pages/PortfolioDetail";
+import Contact from "./pages/static-pages/Contact";
+import About from "./pages/static-pages/About";
+import Features from "./pages/static-pages/Features";
+import CookiesPage from "./pages/static-pages/Cookies";
+import PortfolioDetail from "./pages/portfolio-detail/PortfolioDetail";
 import CreatePortfolio from "./pages/CreatePortfolio";
 import EditPortfolio from "./pages/EditPortfolio";
 import AdminPanel from "./components/admin/AdminPanel";
@@ -120,9 +120,9 @@ const App = () => {
   // Layout wraps the main pages, while other routes are defined for authentication, legal, and error pages
   return (
     <SearchProvider>
-      <NotificationProvider>
-        <BrowserRouter>
-          <ChatProvider>
+      <PusherProvider>
+          <BrowserRouter>
+            <ChatProvider>
       <Suspense fallback={
           <div className="flex items-center justify-center min-h-screen">
             <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-purple-600"></div>
@@ -136,6 +136,7 @@ const App = () => {
             <Route path="/settings" element={<Settings />} />
             <Route path="/settings/profile" element={<ProfileSettings />} />
             <Route path="/settings/change-password" element={<ChangePassword />} />
+            <Route path="/auth/change-password" element={<ChangePassword />} />
             <Route path="/create" element={<CreatePortfolio />} />
             <Route path="/edit-portfolio/:id" element={<EditPortfolio />} />
             <Route path="/categories/:categorySlug/projects" element={<CategoryPage />} />
@@ -147,15 +148,19 @@ const App = () => {
             <Route path="/simple-chat" element={<SimpleChatTest />} /> */}
           </Route>
           <Route path="/projects/:slug" element={<PortfolioDetail />} />
+          <Route path="/auth/signin" element={<SignIn />} />
+          <Route path="/auth/signup" element={<SignUp />} />
+          <Route path="/auth/forgot-password" element={<ForgotPassword />} />
           <Route path="/signin" element={<SignIn />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/auth/reset-password" element={<ResetPassword />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/following" element={<FollowingPage />} />
           <Route path="/trending" element={<TrendingPage />} />
-          <Route path="/explore" element={<ExplorePage />} />
+          {/* <Route path="/explore" element={<ExplorePage />} /> */}
           <Route path="/for-you" element={<ForYouPage />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/about" element={<About />} />
@@ -167,14 +172,13 @@ const App = () => {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
-          </ChatProvider>
-        </BrowserRouter>
-      </NotificationProvider>
+            </ChatProvider>
+          </BrowserRouter>
+        </PusherProvider>
       {/* ToastContainer  */}
       <ToastContainer position="top-right" autoClose={3000} limit={3} />
     </SearchProvider>
   );
-  
 };
 
 export default App;

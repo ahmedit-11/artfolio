@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { useScrollToTop } from "../utils/scrollToTop";
 import Hero from "@/components/Hero";
 import FeaturedCategories from "@/components/FeaturedCategories";
@@ -9,7 +10,17 @@ import CallToAction from "@/components/CallToAction";
 // import AuthForm from "@/pages/authForm/authForm"
 
 const Index = () => {
+  const navigate = useNavigate();
   useScrollToTop();
+
+  const handlePortfolioClick = (portfolio) => {
+    navigate(`/projects/${portfolio.slug || portfolio.id}`);
+  };
+
+  const handleViewAllFollowing = () => {
+    navigate('/following');
+  };
+
   return (
     <div className="animate-fade-in">
       <div className="animate-fade-in">
@@ -22,7 +33,8 @@ const Index = () => {
         <Following 
           title="Following"
           viewAllText="View All"
-          onViewAllClick={() => console.log("View all clicked")}
+          onViewAllClick={handleViewAllFollowing}
+          onItemClick={handlePortfolioClick}
         />
       </div>
       <div className="animate-fade-in animation-delay-900">

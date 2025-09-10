@@ -7,8 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Heart, Search, User, Home, Image, Menu, X, Mail, LogIn, Compass, Users, TrendingUp, Settings, ArrowLeft, MessageCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 import ThemeToggle from "./ThemeToggle";
-import NotificationDropdown from "./NotificationDropdown";
 import AvatarMenu from "./AvatarMenu";
+import NotificationDropdown from "./NotificationDropdown";
 
 // This would come from your auth context
 
@@ -103,13 +103,7 @@ const Header = () => {
             <TrendingUp className="size-4" />
             <span>Trending</span>
           </Link>
-          <Link to="/explore" className={cn(
-            "flex items-center space-x-1.5 text-muted-foreground hover:text-foreground transition-colors font-quicksand border-b-2 border-transparent hover:border-purple-200 dark:hover:border-purple-800",
-            location.pathname === "/explore" && "text-primary border-purple-600 dark:border-purple-400"
-          )}>
-            <Image className="size-4" />
-            <span>Explore</span>
-          </Link>
+        
           <Link to="/chat" className={cn(
             "flex items-center space-x-1.5 text-muted-foreground hover:text-foreground transition-colors font-quicksand border-b-2 border-transparent hover:border-purple-200 dark:hover:border-purple-800",
             location.pathname === "/chat" && "text-primary border-purple-600 dark:border-purple-400"
@@ -130,8 +124,7 @@ const Header = () => {
           >
             <Search className="size-5 dark:text-white " />
           </Button>
-          {/* Notifications bell */}
-          <NotificationDropdown />
+          {token && <NotificationDropdown />}
          
           {token ? (
             <AvatarMenu />
@@ -151,8 +144,7 @@ const Header = () => {
         {/* Mobile Menu Button and User Actions */}
         <div className="flex items-center space-x-3 md:hidden ">
           
-          {/* Notifications bell (mobile) */}
-          <NotificationDropdown />
+          {token && <NotificationDropdown />}
           
           {token ? (
             <AvatarMenu />

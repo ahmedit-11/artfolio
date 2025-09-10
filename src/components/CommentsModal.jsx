@@ -14,9 +14,11 @@ import { deleteCommentThunk } from "@/store/comments/thunk/deleteCommentThunk";
 import { getCommentsThunk } from "@/store/comments/thunk/getCommentsThunk";
 import { getProfileImageUrl } from "@/utils/mediaUtils";
 import { toast } from 'react-toastify';
+import { useScrollToTop } from "../utils/scrollToTop";
 
 
 const CommentsModal = ({ isOpen, onClose, portfolioSlug, portfolioTitle }) => {
+  useScrollToTop();
   const dispatch = useDispatch();
   const { loading: addingComment, deleteLoading, comments, currentProjectId } = useSelector(state => state.comments);
   const { currentUser } = useSelector(state => state.currentUser);

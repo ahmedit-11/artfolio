@@ -1,7 +1,7 @@
 import React from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { useScrollToTop } from "../utils/scrollToTop";
+import { useScrollToTop } from "../../utils/scrollToTop";
 import PageTitle from "@/components/PageTitle";
 import { Link } from "react-router-dom";
 

@@ -1,206 +1,180 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
+import { Bell, X, Check, CheckCheck, Trash2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import {
   DropdownMenu,
-  DropdownMenuTrigger,
   DropdownMenuContent,
-  DropdownMenuSeparator,
-  DropdownMenuLabel,
-  DropdownMenuItem,
-} from "@/components/ui/dropdown-menu";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
-import { Button } from "@/components/ui/button";
-import { Bell, Heart, MessageCircle, User as UserIcon, X } from "lucide-react";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { useNotifications } from "@/contexts/NotificationContext";
-import { useChat } from "@/contexts/ChatContext";
-import { useNavigate } from "react-router-dom";
-
-// Notifications are provided by NotificationContext
-
-
-
-// Notification item component for reuse
-const NotificationItem = ({ notification, onRemove, onClick }) => (
-  <div
-    className={`flex items-start space-x-3 py-3 px-4 hover:bg-muted/50 transition-colors relative group cursor-pointer ${
-    notification.isNew ? 'bg-blue-50/50 dark:bg-blue-950/20' : ''
-  }`}
-    onClick={() => onClick?.(notification)}
-    role="button"
-    tabIndex={0}
-  >
-    {/* New notification indicator */}
-    {notification.isNew && (
-      <div className="absolute left-2 top-1/2 -translate-y-1/2 w-2 h-2 bg-blue-500 rounded-full" />
-    )}
-    
-    <div className="relative flex-shrink-0">
-      <Avatar className="size-8">
-        <AvatarImage src={notification.avatar} alt={notification.actorName} />
-        <AvatarFallback>{notification.actorName.charAt(0)}</AvatarFallback>
-      </Avatar>
-      {/* action icon */}
-      <span className="absolute -bottom-1 -right-1 bg-background rounded-full p-0.5 shadow">
-        {notification.type === "like" && <Heart className="size-3 text-pink-500" />}
-        {notification.type === "follow" && <UserIcon className="size-3 text-cyan-500" />}
-        {notification.type === "comment" && <MessageCircle className="size-3 text-amber-500" />}
-        {notification.type === "message" && <MessageCircle className="size-3 text-purple-500" />}
-      </span>
-    </div>
-    
-    <div className="flex-1 text-sm leading-5 whitespace-normal break-words">
-      <span className="font-medium">{notification.actorName}</span> {notification.action}
-    </div>
-    
-    <div className="flex items-center space-x-2 flex-shrink-0">
-      <span className="text-xs text-muted-foreground">{notification.time}</span>
-      <Button
-        variant="ghost"
-        size="sm"
-        className="opacity-0 group-hover:opacity-100 transition-opacity h-6 w-6 p-0 hover:bg-red-100 dark:hover:bg-red-900/20"
-        onClick={(e) => {
-          e.stopPropagation();
-          onRemove(notification.id);
-        }}
-        aria-label="Remove notification"
-      >
-        <X className="size-3 text-red-500" />
-      </Button>
-    </div>
-  </div>
-);
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { usePusher } from '@/contexts/PusherContext';
+import { cn } from '@/lib/utils';
 
 const NotificationDropdown = () => {
-  const [desktopOpen, setDesktopOpen] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const { notifications, removeNotification, markAllAsRead, unreadCount } = useNotifications();
-  const { conversations, setSelectedConversation, startNewChat } = useChat();
-  const navigate = useNavigate();
+  const { 
+    notifications, 
+    unreadCount, 
+    markAsRead, 
+    markAllAsRead, 
+    clearAllNotifications 
+  } = usePusher();
+  
+  const [isOpen, setIsOpen] = useState(false);
 
-  const handleRemoveNotification = (id) => {
-    removeNotification(id);
+  const handleNotificationClick = (notification) => {
+    if (!notification.read) {
+      markAsRead(notification.id);
+    }
   };
 
-  const newNotificationsCount = unreadCount;
+  const formatTimeAgo = (timestamp) => {
+    const now = new Date();
+    const diff = now - new Date(timestamp);
+    const minutes = Math.floor(diff / 60000);
+    const hours = Math.floor(diff / 3600000);
+    const days = Math.floor(diff / 86400000);
 
-  const createTriggerButton = (onClick) => (
-    <Button
-      variant="ghost"
-      size="icon"
-      className="relative text-muted-foreground hover:text-foreground hover:bg-purple-100 dark:hover:bg-purple-900/20"
-      aria-label="Notifications"
-      onClick={onClick}
-    >
-      <Bell className="size-5 dark:text-white" />
-      {/* Unread indicator */}
-      {newNotificationsCount > 0 && (
-        <span className="absolute -top-0 -right-0 inline-flex items-center justify-center px-1.5 py-0.5 text-[10px] font-medium leading-none text-white bg-red-500 rounded-full">
-          {newNotificationsCount}
-        </span>
-      )}
-    </Button>
-  );
+    if (minutes < 1) return 'Just now';
+    if (minutes < 60) return `${minutes}m ago`;
+    if (hours < 24) return `${hours}h ago`;
+    return `${days}d ago`;
+  };
 
-  const handleNotificationClick = async (n) => {
-    try {
-      if (n.type === "message") {
-        // Try to select by chatId first
-        let targetConv = null;
-        if (n.chatId) {
-          targetConv = conversations.find(
-            (c) => c.chatId === n.chatId || c.id === n.chatId
-          );
-        }
-
-        if (targetConv) {
-          setSelectedConversation(targetConv);
-        } else if (n.userId) {
-          const conv = await startNewChat(String(n.userId));
-          if (conv) setSelectedConversation(conv);
-        }
-
-        navigate("/chat");
-        setDesktopOpen(false);
-        setMobileOpen(false);
-      }
-    } catch (err) {
-      console.error("Failed to handle notification click", err);
+  const getNotificationIcon = (type) => {
+    switch (type) {
+      case 'like':
+        return '❤️';
+      case 'comment':
+        return '💬';
+      case 'follow':
+        return '👤';
+      default:
+        return '🔔';
     }
   };
 
   return (
-    <>
-      {/* Desktop: DropdownMenu with blur background */}
-      <div className="hidden md:block">
-        <DropdownMenu open={desktopOpen} onOpenChange={(open) => {
-          setDesktopOpen(open);
-          if (open) markAllAsRead();
-        }}>
-          <DropdownMenuTrigger asChild>
-            {createTriggerButton()}
-          </DropdownMenuTrigger>
-          <DropdownMenuContent 
-            align="end" 
-            className="w-80 max-h-[24rem] overflow-y-auto p-0 backdrop-blur-md bg-white/95 dark:bg-gray-900/95 border border-gray-200/50 dark:border-gray-700/50 shadow-xl"
-          >
-            <DropdownMenuLabel className="px-4 py-3 border-b border-gray-200/50 dark:border-gray-700/50">
-              Notifications
-            </DropdownMenuLabel>
-            <div className="max-h-[20rem] overflow-y-auto">
-              {notifications.map((n) => (
-                <div key={n.id} className="border-b border-border/50 last:border-b-0">
-                  <NotificationItem notification={n} onRemove={handleRemoveNotification} onClick={handleNotificationClick} />
+    <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="icon" className="relative">
+          <Bell className="h-5 w-5" />
+          {unreadCount > 0 && (
+            <Badge 
+              variant="destructive" 
+              className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
+            >
+              {unreadCount > 99 ? '99+' : unreadCount}
+            </Badge>
+          )}
+        </Button>
+      </DropdownMenuTrigger>
+      
+      <DropdownMenuContent 
+        align="end" 
+        className="w-80 p-0"
+        sideOffset={5}
+      >
+        <Card className="border-0 shadow-lg">
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-lg">Notifications</CardTitle>
+              <div className="flex items-center gap-2">
+                {unreadCount > 0 && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={markAllAsRead}
+                    className="text-xs"
+                  >
+                    <CheckCheck className="h-4 w-4 mr-1" />
+                    Mark all read
+                  </Button>
+                )}
+                {notifications.length > 0 && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={clearAllNotifications}
+                    className="text-xs text-destructive hover:text-destructive"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
+            </div>
+            {unreadCount > 0 && (
+              <p className="text-sm text-muted-foreground">
+                You have {unreadCount} unread notification{unreadCount !== 1 ? 's' : ''}
+              </p>
+            )}
+          </CardHeader>
+          
+          <Separator />
+          
+          <CardContent className="p-0">
+            <ScrollArea className="h-96">
+              {notifications.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-8 text-center">
+                  <Bell className="h-12 w-12 text-muted-foreground/50 mb-4" />
+                  <p className="text-sm text-muted-foreground">No notifications yet</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    You'll see notifications here when someone interacts with your content
+                  </p>
                 </div>
-              ))}
-              {notifications.length === 0 && (
-                <div className="p-8 text-sm text-center text-muted-foreground">
-                  No notifications
+              ) : (
+                <div className="divide-y">
+                  {notifications.map((notification) => (
+                    <div
+                      key={notification.id}
+                      onClick={() => handleNotificationClick(notification)}
+                      className={cn(
+                        "p-4 hover:bg-muted/50 cursor-pointer transition-colors relative",
+                        !notification.read && "bg-blue-50/50 dark:bg-blue-950/20"
+                      )}
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className="flex-shrink-0 text-lg">
+                          {getNotificationIcon(notification.type)}
+                        </div>
+                        
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-foreground leading-relaxed">
+                            {notification.data.message}
+                          </p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {formatTimeAgo(notification.timestamp)}
+                          </p>
+                        </div>
+                        
+                        <div className="flex-shrink-0 flex items-center gap-2">
+                          {!notification.read && (
+                            <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                          )}
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              markAsRead(notification.id);
+                            }}
+                            className="opacity-0 group-hover:opacity-100 transition-opacity p-1 h-6 w-6"
+                          >
+                            <Check className="h-3 w-3" />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               )}
-            </div>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-
-      {/* Mobile: Sheet */}
-      <div className="md:hidden">
-        <Sheet open={mobileOpen} onOpenChange={(open) => {
-          setMobileOpen(open);
-          if (open) markAllAsRead();
-        }}>
-          <SheetTrigger asChild>
-            {createTriggerButton()}
-          </SheetTrigger>
-          <SheetContent side="right" className="w-full sm:w-[400px] p-0">
-            <SheetHeader className="px-4 py-6 border-b">
-              <SheetTitle className="text-left">Notifications</SheetTitle>
-              <SheetDescription className="sr-only">
-                View and manage your notifications
-              </SheetDescription>
-            </SheetHeader>
-            <div className="flex-1 overflow-y-auto">
-              {notifications.map((n) => (
-                <div key={n.id} className="border-b border-border/50 last:border-b-0">
-                  <NotificationItem notification={n} onRemove={handleRemoveNotification} onClick={handleNotificationClick} />
-                </div>
-              ))}
-              {notifications.length === 0 && (
-                <div className="p-8 text-sm text-center text-muted-foreground">
-                  No notifications
-                </div>
-              )}
-            </div>
-          </SheetContent>
-        </Sheet>
-      </div>
-    </>
+            </ScrollArea>
+          </CardContent>
+        </Card>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };
 
