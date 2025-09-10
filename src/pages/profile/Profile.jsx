@@ -95,21 +95,34 @@ const Profile = () => {
   }, [userPortfolios, dispatch]);
 
   // Handle portfolio deletion
-  const handleDeletePortfolio = (portfolioId) => {
-    setPortfolioToDelete(portfolioId);
+  const handleDeletePortfolio = (portfolio) => {
+    console.log('Attempting to delete portfolio:', portfolio);
+    console.log('Portfolio ID:', portfolio.id, 'Portfolio slug:', portfolio.slug);
+    setPortfolioToDelete(portfolio);
     setShowConfirmDialog(true);
   };
 
   const confirmDelete = async () => {
     if (portfolioToDelete) {
+      console.log('Confirming deletion for portfolio:', portfolioToDelete);
+      console.log('Using portfolio slug:', portfolioToDelete.slug);
+      
       try {
-        await dispatch(deletePortfolioThunk(portfolioToDelete));
-        toast.success('Portfolio deleted successfully!');
-        // Refresh portfolios after deletion
-        dispatch(getUserPortfoliosThunk(profileUserId));
+        const result = await dispatch(deletePortfolioThunk(portfolioToDelete.slug));
+        
+        if (deletePortfolioThunk.fulfilled.match(result)) {
+          toast.success('Portfolio deleted successfully!');
+          // Refresh portfolios after deletion
+          dispatch(getUserPortfoliosThunk(profileUserId));
+        } else {
+          // Handle rejected case
+          const errorMessage = result.error?.message || 'Failed to delete portfolio. Please try again.';
+          toast.error(errorMessage);
+        }
       } catch (error) {
         console.error('Failed to delete portfolio:', error);
-        toast.error('Failed to delete portfolio. Please try again.');
+        const errorMessage = error.message || 'Failed to delete portfolio. Please try again.';
+        toast.error(errorMessage);
       } finally {
         setShowConfirmDialog(false);
         setPortfolioToDelete(null);
@@ -304,7 +317,7 @@ const Profile = () => {
                       <Button
                         variant="destructive"
                         size="sm"
-                        onClick={() => handleDeletePortfolio(portfolio.id)}
+                        onClick={() => handleDeletePortfolio(portfolio)}
                         disabled={deleteLoading}
                       >
                         {deleteLoading ? (

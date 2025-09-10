@@ -3,11 +3,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { X, Send, Loader2, Flag, Trash2 } from "lucide-react";
+import { X, Send, Loader2, Trash2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import ReportModal from "./ReportModal";
 import ConfirmDialog from "./ConfirmDialog";
-import { reportAPI } from "@/lib/api";
 import { useDispatch, useSelector } from "react-redux";
 import { addCommentThunk } from "@/store/comments/thunk/addCommentThunk";
 import { deleteCommentThunk } from "@/store/comments/thunk/deleteCommentThunk";
@@ -24,8 +22,6 @@ const CommentsModal = ({ isOpen, onClose, portfolioSlug, portfolioTitle }) => {
   const { currentUser } = useSelector(state => state.currentUser);
   
   const [newComment, setNewComment] = useState("");
-  const [showReportModal, setShowReportModal] = useState(false);
-  const [reportingComment, setReportingComment] = useState(null);
   const [deletingCommentId, setDeletingCommentId] = useState(null);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [commentToDelete, setCommentToDelete] = useState(null);
@@ -111,34 +107,6 @@ const CommentsModal = ({ isOpen, onClose, portfolioSlug, portfolioTitle }) => {
     return `${Math.floor(diffInMinutes / 1440)}d ago`;
   };
 
-  const handleReportComment = (comment) => {
-    setReportingComment({
-      ...comment,
-      displayText: `Comment by ${comment.user?.name || 'Unknown'}`
-    });
-    setShowReportModal(true);
-  };
-
-  const handleSubmitReport = async (reportData) => {
-    try {
-      await reportAPI.reportComment(reportingComment.id, {
-        reason: reportData.reason,
-        reason_type: reportData.reasonType
-      });
-      setShowReportModal(false);
-      setReportingComment(null);
-      toast.success("Comment reported successfully!");
-    } catch (error) {
-      console.error('Failed to report comment:', error);
-      toast.error("Failed to report comment. Please try again.");
-      throw error;
-    }
-  };
-
-  const handleCloseReportModal = () => {
-    setShowReportModal(false);
-    setReportingComment(null);
-  };
 
   if (!isOpen) return null;
 
@@ -228,15 +196,6 @@ const CommentsModal = ({ isOpen, onClose, portfolioSlug, portfolioTitle }) => {
                             Delete
                           </Button>
                         )}
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleReportComment(comment)}
-                          className="text-xs h-auto p-1 hover:bg-red-100 dark:hover:bg-red-900/20 hover:text-red-600"
-                        >
-                          <Flag className="size-3 mr-1" />
-                          Report
-                        </Button>
                       </div>
                     </div>
                   </div>
@@ -256,16 +215,6 @@ const CommentsModal = ({ isOpen, onClose, portfolioSlug, portfolioTitle }) => {
         message="Are you sure you want to delete this comment? This action cannot be undone."
       />
 
-      {/* Report Modal */}
-      {reportingComment && (
-        <ReportModal
-          isOpen={showReportModal}
-          onClose={handleCloseReportModal}
-          portfolioId={reportingComment.id}
-          portfolioTitle={reportingComment.displayText}
-          onSubmit={handleSubmitReport}
-        />
-      )}
     </div>
   );
 };

@@ -19,6 +19,8 @@ import trending from "./trending/trendingSlice"
 import categoryPortfolios from "./categoryPortfolios/categoryPortfoliosSlice"
 import social from "./social/socialSlice"
 import ratings from "./ratings/ratingsSlice"
+import reports  from "./reportt/reportSlice"
+import changePassword from "./changePassword/changePasswordSlice"
 import {
   FLUSH,
   PAUSE,
@@ -113,6 +115,15 @@ const persistForYou = {
   storage
 }
 
+const persistReports = {
+  key: "reports",
+  storage
+}
+
+const persistChangePassword = {
+  key: "changePassword",
+  storage
+} 
 
 const rootReducer = combineReducers({
       allPortfolio: persistReducer(persistAllPortfolio, allPortfolio),
@@ -134,6 +145,8 @@ const rootReducer = combineReducers({
       categoryPortfolios: persistReducer(persistCategoryPortfolios, categoryPortfolios),
       social: persistReducer(persistSocial, social),
       ratings: persistReducer(persistRatings, ratings),
+      reports: persistReducer(persistReports, reports),
+      changePassword: persistReducer(persistChangePassword, changePassword), 
     });
 export const store = configureStore({
   reducer: rootReducer,

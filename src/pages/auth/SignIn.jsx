@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import Cookies from "js-cookie"
 import { useDispatch, useSelector } from "react-redux";
 import { loginThunk } from "../../store/auth/thunk/loginThunk";
+import { getCurrentUserThunk } from "../../store/currentUser/thunk/getCurrentUserThunk";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -39,7 +40,23 @@ const SignIn = () => {
       
       if (loginThunk.fulfilled.match(result)) {
         toast.success("Login Successfully!");
-        navigate("/");
+        
+        // Get user data to determine role-based navigation
+        const userResult = await dispatch(getCurrentUserThunk());
+        
+        if (getCurrentUserThunk.fulfilled.match(userResult)) {
+          const user = userResult.payload;
+          
+          // Navigate based on user role
+          if (user.role === 'admin') {
+            navigate("/admin");
+          } else {
+            navigate("/");
+          }
+        } else {
+          // Fallback to home if user data fetch fails
+          navigate("/");
+        }
       } else {
         // Handle error from thunk
         const errorMessage = result.payload || "Login failed. Please try again.";

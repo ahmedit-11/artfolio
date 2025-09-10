@@ -68,10 +68,11 @@ import CookiesPage from "./pages/static-pages/Cookies";
 import PortfolioDetail from "./pages/portfolio-detail/PortfolioDetail";
 import CreatePortfolio from "./pages/CreatePortfolio";
 import EditPortfolio from "./pages/EditPortfolio";
-import AdminPanel from "./components/admin/AdminPanel";
+import AdminPanel from "./pages/admin/AdminPanel";
+import AdminRoute from "./components/AdminRoute";
+import UserRoute from "./components/UserRoute";
 // import Chat from "./pages/chat/Chat";
-// import ChatTest from "./pages/chat/ChatTest";
-// import TestAuth from "./pages/chat/TestAuth";
+// import ChatTest from "./pages/chat/TestAuth";
 // import TestUsers from "./pages/chat/TestUsers";
 // import SimpleChatTest from "./pages/chat/SimpleChatTest";
 import SimpleChat from "./pages/chat/SimpleChat";
@@ -129,7 +130,8 @@ const App = () => {
           </div>
         }>
         <Routes>
-          <Route element={<Layout />}>
+          {/* User-only routes - Protected from admin access */}
+          <Route element={<UserRoute><Layout /></UserRoute>}>
             <Route index element={<Index />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/profile/:userId" element={<Profile />} />
@@ -141,12 +143,13 @@ const App = () => {
             <Route path="/edit-portfolio/:id" element={<EditPortfolio />} />
             <Route path="/categories/:categorySlug/projects" element={<CategoryPage />} />
             <Route path="/chat" element={<SimpleChat />} />
-            {/* <Route path="/chat-old" element={<Chat />} /> */}
-            {/* <Route path="/chat-test" element={<ChatTest />} />
-            <Route path="/test-auth" element={<TestAuth />} />
-            <Route path="/test-users" element={<TestUsers />} />
-            <Route path="/simple-chat" element={<SimpleChatTest />} /> */}
+            <Route path="/following" element={<FollowingPage />} />
+            <Route path="/for-you" element={<ForYouPage />} />
+            <Route path="/search" element={<SearchPage />} />
           </Route>
+          
+          {/* Public routes - No authentication required */}
+          <Route path="/trending" element={<TrendingPage />} />
           <Route path="/projects/:slug" element={<PortfolioDetail />} />
           <Route path="/auth/signin" element={<SignIn />} />
           <Route path="/auth/signup" element={<SignUp />} />
@@ -158,16 +161,13 @@ const App = () => {
           <Route path="/auth/reset-password" element={<ResetPassword />} />
           <Route path="/terms" element={<Terms />} />
           <Route path="/privacy" element={<Privacy />} />
-          <Route path="/following" element={<FollowingPage />} />
-          <Route path="/trending" element={<TrendingPage />} />
-          {/* <Route path="/explore" element={<ExplorePage />} /> */}
-          <Route path="/for-you" element={<ForYouPage />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/about" element={<About />} />
-          <Route path="/admin" element={<AdminPanel />} />
-          <Route path="/search" element={<SearchPage />} />
           <Route path="/features" element={<Features />} />
           <Route path="/cookies" element={<CookiesPage />} />
+          
+          {/* Admin-only routes - Protected from user access */}
+          <Route path="/admin" element={<AdminRoute><AdminPanel /></AdminRoute>} />
   
           <Route path="*" element={<NotFound />} />
         </Routes>

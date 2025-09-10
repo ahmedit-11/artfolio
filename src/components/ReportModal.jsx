@@ -4,12 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { toast } from "react-toastify";
-
-const ReportModal = ({ isOpen, onClose, portfolioId, portfolioTitle, onSubmit }) => {
+import { createReportThunk } from "@/store/reportt/thunk/createReport";
+import { useDispatch } from "react-redux";
+const ReportModal = ({ isOpen, onClose, portfolioId, portfolioTitle }) => {
   const [selectedReason, setSelectedReason] = useState("");
   const [customReason, setCustomReason] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-
+  const dispatch = useDispatch()
   const reportReasons = [
     { id: "inappropriate", label: "Inappropriate Content", description: "Contains offensive or inappropriate material" },
     { id: "copyright", label: "Copyright Violation", description: "Uses copyrighted material without permission" },
@@ -31,11 +32,12 @@ const ReportModal = ({ isOpen, onClose, portfolioId, portfolioTitle, onSubmit })
 
     setIsSubmitting(true);
     try {
-      await onSubmit({
-        portfolioId,
+      await dispatch(createReportThunk({
+        reportable_id: portfolioId,
         reason: reason.trim(),
-        reasonType: selectedReason
-      });
+        reasonType: selectedReason,
+        reportable_type:"project"
+      }));
       toast.success("Report submitted successfully!", {
         position: "top-right",
         autoClose: 3000,

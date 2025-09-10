@@ -2,12 +2,13 @@ import React, { useState } from "react";
 import { useScrollToTop } from "../utils/scrollToTop";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Lock, User, Trash2, LogOut } from "lucide-react";
+import { Lock, User, Trash2, LogOut, Palette } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import PageTitle from "@/components/PageTitle";
 import { authAPI } from "../lib/api";
 import { toast } from "react-toastify";
 import ConfirmDialog from "@/components/ConfirmDialog";
+import ThemeToggle from "@/components/ThemeToggle";
 
 const SettingsSection = ({ icon: Icon, title, description, children, className }) => (
   <Card className={`p-6 mb-6 ${className || ''}`}>
@@ -103,12 +104,22 @@ const Settings = () => {
         </Button>
       </SettingsSection>
 
+      {/* Theme Settings */}
+      <SettingsSection
+        icon={Palette}
+        title="Theme"
+        description="Switch between light and dark mode"
+        className="animate-fade-in animation-delay-600"
+      >
+        <ThemeToggle />
+      </SettingsSection>
+
       {/* Delete Account */}
       <SettingsSection
         icon={Trash2}
         title="Delete Account"
         description="Permanently delete your account and all associated data"
-        className="animate-fade-in animation-delay-600"
+        className="animate-fade-in animation-delay-750"
       >
         <Button variant="destructive" onClick={() => setShowDeleteDialog(true)}>
           <Trash2 className="size-4 mr-2" />
@@ -121,7 +132,7 @@ const Settings = () => {
         icon={LogOut}
         title="Log Out"
         description="Sign out of your account on this device"
-        className="animate-fade-in animation-delay-750"
+        className="animate-fade-in animation-delay-900"
       >
         <Button 
           variant="destructive" 

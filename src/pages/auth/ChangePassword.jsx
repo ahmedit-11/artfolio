@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useScrollToTop } from "../../utils/scrollToTop";
 import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,11 +10,15 @@ import { Lock, Eye, EyeOff, ArrowLeft, CheckCircle } from "lucide-react";
 import { toast } from "react-toastify";
 import { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from "@/components/ui/tooltip";
 import PageTitle from "@/components/PageTitle";
-import { authAPI } from "../../lib/api";
+import { changePasswordThunk } from "../../store/changePassword/thunk/changePasswordThunk";
+import { resetChangePasswordState, clearError, clearSuccess } from "../../store/changePassword/changePasswordSlice";
 
 const ChangePassword = () => {
   useScrollToTop();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  
+  const { loading, success, error, message } = useSelector(state => state.changePassword);
   
   const [formData, setFormData] = useState({
     current_password: '',
@@ -21,11 +26,33 @@ const ChangePassword = () => {
     new_password_confirmation: ''
   });
   
-  const [isLoading, setIsLoading] = useState(false);
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [isChangeSuccessful, setIsChangeSuccessful] = useState(false);
+
+  // Handle Redux state changes
+  useEffect(() => {
+    if (success) {
+      toast.success(message || "Password changed successfully!");
+      setFormData({
+        current_password: '',
+        new_password: '',
+        new_password_confirmation: ''
+      });
+    }
+    
+    if (error) {
+      toast.error(error);
+      dispatch(clearError());
+    }
+  }, [success, error, message, dispatch]);
+
+  // Reset state when component unmounts
+  useEffect(() => {
+    return () => {
+      dispatch(resetChangePasswordState());
+    };
+  }, [dispatch]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -53,35 +80,11 @@ const ChangePassword = () => {
       return;
     }
 
-    setIsLoading(true);
-    
-    try {
-      const response = await authAPI.changePassword({
-        current_password: formData.current_password,
-        new_password: formData.new_password,
-        new_password_confirmation: formData.new_password_confirmation
-      });
-      
-      if (response && response.success) {
-        setIsChangeSuccessful(true);
-        toast.success("Password changed successfully!");
-      } else {
-        toast.error("Failed to change password. Please try again.");
-      }
-    } catch (error) {
-      console.error("Change password error:", error);
-      let message = "An error occurred. Please try again.";
-      
-      if (error.response && error.response.data && error.response.data.message) {
-        message = error.response.data.message;
-      } else if (error.message) {
-        message = error.message;
-      }
-      
-      toast.error(message);
-    } finally {
-      setIsLoading(false);
-    }
+    dispatch(changePasswordThunk({
+      current_password: formData.current_password,
+      new_password: formData.new_password,
+      new_password_confirmation: formData.new_password_confirmation
+    }));
   };
 
   const toggleCurrentPasswordVisibility = () => {
@@ -96,7 +99,7 @@ const ChangePassword = () => {
     setShowConfirmPassword(!showConfirmPassword);
   };
 
-  if (isChangeSuccessful) {
+  if (success) {
     return (
       <div className="container max-w-2xl mx-auto px-4 py-8 bg-background animate-fade-in">
         <div className="text-center mb-8">
@@ -117,7 +120,10 @@ const ChangePassword = () => {
           </CardHeader>
           <CardContent className="flex flex-col space-y-4">
             <Button
-              onClick={() => navigate('/settings')}
+              onClick={() => {
+                dispatch(clearSuccess());
+                navigate('/settings');
+              }}
               className="w-full bg-purple-gradient hover:opacity-90 transition-all font-quicksand"
             >
               Back to Settings
@@ -255,9 +261,9 @@ const ChangePassword = () => {
             <Button
               type="submit"
               className="w-full bg-purple-gradient hover:opacity-90 transition-all font-quicksand"
-              disabled={isLoading}
+              disabled={loading}
             >
-              {isLoading ? (
+              {loading ? (
                 <span className="flex items-center">
                   <span className="animate-spin mr-2">◌</span>
                   Changing Password...

@@ -145,7 +145,7 @@ export const authAPI = {
 
   // Change password
   changePassword: async (passwordData) => {
-    const response = await api.put('/user/change-password', passwordData);
+    const response = await api.post('/change-password', passwordData);
     return response.data;
   }
 };
