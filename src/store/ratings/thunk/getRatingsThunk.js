@@ -1,11 +1,17 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
+import Cookies from "js-cookie";
 
 export const getRatingsThunk = createAsyncThunk(
   "ratings/getRatings",
-  async (projectSlug, { rejectWithValue, getState }) => {
+  async (projectSlug, { getState }) => {
     try {
-      const response = await axios.get(`/projects/${projectSlug}/ratings`);
+      const token = Cookies.get("token");
+      const endpoint = token 
+        ? `/projects/${projectSlug}/ratings`
+        : `/projects/${projectSlug}/public/ratings`;
+      
+      const response = await axios.get(endpoint);
       const { auth, ratings } = getState();
       
       // Preserve existing user rating if it's already set for this project
@@ -21,7 +27,9 @@ export const getRatingsThunk = createAsyncThunk(
       };
     } catch (error) {
       console.error("Get ratings error:", error);
-      return rejectWithValue(error.response?.data?.message || "Failed to get ratings");
+      console.error("Error response:", error.response?.data);
+      console.error("Error status:", error.response?.status);
+      return Promise.reject(error.response?.data || error.message);
     }
   }
 );

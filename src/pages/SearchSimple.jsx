@@ -14,6 +14,7 @@ import { useInfiniteSearch } from "@/hooks/useInfiniteSearch";
 import PortfolioCard from "@/components/PortfolioCard";
 import { getAllTagsThunk } from "@/store/tags/thunk/getAllTagsThunk";
 import { getRatingsThunk } from "@/store/ratings/thunk/getRatingsThunk";
+import Cookies from "js-cookie";
 
 const popularTerms = ["UI/UX", "3D", "Illustration", "Photography"];
 
@@ -31,8 +32,9 @@ const SearchSimple = () => {
   
   const currentSearch = scope === 'users' ? userSearch : projectSearch;
   const { tags, loading: tagsLoading } = useSelector(state => state.tags);
+  const isAuthenticated = !!Cookies.get('token');
 
-  // Fetch available tags using Redux thunk
+  // Fetch available tags using Redux thunk (public endpoint)
   useEffect(() => {
     if (tags.length === 0) {
       dispatch(getAllTagsThunk());
@@ -55,15 +57,16 @@ const SearchSimple = () => {
     }
   }, [query, selectedTag, scope]);
 
+  // Fetch ratings for portfolios (requires authentication)
   useEffect(() => {
-    if (currentSearch?.data && currentSearch.data.length > 0 && scope === 'portfolios') {
+    if (currentSearch?.data && currentSearch.data.length > 0 && scope === 'portfolios' && isAuthenticated) {
       currentSearch.data.forEach(portfolio => {
         if (portfolio.slug) {
           dispatch(getRatingsThunk(portfolio.slug));
         }
       });
     }
-  }, [currentSearch?.data, scope, dispatch]);
+  }, [currentSearch?.data, scope, dispatch, isAuthenticated]);
 
   const handleSubmit = (val) => {
     if (!val) return;
@@ -119,7 +122,7 @@ const SearchSimple = () => {
           ))}
         </div>
 
-        {/* Tags Section - Only show for portfolios */}
+        {/* Tags Section - Available for all users (public endpoint) */}
         {scope === 'portfolios' && tags.length > 0 && (
           <section className="space-y-4">
             <div>
@@ -136,6 +139,17 @@ const SearchSimple = () => {
                   </Button>
                 ))}
               </div>
+            </div>
+          </section>
+        )}
+
+        {/* Guest user message for additional features */}
+        {!isAuthenticated && (
+          <section className="space-y-4">
+            <div className="bg-muted/50 p-4 rounded-lg">
+              <p className="text-sm text-muted-foreground">
+                <strong>Sign in</strong> to access personalized features like ratings, comments, and recommendations.
+              </p>
             </div>
           </section>
         )}
@@ -196,7 +210,9 @@ const SearchSimple = () => {
 
         {/* Results */}
         {!currentSearch.loading && query.trim().length === 0 && !selectedTag && (
-          <p className="text-center text-muted-foreground py-10">Start typing to search or select a tag...</p>
+          <p className="text-center text-muted-foreground py-10">
+            Start typing to search or select a tag...
+          </p>
         )}
 
         {!currentSearch.loading && (query.trim().length >= 3 || selectedTag) && (
@@ -233,7 +249,6 @@ const SearchSimple = () => {
                         portfolio={project}
                         likes={project.likes_count}
                         comments={project.comments_count}
-                        onCardClick={() => navigate(`/projects/${project.slug}`)}
                         onCreatorClick={() => navigate(`/profile/${project.user.id}`)}
                       />
                     ))

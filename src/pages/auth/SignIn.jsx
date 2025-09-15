@@ -39,13 +39,13 @@ const SignIn = () => {
       const result = await dispatch(loginThunk({ email, password }));
       
       if (loginThunk.fulfilled.match(result)) {
-        toast.success("Login Successfully!");
-        
         // Get user data to determine role-based navigation
         const userResult = await dispatch(getCurrentUserThunk());
         
         if (getCurrentUserThunk.fulfilled.match(userResult)) {
           const user = userResult.payload;
+          
+          toast.success("Login Successfully!");
           
           // Navigate based on user role
           if (user.role === 'admin') {
@@ -54,16 +54,26 @@ const SignIn = () => {
             navigate("/");
           }
         } else {
+          toast.success("Login Successfully!");
           // Fallback to home if user data fetch fails
           navigate("/");
         }
       } else {
         // Handle error from thunk
-        const errorMessage = result.payload || "Login failed. Please try again.";
+        let errorMessage = "Login failed. Please try again.";
+        
+        if (result.payload && typeof result.payload === 'object') {
+          if (result.payload.message) {
+            errorMessage = result.payload.message;
+          }
+        } else if (typeof result.payload === 'string') {
+          errorMessage = result.payload;
+        }
+        
         toast.error(errorMessage);
       }
     } catch (err) {
-      console.error("Login error:", err);
+      console.error("Unexpected error:", err);
       toast.error("An unexpected error occurred");
     }
   };

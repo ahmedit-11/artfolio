@@ -21,6 +21,7 @@ import ConfirmDialog from "@/components/ConfirmDialog";
 import FollowButton from "./components/FollowButton";
 import ProfileStatsEnhanced from "./components/ProfileStatsEnhanced";
 import { getRatingsThunk } from "@/store/ratings/thunk/getRatingsThunk";
+import Cookies from "js-cookie";
 
 
 
@@ -36,7 +37,7 @@ const Profile = () => {
   useScrollToTop();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { userId } = useParams(); // Get userId from URL params
+  const { id: userId } = useParams(); // Get userId from URL params
   
   const { currentUser, error: currentUserError, loading: currentUserLoading } = useSelector(state => state.currentUser);
   const { userById, userByIdLoading, userByIdError } = useSelector(state => state.users);
@@ -47,8 +48,11 @@ const Profile = () => {
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [portfolioToDelete, setPortfolioToDelete] = useState(null);
 
+  // Authentication check
+  const isAuthenticated = !!Cookies.get('token');
+  
   // Determine if we're viewing current user's profile or another user's profile
-  const isOwnProfile = !userId;
+  const isOwnProfile = !userId && isAuthenticated;
   const profileUserId = userId || currentUser?.id;
   
   // Get the appropriate user data
@@ -57,16 +61,18 @@ const Profile = () => {
   const profileError = isOwnProfile ? currentUserError : userByIdError[userId];
 
   useEffect(() => {
-    // Always fetch current user data for authentication and comparison
-    dispatch(getCurrentUserThunk());
-  }, [dispatch]);
+    // Only fetch current user data if authenticated
+    if (isAuthenticated) {
+      dispatch(getCurrentUserThunk());
+    }
+  }, [dispatch, isAuthenticated]);
 
   useEffect(() => {
-    if (userId && userId !== currentUser?.id) {
-      // Fetch other user's data if viewing someone else's profile
+    if (userId) {
+      // Always fetch other user's data when viewing someone else's profile
       dispatch(getUserByIdThunk(userId));
     }
-  }, [dispatch, userId, currentUser?.id]);
+  }, [dispatch, userId]);
 
   useEffect(() => {
     if (profileUserId) {
@@ -74,25 +80,25 @@ const Profile = () => {
     }
   }, [dispatch, profileUserId]);
 
-  // Reset social state and fetch follow status when viewing a different user
+  // Reset social state and fetch follow status when viewing a different user (only if authenticated)
   useEffect(() => {
-    if (userId) {
+    if (userId && isAuthenticated) {
       // Reset social state to prevent data from previous user
       dispatch(resetSocialState());
       // Fetch follow status for this specific user
       dispatch(getFollowStatusThunk(userId));
     }
-  }, [dispatch, userId]);
+  }, [dispatch, userId, isAuthenticated]);
 
   useEffect(() => {
-    if (userPortfolios && userPortfolios.length > 0) {
+    if (userPortfolios && userPortfolios.length > 0 && isAuthenticated) {
       userPortfolios.forEach(portfolio => {
         if (portfolio.slug) {
           dispatch(getRatingsThunk(portfolio.slug));
         }
       });
     }
-  }, [userPortfolios, dispatch]);
+  }, [userPortfolios, dispatch, isAuthenticated]);
 
   // Handle portfolio deletion
   const handleDeletePortfolio = (portfolio) => {
@@ -246,7 +252,7 @@ const Profile = () => {
                       <span>New Portfolio</span>
                     </Button>
                   </>
-                ) : (
+                ) : isAuthenticated ? (
                   <>
                     <FollowButton userId={profileUserId} />
                     <Button variant="outline" className="space-x-2" onClick={() => navigate(`/chat?userId=${profileUserId}&userName=${encodeURIComponent(name || 'User')}`)}>
@@ -254,6 +260,12 @@ const Profile = () => {
                       <span>Message</span>
                     </Button>
                   </>
+                ) : (
+                  <div className="bg-muted/50 p-3 rounded-lg">
+                    <p className="text-sm text-muted-foreground">
+                      <strong>Sign in</strong> to follow users and send messages.
+                    </p>
+                  </div>
                 )}
               </div>
             </div>

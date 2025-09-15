@@ -4,6 +4,7 @@ import React, { useEffect,Suspense } from "react";
 import { SearchProvider } from './contexts/SearchContext';
 import { ChatProvider } from './contexts/ChatContext';
 import { PusherProvider } from './contexts/PusherContext';
+import { NotificationProvider } from './contexts/NotificationContext';
 
 // Import routing components from react-router-dom
 // import { BrowserRouter, Routes, Route } from "react-router-dom";
@@ -69,6 +70,7 @@ import PortfolioDetail from "./pages/portfolio-detail/PortfolioDetail";
 import CreatePortfolio from "./pages/CreatePortfolio";
 import EditPortfolio from "./pages/EditPortfolio";
 import AdminPanel from "./pages/admin/AdminPanel";
+import AdminPortfolioDetail from "./pages/admin/AdminPortfolioDetail";
 import AdminRoute from "./components/AdminRoute";
 import UserRoute from "./components/UserRoute";
 // import Chat from "./pages/chat/Chat";
@@ -122,6 +124,7 @@ const App = () => {
   return (
     <SearchProvider>
       <PusherProvider>
+        <NotificationProvider>
           <BrowserRouter>
             <ChatProvider>
       <Suspense fallback={
@@ -132,9 +135,8 @@ const App = () => {
         <Routes>
           {/* User-only routes - Protected from admin access */}
           <Route element={<UserRoute><Layout /></UserRoute>}>
-            <Route index element={<Index />} />
             <Route path="/profile" element={<Profile />} />
-            <Route path="/profile/:userId" element={<Profile />} />
+         
             <Route path="/settings" element={<Settings />} />
             <Route path="/settings/profile" element={<ProfileSettings />} />
             <Route path="/settings/change-password" element={<ChangePassword />} />
@@ -145,12 +147,18 @@ const App = () => {
             <Route path="/chat" element={<SimpleChat />} />
             <Route path="/following" element={<FollowingPage />} />
             <Route path="/for-you" element={<ForYouPage />} />
-            <Route path="/search" element={<SearchPage />} />
           </Route>
           
           {/* Public routes - No authentication required */}
-          <Route path="/trending" element={<TrendingPage />} />
-          <Route path="/projects/:slug" element={<PortfolioDetail />} />
+          <Route element={<Layout />}>
+            <Route index element={<Index />} />
+            <Route path="/search" element={<SearchPage />} />
+            <Route path="/trending" element={<TrendingPage />} />
+            <Route path="/profile/:id" element={<Profile />} />
+          </Route>
+          
+          {/* Protected portfolio detail route */}
+          <Route path="/projects/:slug" element={<UserRoute><PortfolioDetail /></UserRoute>} />
           <Route path="/auth/signin" element={<SignIn />} />
           <Route path="/auth/signup" element={<SignUp />} />
           <Route path="/auth/forgot-password" element={<ForgotPassword />} />
@@ -168,15 +176,29 @@ const App = () => {
           
           {/* Admin-only routes - Protected from user access */}
           <Route path="/admin" element={<AdminRoute><AdminPanel /></AdminRoute>} />
+          <Route path="/admin/portfolio/:slug" element={<AdminRoute><AdminPortfolioDetail /></AdminRoute>} />
   
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
             </ChatProvider>
           </BrowserRouter>
-        </PusherProvider>
+        </NotificationProvider>
+      </PusherProvider>
       {/* ToastContainer  */}
-      <ToastContainer position="top-right" autoClose={3000} limit={3} />
+      <ToastContainer 
+        position="top-right" 
+        autoClose={3000} 
+        limit={3}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
     </SearchProvider>
   );
 };

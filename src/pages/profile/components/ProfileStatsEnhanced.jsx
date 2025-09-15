@@ -3,10 +3,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { Users, Heart, Briefcase, Loader2 } from "lucide-react";
 import { getFollowingCountThunk } from "../../../store/social/thunk/getFollowingCountThunk";
 import { getFollowersCountThunk } from "../../../store/social/thunk/getFollowersCountThunk";
+import Cookies from "js-cookie";
 
 const ProfileStatsEnhanced = ({ userId, portfoliosCount = 0 }) => {
   const dispatch = useDispatch();
   const { followingCount, followersCount, loadingCounts, countsLoaded, currentUserId } = useSelector(state => state.social);
+  const isAuthenticated = !!Cookies.get('token');
 
   useEffect(() => {
     if (userId && (!countsLoaded || currentUserId !== userId)) {

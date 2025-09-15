@@ -102,7 +102,7 @@ const CategoryManagement = () => {
       toast.error('Category name is required');
       return;
     }
-
+      
     try {
       if (showCreateModal) {
         const result = await dispatch(createCategoryThunk(formData));

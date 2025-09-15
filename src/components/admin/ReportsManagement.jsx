@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Search, Eye, Ban, Bell, Trash2, X, Calendar, User, Flag, Settings, CheckCircle, Zap, CircleX, AlertTriangle, Clock, CheckCircle2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toast } from 'react-toastify';
+import { adminAPI } from '../../lib/api';
 import StatCard from './StatCard';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 
@@ -217,47 +218,62 @@ const ReportsManagement = () => {
     setActionStep('finish');
   };
 
-  const handleFinishAction = () => {
-    let resolution = '';
-    let status = 'resolved';
-    let toastMessage = '';
+  const handleFinishAction = async () => {
+    try {
+      let toastMessage = '';
+      
+      switch (selectedAction) {
+        case 'ban':
+          // Make API call to ban user
+          const banData = {
+            ban_duration: parseInt(banDuration), // Convert to integer (0 for permanent)
+            ban_reason: actionReason
+          };
+          
+          await adminAPI.acceptReport(takeActionModal.id, banData);
+          
+          const banText = banDuration === '0' ? 'permanently' : `for ${banDuration} days`;
+          toastMessage = `User banned ${banText}`;
+          break;
+          
+        case 'delete':
+          // TODO: Implement content deletion API call
+          toastMessage = 'Content deleted successfully';
+          break;
+          
+        case 'dismiss':
+          // Make API call to reject/dismiss report
+          await adminAPI.rejectReport(takeActionModal.id);
+          toastMessage = 'Report dismissed';
+          break;
+          
+        default:
+          break;
+      }
 
-    switch (selectedAction) {
-      case 'ban':
-        resolution = `User banned for ${banDuration} days. Reason: ${actionReason}. User notified: ${userAlert}`;
-        toastMessage = `User banned for ${banDuration} days`;
-        break;
-      case 'delete':
-        resolution = `Content deleted. Reason: ${actionReason}. User notified: ${userAlert}`;
-        toastMessage = 'Content deleted successfully';
-        break;
-      case 'dismiss':
-        resolution = 'Report dismissed by admin';
-        status = 'dismissed';
-        toastMessage = 'Report dismissed';
-        break;
-      default:
-        break;
-    }
+      // Update local state to reflect the change
+      setReports(reports.map(report => 
+        report.id === takeActionModal.id 
+          ? { ...report, status: selectedAction === 'dismiss' ? 'dismissed' : 'resolved' }
+          : report
+      ));
 
-    // Update report status
-    setReports(reports.map(report => 
-      report.id === takeActionModal.id 
-        ? { ...report, status, resolution }
-        : report
-    ));
+      // Reset modal state
+      setTakeActionModal(null);
+      setSelectedAction(null);
+      setActionStep('select');
+      setActionReason('');
+      setUserAlert('');
+      setBanDuration('3');
 
-    // Reset modal state
-    setTakeActionModal(null);
-    setSelectedAction(null);
-    setActionStep('select');
-    setActionReason('');
-    setUserAlert('');
-    setBanDuration('3');
-
-    // Show success toast
-    if (toastMessage) {
-      toast.success(toastMessage);
+      // Show success toast
+      if (toastMessage) {
+        toast.success(toastMessage);
+      }
+      
+    } catch (error) {
+      console.error('Error processing report action:', error);
+      toast.error(error.response?.data?.message || 'Failed to process action');
     }
   };
 
@@ -524,7 +540,9 @@ const ReportsManagement = () => {
                       >
                         <option value="3">3 days</option>
                         <option value="7">7 days</option>
-                        <option value="permanent">Permanent</option>
+                        <option value="14">14 days</option>
+                        <option value="30">30 days</option>
+                        <option value="0">Permanent</option>
                       </select>
                     </div>
                     <div>
@@ -726,7 +744,7 @@ const ReportsManagement = () => {
                         <option value="7">7 days</option>
                         <option value="14">14 days</option>
                         <option value="30">30 days</option>
-                        <option value="permanent">Permanent</option>
+                        <option value="0">Permanent</option>
                       </select>
                     </div>
                   )}

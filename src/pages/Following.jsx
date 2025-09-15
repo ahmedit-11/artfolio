@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useScrollToTop } from "../utils/scrollToTop";
-import Header from "@/components/Header";
+
 import Footer from "@/components/Footer";
 import PortfolioCard from "@/components/PortfolioCard";
 import { useSearch, localSearch } from "@/contexts/SearchContext";
@@ -110,7 +110,7 @@ const FollowingPage = () => {
   );
   return (
     <div className="flex flex-col min-h-screen bg-background">
-      <Header />
+     
       <main className="flex-grow animate-fade-in">
         <section className="py-12 bg-gradient-to-b from-background to-secondary/30">
           <div className="container px-4 mx-auto">

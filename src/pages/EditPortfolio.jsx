@@ -75,6 +75,17 @@ const EditPortfolio = () => {
       // Set media - transform existing media to match new media item structure
       if (currentPortfolio.media && currentPortfolio.media.length > 0) {
         const transformedMedia = currentPortfolio.media.map((media, index) => {
+          // Handle text content differently from files
+          if (media.file_type === 'text' && media.text_content) {
+            return {
+              id: media.id,
+              type: 'text',
+              value: media.text_content,
+              isExisting: true
+            };
+          }
+          
+          // Handle file media
           const fileType = media.file_type?.startsWith('image/') ? 'image' : 
                           media.file_type?.startsWith('video/') ? 'video' :
                           media.file_type?.startsWith('audio/') ? 'audio' : 'file';
@@ -227,6 +238,18 @@ const EditPortfolio = () => {
       const fileItems = mediaItems.filter(item => item.value && item.value instanceof File && !item.value.isExisting);
       fileItems.forEach((item) => {
         formData.append('new_media[]', item.value);
+      });
+      
+      // Add new text content (only new text items, not existing ones)
+      const textItems = mediaItems.filter(item => 
+        item.type === 'text' && 
+        item.value && 
+        typeof item.value === 'string' && 
+        item.value.trim() && 
+        !item.isExisting
+      );
+      textItems.forEach((item) => {
+        formData.append('new_text_contents[]', item.value);
       });
 
       // Add media IDs to remove
@@ -465,9 +488,16 @@ const EditPortfolio = () => {
                     >
                       <X className="size-4" />
                     </Button>
-                    {media.file_type && media.file_type.startsWith('image/') ? (
+                    {media.file_type === 'text' ? (
+                      <div className="w-full p-4 bg-muted rounded">
+                        <p className="text-sm text-muted-foreground mb-2">Text Content:</p>
+                        <p className="text-sm line-clamp-3">
+                          {media.text_content || 'No text content'}
+                        </p>
+                      </div>
+                    ) : media.file_type && media.file_type.startsWith('image/') ? (
                       <img
-                        src={`${import.meta.env.VITE_API_BASE_URL || 'http://127.0.0.1:8000'}/storage/${media.file_path}`}
+                        src={media.file_path}
                         alt="Media"
                         className="w-full h-32 object-cover rounded"
                       />
@@ -523,11 +553,20 @@ const EditPortfolio = () => {
                     <p className="text-sm font-medium capitalize">{item.type}</p>
 
                     {item.type === "text" ? (
-                      <Textarea
-                        placeholder="Enter text content..."
-                        value={item.value || ""}
-                        onChange={(e) => handleMediaChange(item.id, e.target.value)}
-                      />
+                      <div className="space-y-2">
+                        <Textarea
+                          placeholder="Enter your text content here..."
+                          value={item.value || ""}
+                          onChange={(e) => handleMediaChange(item.id, e.target.value)}
+                          rows={6}
+                          className="w-full"
+                        />
+                        {item.value && (
+                          <p className="text-xs text-muted-foreground">
+                            {item.value.length} characters
+                          </p>
+                        )}
+                      </div>
                     ) : (
                       <div className="space-y-2">
                         <div className="flex items-center gap-2">

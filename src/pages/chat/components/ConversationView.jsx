@@ -11,7 +11,7 @@ const ConversationView = ({ selectedUserId, selectedUserName }) => {
   const [messageText, setMessageText] = useState('');
   const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef(null);
-  const { currentUser, selectedConversation, messages, sendMessage, markMessagesAsRead, userProfiles, typingUsers, setTypingStatus } = useChat();
+  const { currentUser, selectedConversation, messages, sendMessage, userProfiles, typingUsers, setTypingStatus } = useChat();
   const [chatId, setChatId] = useState(null);
 
   // Get messages from context for the selected conversation
@@ -50,10 +50,7 @@ const ConversationView = ({ selectedUserId, selectedUserName }) => {
       const newChatId = chatService.makeChatId(String(currentUser.id), String(selectedUserId));
       setChatId(newChatId);
       
-      // Mark messages as read when opening conversation (only if conversation exists)
-      if (selectedConversation?.chatId) {
-        markMessagesAsRead(selectedConversation.chatId);
-      }
+      // Note: Message read functionality can be implemented later if needed
     }
   }, [selectedUserId, currentUser?.id, selectedConversation]);
 

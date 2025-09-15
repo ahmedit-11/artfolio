@@ -9,6 +9,8 @@ import { authAPI } from "../lib/api";
 import { toast } from "react-toastify";
 import ConfirmDialog from "@/components/ConfirmDialog";
 import ThemeToggle from "@/components/ThemeToggle";
+import axios from "axios";
+import Cookies from "js-cookie";
 
 const SettingsSection = ({ icon: Icon, title, description, children, className }) => (
   <Card className={`p-6 mb-6 ${className || ''}`}>
@@ -33,6 +35,7 @@ const Settings = () => {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showLogoutDialog, setShowLogoutDialog] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Event handlers
   const handleLogoutClick = () => {
@@ -54,9 +57,26 @@ const Settings = () => {
     }
   };
 
-  const handleDeleteAccount = () => {
+  const handleDeleteAccount = async () => {
     setShowDeleteDialog(false);
-    toast.success("Account deletion request submitted. You will receive an email with further instructions.");
+    setIsDeleting(true);
+    
+    try {
+      const response = await axios.delete('/delete-account');
+      
+      if (response.data.success) {
+        toast.success(response.data.message);
+        // Clear all auth data and redirect
+        Cookies.remove('token');
+        localStorage.clear();
+        navigate('/signin');
+      }
+    } catch (error) {
+      const errorMessage = error.response?.data?.message || "Failed to delete account";
+      toast.error(errorMessage);
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   const handleExportData = () => {
@@ -121,9 +141,13 @@ const Settings = () => {
         description="Permanently delete your account and all associated data"
         className="animate-fade-in animation-delay-750"
       >
-        <Button variant="destructive" onClick={() => setShowDeleteDialog(true)}>
+        <Button 
+          variant="destructive" 
+          onClick={() => setShowDeleteDialog(true)}
+          disabled={isDeleting}
+        >
           <Trash2 className="size-4 mr-2" />
-          Delete Account
+          {isDeleting ? "Deleting..." : "Delete Account"}
         </Button>
       </SettingsSection>
 

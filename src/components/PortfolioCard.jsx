@@ -9,8 +9,9 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import  Tag  from '@/components/ui/tag';
-import Cookies from 'js-cookie';
 import { getPortfolioMediaUrl, getProfileImageUrl } from '@/utils/mediaUtils';
+import LoginPromptModal from '@/components/ui/LoginPromptModal';
+import { useAuthModal } from '@/hooks/useAuthModal';
 
 // PortfolioCard component renders a card for a single portfolio item with interactive features
 const PortfolioCard = ({
@@ -75,16 +76,29 @@ const PortfolioCard = ({
   
   
   const navigate = useNavigate();
+  
+  const { requireAuth, showLoginModal, closeModal, modalProps } = useAuthModal({
+    title: "Explore Portfolio Details",
+    description: `Sign in to explore "${portfolioTitle}" in detail, leave comments, and discover amazing creative work from our community.`,
+    features: [
+      "View full portfolio details & media",
+      "Leave comments and feedback", 
+      "Like and save your favorites",
+      "Connect with amazing creators"
+    ],
+    actionContext: portfolioTitle
+  });
 
   const handleCardClick = (e) => {
     e.preventDefault();
     if (onCardClick) {
       onCardClick();
     } else {
-      navigate(`/projects/${portfolioSlug || portfolioId}`);
+      requireAuth(() => {
+        navigate(`/projects/${portfolioSlug || portfolioId}`);
+      });
     }
   };
-  const token = Cookies.get('token')
   
   // Use average_rating from backend data, fallback to prop rating or 0
   const displayRating = portfolioAverageRating || portfolioRating || 0;
@@ -181,6 +195,15 @@ const PortfolioCard = ({
         
         </div>
       </div>
+
+      {/* Login Prompt Modal - Rendered outside card using React Portal */}
+      {showLoginModal && (
+        <LoginPromptModal
+          isOpen={showLoginModal}
+          onClose={closeModal}
+          {...modalProps}
+        />
+      )}
     </div>
   );
 };

@@ -29,7 +29,7 @@ const ForYouPage = () => {
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
-      <Header />
+     
       <main className="flex-grow animate-fade-in">
         <section className="py-12 bg-gradient-to-b from-background to-secondary/30">
           <div className="container px-4 mx-auto">

@@ -1,10 +1,26 @@
 import { useSelector } from 'react-redux';
 import { Navigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
+import { toast } from 'react-toastify';
+import { useEffect } from 'react';
+
+// Global flag to prevent duplicate toasts
+let toastShown = false;
 
 const UserRoute = ({ children }) => {
   const { currentUser } = useSelector(state => state.currentUser);
   const token = Cookies.get('token');
+
+  useEffect(() => {
+    if (!token && !toastShown) {
+      toast.info("You need to be signed in");
+      toastShown = true;
+      // Reset flag after a delay to allow new attempts
+      setTimeout(() => {
+        toastShown = false;
+      }, 3000);
+    }
+  }, [token]);
 
   // If no token, redirect to signin
   if (!token) {

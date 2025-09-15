@@ -208,6 +208,7 @@ const PortfolioDetail = () => {
     const images = portfolio.media.filter(item => item.file_type?.startsWith('image/'));
     const videos = portfolio.media.filter(item => item.file_type?.startsWith('video/'));
     const audios = portfolio.media.filter(item => item.file_type?.startsWith('audio/'));
+    const textContent = portfolio.media.filter(item => item.file_type === 'text' && item.text_content);
     const textFiles = portfolio.media.filter(item => 
       item.file_type?.startsWith('text/') || 
       item.file_type?.includes('pdf') ||
@@ -217,7 +218,7 @@ const PortfolioDetail = () => {
       item.file_path?.endsWith('.md') ||
       item.file_path?.endsWith('.pdf') ||
       item.file_path?.endsWith('.docx')
-    );
+    ).filter(item => item.file_type !== 'text'); // Exclude new text content type
 
     return (
       <div className="space-y-6">
@@ -316,6 +317,20 @@ const PortfolioDetail = () => {
           </div>
         )}
 
+        {/* Text Content */}
+        {textContent.length > 0 && (
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold">Text Content</h3>
+            {textContent.map((textItem, index) => (
+              <TextContent
+                key={index}
+                content={textItem.text_content.replace(/\n/g, '<br>')}
+                title={`${portfolio.title} - Text ${index + 1}`}
+              />
+            ))}
+          </div>
+        )}
+
         {/* Text Files */}
         {textFiles.length > 0 && (
           <div className="space-y-4">
@@ -376,11 +391,6 @@ const PortfolioDetail = () => {
       </div>
     );
   };
-  const handelTranslate = () => {
-    if (!Cookies.get("token")) {
-      navigate('/signIn')
-    }
-  }
   const token = Cookies.get("token")
   return (
     <div className={cn("min-h-screen bg-background", isClosing ? "animate-fade-out" : "animate-fade-in")}>
@@ -463,7 +473,7 @@ const PortfolioDetail = () => {
           <div className="space-y-6 animate-fade-in animation-delay-1050">
             {/* Stats */}
             <Card className="p-6 animate-fade-in animation-delay-1200">
-              <div className="" onClick={handelTranslate}>
+              <div>
                 <h3 className="font-semibold mb-4">Stats</h3>
                 <div className="flex flex-col gap-4  items-center justify-between">
                 <div className="grid grid-cols-2 justify-center gap-4">

@@ -3,10 +3,12 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Button } from "@/components/ui/button";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, Users, Heart, MessageCircle } from "lucide-react";
 import PortfolioCard from "./PortfolioCard";
 import { getCurrentUserThunk } from "@/store/currentUser/thunk/getCurrentUserThunk";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import Cookies from "js-cookie";
 
 // Following component renders a section of portfolio items with interactive features
 const Following = ({ 
@@ -21,16 +23,25 @@ const Following = ({
   onTagClick = () => {}
 }) => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { currentUser } = useSelector(state => state.currentUser);
   const [followingPortfolios, setFollowingPortfolios] = useState([]);
   const [loading, setLoading] = useState(true);
+  const isAuthenticated = !!Cookies.get("token");
 
   useEffect(() => {
-    dispatch(getCurrentUserThunk());
-  }, [dispatch]);
+    if (isAuthenticated) {
+      dispatch(getCurrentUserThunk());
+    }
+  }, [dispatch, isAuthenticated]);
 
-  // Fetch portfolios from followed users
+  // Fetch portfolios from followed users only if authenticated
   useEffect(() => {
+    if (!isAuthenticated) {
+      setLoading(false);
+      return;
+    }
+
     const fetchFollowingPortfolios = async () => {
       if (!currentUser?.following || !Array.isArray(currentUser.following) || currentUser.following.length === 0) {
         setFollowingPortfolios([]);
@@ -68,7 +79,7 @@ const Following = ({
 
     const timeoutId = setTimeout(fetchFollowingPortfolios, 100);
     return () => clearTimeout(timeoutId);
-  }, [currentUser?.following]);
+  }, [currentUser?.following, isAuthenticated]);
   return (
     <section className={`py-16 bg-gradient-to-br from-slate-200/50  to-purple-200/50 dark:bg-gradient-to-br dark:from-purple-900/15 dark:via-indigo-900/20 dark:to-background ${className || ''}`}>
       <div className="container mx-auto px-4">
@@ -86,7 +97,40 @@ const Following = ({
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 bg-secondary\/50">
-          {loading ? (
+          {!isAuthenticated ? (
+            <div className="col-span-full text-center py-12 px-6">
+              <div className="max-w-md mx-auto">
+                <div className="mb-6">
+                  <Users className="w-16 h-16 mx-auto text-purple-500 mb-4" />
+                  <h3 className="text-xl font-semibold text-foreground mb-2">Stay Connected</h3>
+                  <p className="text-muted-foreground mb-6">
+                    Follow your favorite creators and never miss their latest work. Get updates from the artists and designers you love.
+                  </p>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 text-sm">
+                  <div className="flex items-center justify-center gap-2 p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+                    <Heart className="w-4 h-4 text-purple-600" />
+                    <span>Latest from creators</span>
+                  </div>
+                  <div className="flex items-center justify-center gap-2 p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+                    <MessageCircle className="w-4 h-4 text-purple-600" />
+                    <span>Real-time updates</span>
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  <Button 
+                    onClick={() => navigate('/signin')} 
+                    className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700"
+                  >
+                    Sign In to Follow Creators
+                  </Button>
+                  <p className="text-sm text-muted-foreground">
+                    New here? <button onClick={() => navigate('/signup')} className="text-purple-600 hover:text-purple-700 font-medium">Create your account</button>
+                  </p>
+                </div>
+              </div>
+            </div>
+          ) : loading ? (
             // Loading skeleton
             [...Array(4)].map((_, index) => (
               <div key={index} className="animate-pulse">

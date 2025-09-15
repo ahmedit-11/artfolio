@@ -111,7 +111,7 @@ const token =Cookies.get('token')
               Authorization: `Bearer ${token}`
             }
           });
-          toastMessage = `User banned for ${banDuration} days`;
+          toastMessage = `User banned ${banDuration === '0' ? 'permanently' : `for ${banDuration} days`}`;
           break;
     
     
@@ -122,6 +122,22 @@ const token =Cookies.get('token')
             }
           });
           toastMessage = 'Report dismissed';
+          break;
+
+        case 'delete':
+          if (!actionReason.trim()) {
+            toast.error('Please provide a reason for deleting the content');
+            return;
+          }
+          
+          await axios.post(`/admin/reports/${takeActionModal.id}/delete-content`, {
+            reason: actionReason
+          }, {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          });
+          toastMessage = 'Content deleted successfully';
           break;
     
         default:
@@ -184,7 +200,7 @@ const token =Cookies.get('token')
         </div>
         
         {/* Statistics Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mb-4 sm:mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-3 sm:gap-4 mb-4 sm:mb-6">
           <StatCard
             title="Total Reports"
             value={reports.length}
@@ -197,12 +213,7 @@ const token =Cookies.get('token')
             icon={Clock}
             color="orange"
           />
-          <StatCard
-            title="Resolved Reports"
-            value={reports.filter(r => r.status === 'resolved').length}
-            icon={CheckCircle2}
-            color="green"
-          />
+         
         </div>
       </div>
   
@@ -252,6 +263,11 @@ const token =Cookies.get('token')
                         <div className="text-xs sm:text-sm text-muted-foreground truncate">
                           ID: {report.reported_user_id}
                         </div>
+                        {report.reportable_type === 'App\\Models\\Project' && (
+                          <div className="text-xs text-blue-600 truncate">
+                            Portfolio: {report.reportable?.title || `ID ${report.reportable_id}`}
+                          </div>
+                        )}
                       </div>
                     </div>
                   </td>
@@ -346,6 +362,42 @@ const token =Cookies.get('token')
                   </div>
                 </div>
   
+                {/* Portfolio Link */}
+                {selectedReport.reportable_type === 'App\\Models\\Project' && (
+                  <div>
+                    <h4 className="font-semibold text-foreground mb-2">Reported Portfolio</h4>
+                    <div className="bg-muted/50 p-4 rounded-lg">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <div className="font-medium text-foreground">
+                            {selectedReport.reportable?.title || 'Portfolio'}
+                          </div>
+                          <div className="text-sm text-muted-foreground">
+                            ID: {selectedReport.reportable_id}
+                          </div>
+                          {selectedReport.reportable?.slug && (
+                            <div className="text-sm text-muted-foreground">
+                              Slug: {selectedReport.reportable.slug}
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex gap-2">
+                          {selectedReport.reportable?.slug && (
+                            <button
+                              onClick={() => window.open(`/admin/portfolio/${selectedReport.reportable.slug}`, '_blank')}
+                              className="px-3 py-2 bg-primary text-primary-foreground rounded-md text-sm hover:bg-primary/90 transition-colors"
+                            >
+                              <Eye className="size-4 mr-1 inline" />
+                              Review Portfolio
+                            </button>
+                          )}
+                         
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {/* Report Details */}
                 <div>
                   <h4 className="font-semibold text-foreground mb-2">Report Information</h4>
@@ -423,6 +475,16 @@ const token =Cookies.get('token')
                       </div>
                     </button>
                     <button
+                      onClick={() => handleActionSelect('delete')}
+                      className="w-full p-4 text-left border border-border rounded-lg hover:bg-muted/50 transition-colors flex items-center gap-3"
+                    >
+                      <Trash2 className="size-5 text-red-600" />
+                      <div>
+                        <div className="font-medium text-foreground">Delete Content</div>
+                        <div className="text-sm text-muted-foreground">Remove the reported content permanently</div>
+                      </div>
+                    </button>
+                    <button
                       onClick={() => handleActionSelect('dismiss')}
                       className="w-full p-4 text-left border border-border rounded-lg hover:bg-muted/50 transition-colors flex items-center gap-3"
                     >
@@ -441,7 +503,7 @@ const token =Cookies.get('token')
                 <>
                   <div className="flex justify-between items-center mb-6">
                     <h3 className="text-lg font-bold text-foreground">
-                      {selectedAction === 'ban' ? 'Ban User - Notify' : 'Delete Content - Notify'}
+                      {selectedAction === 'ban' ? 'Ban User - Notify' : selectedAction === 'delete' ? 'Delete Content - Notify' : 'Action - Notify'}
                     </h3>
                     <button
                       onClick={resetTakeActionModal}
@@ -467,6 +529,7 @@ const token =Cookies.get('token')
                         <option value="30">30 days</option>
                         <option value="90">90 days</option>
                         <option value="365">1 year</option>
+                        <option value="0">Permanent</option>
                       </select>
                     </div>
                   )}
@@ -532,7 +595,7 @@ const token =Cookies.get('token')
                       <div className="flex justify-between">
                         <span className="text-muted-foreground">Action:</span>
                         <span className="text-foreground font-medium capitalize">
-                          {selectedAction === 'ban' ? `Ban User (${banDuration} days)` : 
+                          {selectedAction === 'ban' ? `Ban User (${banDuration === '0' ? 'Permanent' : banDuration + ' days'})` : 
                            selectedAction === 'delete' ? 'Delete Content' : 'Dismiss Report'}
                         </span>
                       </div>
@@ -556,11 +619,12 @@ const token =Cookies.get('token')
                       onClick={handleFinishAction}
                       className={`flex-1 py-2 px-4 rounded-lg transition-colors text-white flex items-center justify-center gap-2 ${
                         selectedAction === 'ban' ? 'bg-red-600 hover:bg-red-700' :
+                        selectedAction === 'delete' ? 'bg-red-600 hover:bg-red-700' :
                         'bg-gray-600 hover:bg-gray-700'
                       }`}
                     >
                       <CheckCircle className="size-4" />
-                      {selectedAction === 'ban' ? 'Ban User' : 'Dismiss Report'}
+                      {selectedAction === 'ban' ? 'Ban User' : selectedAction === 'delete' ? 'Delete Content' : 'Dismiss Report'}
                     </button>
                   </div>
                 </>

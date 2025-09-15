@@ -1,9 +1,15 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
+import Cookies from "js-cookie";
 
 export const getFollowingCountThunk = createAsyncThunk("social/getFollowingCount", async (userId) => {
     try {
-        const response = await axios.get(`/users/${userId}/following-count`);
+        const isAuthenticated = !!Cookies.get('token');
+        const endpoint = isAuthenticated 
+            ? `/users/${userId}/following-count`
+            : `/users/${userId}/public/following-count`;
+            
+        const response = await axios.get(endpoint);
        
         return response.data;
     } catch (error) {

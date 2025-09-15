@@ -111,11 +111,12 @@ useEffect(()=>{
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Laravel backend requires at least 1 media file
+    // Laravel backend requires at least 1 media item (file or text)
     const fileItems = mediaItems.filter(item => item.value && item.value instanceof File);
+    const textItems = mediaItems.filter(item => item.type === 'text' && item.value && typeof item.value === 'string' && item.value.trim());
     
-    if (fileItems.length === 0) {
-      toast.error("Please add at least one media file (image, video, or audio).");
+    if (fileItems.length === 0 && textItems.length === 0) {
+      toast.error("Please add at least one media item (image, video, audio, or text content).");
       return;
     }
 
@@ -167,9 +168,14 @@ useEffect(()=>{
         formData.append('cover_image', coverImage);
       }
       
-      // Add required media files (backend requires min:1)
+      // Add media files (if any)
       fileItems.forEach((item) => {
         formData.append('media[]', item.value);
+      });
+      
+      // Add text content (if any)
+      textItems.forEach((item, index) => {
+        formData.append('text_contents[]', item.value);
       });
 
       // Step 3: Submit the portfolio
@@ -386,29 +392,37 @@ useEffect(()=>{
                   </Button>
                   <p className="text-sm font-medium capitalize">{item.type}</p>
 
-                  <input
-                    type="file"
-                    accept={
-                      item.type === "image"
-                        ? "image/*"
-                        : item.type === "video"
-                        ? "video/*"
-                        : item.type === "audio"
-                        ? "audio/*"
-                        : item.type === "model"
-                        ? ".glb,.gltf,.obj,.fbx"
-                        : item.type === "text"
-                        ? ".txt,.md,.docx,.pdf"
-                        : "*/*"
-                    }
-                    onChange={(e) => handleMediaChange(item.id, e.target.files?.[0] || null)}
-                    className="block w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100"
-                  />
+                  {item.type === "text" ? (
+                    <Textarea
+                      placeholder="Enter your text content here..."
+                      value={item.value || ""}
+                      onChange={(e) => handleMediaChange(item.id, e.target.value)}
+                      rows={6}
+                      className="w-full"
+                    />
+                  ) : (
+                    <input
+                      type="file"
+                      accept={
+                        item.type === "image"
+                          ? "image/*"
+                          : item.type === "video"
+                          ? "video/*"
+                          : item.type === "audio"
+                          ? "audio/*"
+                          : item.type === "model"
+                          ? ".glb,.gltf,.obj,.fbx"
+                          : "*/*"
+                      }
+                      onChange={(e) => handleMediaChange(item.id, e.target.files?.[0] || null)}
+                      className="block w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100"
+                    />
+                  )}
                   
-                  {/* Show selected file name for text files */}
+                  {/* Show character count for text content */}
                   {item.type === "text" && item.value && (
                     <p className="text-xs text-muted-foreground mt-1">
-                      Selected: {item.value.name}
+                      {item.value.length} characters
                     </p>
                   )}
                 </Card>

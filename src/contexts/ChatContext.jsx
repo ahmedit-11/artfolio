@@ -6,6 +6,7 @@ import { useLocation } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { getUserByIdThunk } from '../store/users/thunk/getUserByIdThunk';
 import { getProfileImageUrl } from '../utils/mediaUtils';
+import { useNotification } from './NotificationContext';
 
 const ChatContext = createContext();
 
@@ -21,6 +22,7 @@ export const ChatProvider = ({ children }) => {
   // Get currentUser from Redux store
   const reduxCurrentUser = useSelector(state => state.currentUser?.currentUser);
   const dispatch = useDispatch();
+  const { addNotification } = useNotification();
   const [currentUser, setCurrentUser] = useState(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [conversations, setConversations] = useState([]);
@@ -29,6 +31,7 @@ export const ChatProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [typingUsers, setTypingUsers] = useState({});
   const [userProfiles, setUserProfiles] = useState({});
+  const [unreadCounts, setUnreadCounts] = useState({});
   const token = Cookies.get('token');
   const location = useLocation();
 
@@ -197,6 +200,32 @@ export const ChatProvider = ({ children }) => {
         };
       });
       
+      // Check for new messages and generate notifications
+      if (hasInitializedRef.current) {
+        formattedConversations.forEach((conv) => {
+          const currentKey = conv.lastMessage
+            ? `${conv.lastMessage.senderId}|${conv.lastMessage.text}|${conv.lastMessage.timestamp ? new Date(conv.lastMessage.timestamp).getTime() : ''}`
+            : '';
+          const previousKey = prevLastMsgKeyRef.current[conv.id] || '';
+          
+          // Check if there's a new message from someone else
+          if (currentKey !== previousKey && conv.lastMessage && conv.lastMessage.senderId !== String(currentUser.id)) {
+            // Only show notification if not currently viewing this conversation
+            const isCurrentlyViewing = selectedConvRef.current?.id === conv.id;
+            
+            if (!isCurrentlyViewing) {
+              addNotification({
+                type: 'message',
+                title: 'New Message',
+                message: `${conv.user.name} sent you a new message`,
+                userId: conv.user.id,
+                conversationId: conv.id
+              });
+            }
+          }
+        });
+      }
+      
       // Update previous last message keys
       const nextKeys = {};
       formattedConversations.forEach((conv) => {
@@ -219,7 +248,7 @@ export const ChatProvider = ({ children }) => {
     });
 
     return unsubscribe;
-  }, [currentUser?.id, authLoading]);
+  }, [currentUser?.id, authLoading, addNotification]);
 
   // Listen for messages in selected conversation
   useEffect(() => {

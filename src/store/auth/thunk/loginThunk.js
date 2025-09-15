@@ -3,7 +3,7 @@ import axios from "axios";
 import Cookies from 'js-cookie'
 import { getCurrentUserThunk } from "../../currentUser/thunk/getCurrentUserThunk";
 
-export const loginThunk = createAsyncThunk("loginThunk", async (data, { dispatch }) => {
+export const loginThunk = createAsyncThunk("loginThunk", async (data, { dispatch, rejectWithValue }) => {
     try {
         const response = await axios.post("/login",{
             email:data.email,
@@ -19,6 +19,11 @@ export const loginThunk = createAsyncThunk("loginThunk", async (data, { dispatch
         console.error("Login error:", error);
         console.error("Error response:", error.response?.data);
         console.error("Error status:", error.response?.status);
-        return Promise.reject(error.response?.data || error.message);
+        
+        // Handle different error response formats
+        if (error.response?.data) {
+            return rejectWithValue(error.response.data);
+        }
+        return rejectWithValue({ message: error.message || "Login failed" });
     }
 });

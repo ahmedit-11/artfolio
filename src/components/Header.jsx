@@ -188,6 +188,13 @@ const Header = () => {
             <Home className="size-5" />
             <span>Home</span>
           </Link>
+          <Link to="/search" className={cn(
+            "flex items-center space-x-2 p-3 rounded-lg text-muted-foreground hover:text-foreground hover:bg-purple-100 dark:hover:bg-purple-900/20 transition-colors",
+            location.pathname === "/search" && "text-primary bg-purple-100 dark:bg-purple-900/20"
+          )}>
+            <Search className="size-5" />
+            <span>Search</span>
+          </Link>
           <Link to="/following" className={cn(
             "flex items-center space-x-2 p-3 rounded-lg text-muted-foreground hover:text-foreground hover:bg-purple-100 dark:hover:bg-purple-900/20 transition-colors",
             location.pathname === "/following" && "text-primary bg-purple-100 dark:bg-purple-900/20"
