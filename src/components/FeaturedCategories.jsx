@@ -47,11 +47,7 @@ const FeaturedCategories = () => {
               Explore Categories
             </span>
           </h2>
-          <Link to="/trending">
-            <Button variant="ghost" className="text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300 hover:bg-purple-100 dark:hover:bg-purple-900/20 flex items-center">
-              View all <ChevronRight className="ml-1 size-4" />
-            </Button>
-          </Link>
+         
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {loading ? (

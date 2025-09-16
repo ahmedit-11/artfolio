@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { useScrollToTop } from "../utils/scrollToTop";
-import Header from "@/components/Header";
+
 import Footer from "@/components/Footer";
 import SearchBar from "@/components/SearchBar";
 import { useSearch } from "@/contexts/SearchContext";
@@ -96,7 +96,7 @@ const SearchSimple = () => {
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
-      <Header />
+ 
       <main className="flex-grow container px-4 py-8 space-y-6">
         <SearchBar
           className="w-full"
